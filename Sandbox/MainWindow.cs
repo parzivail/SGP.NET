@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
@@ -15,290 +16,78 @@ using PFX;
 using PFX.BmFont;
 using PFX.Shader;
 using PFX.Util;
+using SGP4_Sharp;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace Sandbox
 {
     class MainWindow : GameWindow
     {
-        /*
-         * Constants
-         */
-        public static Vector3 UpVector = Vector3.UnitY;
-        public static Vector3 PosXVector = Vector3.UnitX;
-        public static Vector3 NegXVector = -PosXVector;
-        public static Vector3 PosZVector = Vector3.UnitZ;
-        public static Vector3 NegZVector = -PosZVector;
+        /// <summary>
+        /// Onscreen font
+        /// </summary>
+        public BitmapFont Font { get; set; }
+        /// <summary>
+        /// Keyboard State
+        /// </summary>
+        public KeyboardState KeyboardState { get; private set; }
 
-        /*
-         * Render-related
-         */
-        private float _zoom = 1;
-        private double _angle = 45;
-        private double _angleY = 160;
+        private Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 40, 20);
 
-        private static ShaderProgram _shaderProgram;
-        private static readonly List<Uniform> Uniforms = new List<Uniform>();
-        private static readonly Uniform TintUniform = new Uniform("tint");
+        private Vector3 _rotation = Vector3.Zero;
 
-        private readonly SimpleVertexBuffer _terrainVbo = new SimpleVertexBuffer();
-        private readonly BackgroundWorker _backgroundRenderer = new BackgroundWorker();
-        private bool _dirty;
+        private static Tle _tle;
+        private static SGP4 _sgp4;
+        private static CoordGeodetic _geo;
 
-        /*
-         * Terrain-related
-         */
-        private int _numVerts;
-        private Color _tintColor;
-        private Vector3 _tintColorVector;
+        private int _earthSpheremap;
 
-        public Color TintColor
+        public MainWindow() : base(960, 540)
         {
-            get { return _tintColor; }
-            set
-            {
-                _tintColor = value;
-                _tintColorVector = new Vector3(value.R / 255f, value.G / 255f, value.B / 255f);
-            }
+            Resize += MainWindow_Resize;
+            Load += MainWindow_Load;
+            MouseWheel += OnMouseWheel;
+            RenderFrame += MainWindow_RenderFrame;
+            UpdateFrame += MainWindow_UpdateFrame;
         }
 
-        /*
-         * Window-related
-         */
-        private bool _shouldDie;
-        private Sparkline _fpsSparkline;
-        private Sparkline _renderTimeSparkline;
-        private readonly Profiler _profiler = new Profiler();
-        private static KeyboardState _keyboard;
-        private static BitmapFont _font;
-        private Dictionary<string, TimeSpan> _profile = new Dictionary<string, TimeSpan>();
-
-        public MainWindow() : base(800, 600)
+        private void OnMouseWheel(object sender, MouseWheelEventArgs args)
         {
-            // Wire up window
-            Load += LoadHandler;
-            Closing += CloseHandler;
-            Resize += ResizeHandler;
-            UpdateFrame += UpdateHandler;
-            RenderFrame += RenderHandler;
-            MouseWheel += WindowVisualize_MouseWheel;
-
-            // Wire up background worker
-            _backgroundRenderer.WorkerReportsProgress = true;
-            _backgroundRenderer.WorkerSupportsCancellation = true;
-            _backgroundRenderer.DoWork += DoBackgroundRender;
-            //            _backgroundRenderer.ProgressChanged += DoBackgroundRenderProgress;
-            _backgroundRenderer.RunWorkerCompleted += DoBackgroundRenderComplete;
-
-            TintColor = Color.White;
         }
 
-        private void LoadHandler(object sender, EventArgs e)
+        private void MainWindow_UpdateFrame(object sender, FrameEventArgs e)
         {
-            Lumberjack.Log($"Window Thread: {Thread.CurrentThread.ManagedThreadId}");
+            KeyboardState = Keyboard.GetState();
 
-            // Set up lights
-            const float diffuse = 0.9f;
-            float[] matDiffuse = { diffuse, diffuse, diffuse };
-            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, matDiffuse);
-            GL.Light(LightName.Light0, LightParameter.Position, new[] { 0.0f, 0.0f, 0.0f, 100.0f });
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new[] { diffuse, diffuse, diffuse, diffuse });
+            var t = (float)(50 * e.Time);
 
-            // Set up lighting
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
-            GL.ShadeModel(ShadingModel.Smooth);
-            GL.Enable(EnableCap.ColorMaterial);
+            if (KeyboardState[Key.Left])
+                _rotation.Y -= t;
+            if (KeyboardState[Key.Right])
+                _rotation.Y += t;
+            if (KeyboardState[Key.Up])
+                _rotation.X -= t;
+            if (KeyboardState[Key.Down])
+                _rotation.X += t;
 
-            // Set up caps
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.RescaleNormal);
-
-            // Set up blending
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-            // Set background color
-            GL.ClearColor(Color.FromArgb(255, 13, 13, 13));
-
-            // Load fonts
-            _font = BitmapFont.LoadBinaryFont("dina", FontBank.FontDina, FontBank.BmDina);
-
-            // Load sparklines
-            _fpsSparkline = new Sparkline(_font, $"0-{(int)TargetRenderFrequency}fps", 50,
-                (float)TargetRenderFrequency, Sparkline.SparklineStyle.Area);
-            _renderTimeSparkline = new Sparkline(_font, "0-50ms", 50, 50, Sparkline.SparklineStyle.Area);
-
-            // Init keyboard to ensure first frame won't NPE
-            _keyboard = Keyboard.GetState();
-
-            // Load shaders
-            _shaderProgram = new DefaultShaderProgram("#version 120\r\n\r\nuniform vec3 tint;\r\n\r\nvoid main() { \r\n\tgl_FragColor = vec4(gl_Color.rgb * tint, 1);\r\n}");
-            _shaderProgram.InitProgram();
-
-            Lumberjack.Info("Window loaded");
-
-            _dirty = true;
+            var eci = _sgp4.FindPosition(SGP4_Sharp.DateTime.Now());
+            _geo = eci.ToGeodetic();
         }
 
-        private void WindowVisualize_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            _zoom -= e.DeltaPrecise / 4f;
-
-            if (_zoom < 0.5f)
-                _zoom = 0.5f;
-            if (_zoom > 20)
-                _zoom = 20;
-        }
-
-        private void CloseHandler(object sender, CancelEventArgs e)
-        {
-            //            if (!_shouldDie)
-            //                _terrainLayerList?.Close();
-        }
-
-        public void Kill()
-        {
-            _shouldDie = true;
-        }
-
-        private void ResizeHandler(object sender, EventArgs e)
+        private void MainWindow_Resize(object sender, EventArgs e)
         {
             GL.Viewport(ClientRectangle);
 
-            var aspectRatio = Width / (float)Height;
-            var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1, 1024);
+            // Set up the viewport
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, Width, Height, 0, -1000, 1000);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
         }
 
-        public bool IsRendering()
+        private void MainWindow_RenderFrame(object sender, FrameEventArgs e)
         {
-            return _backgroundRenderer.IsBusy;
-        }
-
-        public void CancelRender()
-        {
-            Lumberjack.Warn("Render cancelled");
-            _backgroundRenderer.CancelAsync();
-
-            while (IsRendering())
-                Application.DoEvents();
-        }
-
-        public void CancelBackgroundTasks()
-        {
-            if (IsRendering())
-                CancelRender();
-        }
-
-        public void ReRender(bool manualOverride = false, bool regenHeightmap = true)
-        {
-            // If there's an ongoing render, cancel it
-            if (IsRendering())
-                CancelRender();
-
-            // Fire up the render
-            _backgroundRenderer.RunWorkerAsync(new BackgroundRenderArgs());
-        }
-
-        private void DoBackgroundRenderComplete(object sender, RunWorkerCompletedEventArgs e)
-        {
-            // If the render was manually cancelled, go no further
-            if (e.Cancelled)
-                return;
-
-            Lumberjack.Log($"DBRC Thread: {Thread.CurrentThread.ManagedThreadId}");
-
-            var result = (VertexBufferInitializer)e.Result;
-            // Take the render result and upload it to the VBO
-            _numVerts = result.Vertices.Count;
-            _terrainVbo.InitializeVbo(result);
-            GC.Collect();
-
-            // Wait for render thread to exit
-            while (IsRendering())
-                Application.DoEvents();
-        }
-
-        private void DoBackgroundRender(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                // Grab worker and report progress
-                var worker = (BackgroundWorker)sender;
-                var args = (BackgroundRenderArgs)e.Argument;
-
-                // Init VBO-needed lists
-                var vbi = new VertexBufferInitializer();
-
-                const int size = 100;
-
-                //for (var x = -size; x < size; x++)
-                //    for (var y = -size; y < size; y++)
-                //    {
-                //        var val = new Vector3(x, _terrainGenerator.Eval(x, y), y);
-                //        vbi.AddVertex(val, _terrainGenerator.EvalNormal(x, y));
-
-                //        val = new Vector3(x - 1, _terrainGenerator.Eval(x - 1, y), y);
-                //        vbi.AddVertex(val, _terrainGenerator.EvalNormal(x - 1, y));
-
-                //        val = new Vector3(x - 1, _terrainGenerator.Eval(x - 1, y - 1), y - 1);
-                //        vbi.AddVertex(val, _terrainGenerator.EvalNormal(x - 1, y - 1));
-
-                //        val = new Vector3(x, _terrainGenerator.Eval(x, y - 1), y - 1);
-                //        vbi.AddVertex(val, _terrainGenerator.EvalNormal(x, y - 1));
-                //    }
-
-                // Send the result back to the worker
-                e.Result = vbi;
-            }
-            catch (Exception ex)
-            {
-                Lumberjack.Error(ex.Message);
-                e.Result = new VertexBufferInitializer();
-            }
-        }
-
-        private void UpdateHandler(object sender, FrameEventArgs e)
-        {
-            if (_shouldDie)
-                Exit();
-
-            // Grab the new keyboard state
-            _keyboard = Keyboard.GetState();
-
-            // Compute input-based rotations
-            var delta = e.Time;
-            var amount = _keyboard[Key.LShift] || _keyboard[Key.RShift] ? 45 : 90;
-
-            if (_keyboard[Key.Left])
-                _angle += amount * delta;
-            if (_keyboard[Key.Right])
-                _angle -= amount * delta;
-            if (_keyboard[Key.Up])
-                _angleY += amount * delta;
-            if (_keyboard[Key.Down])
-                _angleY -= amount * delta;
-
-            if (_dirty)
-            {
-                ReRender();
-                _dirty = false;
-            }
-        }
-
-
-        private void RenderHandler(object sender, FrameEventArgs e)
-        {
-            // Start profiling
-            _profiler.Start("render");
-
-            // Update sparklines
-            if (_profile.ContainsKey("render"))
-                _renderTimeSparkline.Enqueue((float)_profile["render"].TotalMilliseconds);
-
-            _fpsSparkline.Enqueue((float)RenderFrequency);
-
             // Reset the view
             GL.Clear(ClearBufferMask.ColorBufferBit |
                      ClearBufferMask.DepthBufferBit |
@@ -310,39 +99,72 @@ namespace Sandbox
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref projection);
 
-            var lookat = Matrix4.LookAt(0, 128, 256, 0, 0, 0, 0, 1, 0);
+            /*
+              glClear(GL_DEPTH_BUFFER_BIT);
+              glEnable(GL_STENCIL_TEST);
+              glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+              glDepthMask(GL_FALSE);
+              glStencilFunc(GL_NEVER, 1, 0xFF);
+              glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);  // draw 1s on test fail (always)
+
+              // draw stencil pattern
+              glStencilMask(0xFF);
+              glClear(GL_STENCIL_BUFFER_BIT);  // needs mask=0xFF
+              draw_circle();
+
+              glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+              glDepthMask(GL_TRUE);
+              glStencilMask(0x00);
+              // draw where stencil's value is 0
+              glStencilFunc(GL_EQUAL, 0, 0xFF);
+              /* (nothing to draw) 
+                // draw only where stencil's value is 1
+                glStencilFunc(GL_EQUAL, 1, 0xFF);
+
+                draw_scene();
+
+                glDisable(GL_STENCIL_TEST);
+            */
+
+            var lookat = Matrix4.LookAt(0, 0, 256, 0, 0, 0, 0, 1, 0);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref lookat);
 
-            // "Center" the terrain
-            GL.Translate(0, -25, 0);
-
-            // Zoom and scale the terrain
-            var scale = new Vector3(4 * (1 / _zoom), -4 * (1 / _zoom), 4 * (1 / _zoom));
-            GL.Scale(scale);
-            GL.Rotate(_angleY, 1.0f, 0.0f, 0.0f);
-            GL.Rotate(_angle, 0.0f, 1.0f, 0.0f);
-
-            // Reset the frag shader uniforms
-            Uniforms.Clear();
-
-            // Set up uniforms
-            TintUniform.Value = _tintColorVector;
-            Uniforms.Add(TintUniform);
-
             GL.Color3(Color.White);
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.Rotate(_rotation.X, 1.0f, 0.0f, 0.0f);
+            GL.Rotate(_rotation.Y, 0.0f, 1.0f, 0.0f);
 
-            // Engage shader, render, disengage
-            _shaderProgram.Use(Uniforms);
-            _terrainVbo.Render();
-            GL.UseProgram(0);
+            GL.PushMatrix();
+            GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, _earthSpheremap);
+            _sphere.Draw();
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.Disable(EnableCap.Texture2D);
+
+
+            GL.Disable(EnableCap.Lighting);
+            var posVec = new Vector3(
+                (float)(Math.Cos(_geo.latitude) * Math.Cos(-_geo.longitude + Math.PI) * (_geo.altitude + Global.kXKMPER)),
+                (float)(Math.Sin(_geo.latitude) * (_geo.altitude + Global.kXKMPER)),
+                (float)(Math.Cos(_geo.latitude) * Math.Sin(-_geo.longitude + Math.PI) * (_geo.altitude + Global.kXKMPER))
+                );
+            posVec *= 1 / 100f;
+
+            GL.Color3(Color.Black);
+            GL.Begin(PrimitiveType.Points);
+            GL.Vertex3(posVec);
+            GL.End();
+
+            GL.PopMatrix();
+
+            // Capture last matrix
+            GL.GetFloat(GetPName.ModelviewMatrix, out Matrix4 modelViewMatrix);
 
             // Set up 2D mode
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, Width, Height, 0, 1, -1);
+            GL.Ortho(0, Width, Height, 0, 100, -100);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
@@ -354,31 +176,18 @@ namespace Sandbox
 
             // Render diagnostic data
             GL.Enable(EnableCap.Texture2D);
-            if (_keyboard[Key.D])
-            {
-                // Static diagnostic header
-                GL.PushMatrix();
-                _font.RenderString($"FPS: {(int)Math.Ceiling(RenderFrequency)}");
-                GL.Translate(0, _font.Common.LineHeight, 0);
-                _font.RenderString($"Verts: {_numVerts}");
-                GL.PopMatrix();
+            // Info footer
+            GL.PushMatrix();
+            GL.Color3(posVec.Z < -30 ? Color.DarkGray : Color.Black);
+            Font.RenderString($"Development Build");
 
-                // Sparklines
-                GL.Translate(0, Height - _font.Common.LineHeight * 1.4f * 2, 0);
-                _fpsSparkline.Render();
-                GL.Translate(0, _font.Common.LineHeight * 1.4f, 0);
-                _renderTimeSparkline.Render();
-            }
-            else
-            {
-                // Info footer
-                GL.PushMatrix();
-                _font.RenderString($"SPG4Sandbox - Development Build");
-                GL.Translate(0, Height - _font.Common.LineHeight, 0);
-                _font.RenderString("PRESS 'D' FOR DIAGNOSTICS");
-                GL.PopMatrix();
-            }
+            GL.StencilFunc(StencilFunction.Always, 1, 0x00);
+            var mat = modelViewMatrix * projection;
+            var proj = WorldToScreen(posVec, ref mat, ClientRectangle);
+            GL.Translate(proj.X + 3, proj.Y - Font.Common.LineHeight / 2f, 0);
+            Font.RenderString($"NOAA 19");
 
+            GL.PopMatrix();
             GL.Disable(EnableCap.Texture2D);
 
             GL.Enable(EnableCap.Lighting);
@@ -388,10 +197,99 @@ namespace Sandbox
 
             // Swap the graphics buffer
             SwapBuffers();
+        }
 
-            // Stop profiling and get the results
-            _profiler.End();
-            _profile = _profiler.Reset();
+        public static Vector2 WorldToScreen(Vector3 worldPos, ref Matrix4 viewProjMat, Rectangle clientRect)
+        {
+            var pos = Vector4.Transform(new Vector4(worldPos, 1f), viewProjMat);
+            pos /= pos.W;
+            pos.Y = -pos.Y;
+            var screenSize = new Vector2(clientRect.Width, clientRect.Height);
+            var screenCenter = new Vector2(clientRect.X, clientRect.Y) + screenSize / 2f;
+            return screenCenter + pos.Xy * screenSize / 2f;
+        }
+
+        private Vector3 F(double u, double v, double r)
+        {
+            return new Vector3((float)(Math.Cos(u) * Math.Sin(v) * r), (float)(Math.Cos(v) * r), (float)(Math.Sin(u) * Math.Cos(v) * r));
+        }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            // Setup OpenGL data
+            GL.ClearColor(Color.White);
+            GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
+            GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Nicest);
+            GL.Enable(EnableCap.Blend);
+            GL.Enable(EnableCap.LineSmooth);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.PointSize(4);
+            GL.LineWidth(2);
+            Lumberjack.Log("Loaded OpenGL settings");
+
+            const float diffuse = 1.5f;
+            float[] matDiffuse = { diffuse, diffuse, diffuse };
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, matDiffuse);
+            GL.Light(LightName.Light0, LightParameter.Position, new[] { 0.0f, 0.0f, 0.0f, 256.0f });
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new[] { diffuse, diffuse, diffuse, diffuse });
+
+            // Set up lighting
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            GL.ShadeModel(ShadingModel.Smooth);
+
+            // Set up caps
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.RescaleNormal);
+
+            // Load the font
+            Font = BitmapFont.LoadBinaryFont("dina", FontBank.FontDina, FontBank.BmDina);
+
+            var pair = new Bitmap("earth.jpg").LoadGlTexture();
+            _earthSpheremap = pair.Key;
+
+            // Load the map
+            //if (!File.Exists("map.png"))
+            //    Lumberjack.Kill("Unable to locate 'map.png'", Util.ErrorCode.FnfMap);
+            //var pair = new Bitmap("map.png").LoadGlTexture();
+
+            _tle = new Tle(
+                "1 33591U 09005A   18126.90753522  .00000083  00000-0  70028-4 0  9998",
+                "2 33591  99.1390 104.1221 0015038  83.2147 277.0734 14.12275499476086"
+                );
+            _sgp4 = new SGP4(_tle);
+        }
+
+        /// <summary>
+        /// Cartesian distance formula
+        /// </summary>
+        /// <param name="x1">The X of point 1</param>
+        /// <param name="y1">The Y of point 1</param>
+        /// <param name="x2">The X of point 2</param>
+        /// <param name="y2">The Y of point 2</param>
+        /// <returns></returns>
+        public double Distance(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+        }
+
+        /// <summary>
+        /// Saves the current screen frame to a PNG
+        /// </summary>
+        /// <param name="filename">The PNG filename to save</param>
+        public void SaveScreen(string filename)
+        {
+            using (var bmp = new Bitmap(ClientRectangle.Width, ClientRectangle.Height))
+            {
+                var data = bmp.LockBits(ClientRectangle, ImageLockMode.WriteOnly,
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                GL.ReadPixels(0, 0, ClientRectangle.Width, ClientRectangle.Height, PixelFormat.Bgr,
+                    PixelType.UnsignedByte, data.Scan0);
+                bmp.UnlockBits(data);
+                bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+
+                bmp.Save(filename, ImageFormat.Png);
+            }
         }
     }
 }
