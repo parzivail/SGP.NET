@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -21,7 +22,6 @@ namespace Sandbox
             GL.Begin(PrimitiveType.Triangles);
             foreach (var element in _sphereElements)
             {
-                GL.Color4(1.5f, 0.0f, 1.0f, 0.50f);
                 var vertex = _sphereVertices[element];
                 GL.TexCoord2(vertex.TexCoord);
                 GL.Normal3(vertex.Normal);
@@ -29,6 +29,31 @@ namespace Sandbox
             }
 
             GL.End();
+        }
+
+        public GlslBufferInitializer MakeBuffers()
+        {
+            var positions = new List<float>();
+            var uvs = new List<float>();
+            var normals = new List<float>();
+
+            foreach (var element in _sphereElements)
+            {
+                var vertex = _sphereVertices[element];
+
+                positions.Add(vertex.Position.X);
+                positions.Add(vertex.Position.Y);
+                positions.Add(vertex.Position.Z);
+
+                uvs.Add(vertex.TexCoord.X);
+                uvs.Add(vertex.TexCoord.Y);
+
+                normals.Add(vertex.Normal.X);
+                normals.Add(vertex.Normal.Y);
+                normals.Add(vertex.Normal.Z);
+            }
+
+            return new GlslBufferInitializer(positions, normals, uvs, _sphereElements);
         }
 
         public static Vertex[] CalculateVertices2(float radius, float height, byte segments, byte rings)

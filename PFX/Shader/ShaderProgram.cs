@@ -54,6 +54,10 @@ namespace PFX.Shader
                 {
                     GL.Uniform1(loc, (uint) val);
                 }
+                else if (type == typeof(bool))
+                {
+                    GL.Uniform1(loc, (bool) val ? 1 : 0);
+                }
                 else if (type == typeof(Vector2))
                 {
                     var vec2 = (Vector2) val;
@@ -63,6 +67,16 @@ namespace PFX.Shader
                 {
                     var vec3 = (Vector3) val;
                     GL.Uniform3(loc, vec3.X, vec3.Y, vec3.Z);
+                }
+                else if (type == typeof(Matrix3))
+                {
+                    var mat = (Matrix3) val;
+                    GL.UniformMatrix3(loc, false, ref mat);
+                }
+                else if (type == typeof(Matrix4))
+                {
+                    var mat = (Matrix4) val;
+                    GL.UniformMatrix4(loc, false, ref mat);
                 }
                 else
                 {
@@ -92,6 +106,11 @@ namespace PFX.Shader
             msg = msg.Trim();
             if (msg.Length > 0)
                 Lumberjack.Log(msg, ConsoleColor.DarkYellow, "GLSL");
+        }
+
+        public int GetId()
+        {
+            return PgmId;
         }
     }
 }
