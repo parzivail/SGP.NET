@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundRenderArgs.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FormLauncher.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -38,7 +38,8 @@ namespace Sandbox
 
         private static Tle _tle;
         private static SGP4 _sgp4;
-        private static CoordGeodetic _geo;
+        private static CoordGeodetic _geo = new CoordGeodetic(0, 0, 0);
+        private static List<CoordGeodetic> _geoPredictions = new List<CoordGeodetic>();
 
         private int _earthSpheremap;
 
@@ -70,8 +71,19 @@ namespace Sandbox
             if (KeyboardState[Key.Down])
                 _rotation.X += t;
 
-            var eci = _sgp4.FindPosition(SGP4_Sharp.DateTime.Now());
+            _geoPredictions.Clear();
+
+            var now = SGP4_Sharp.DateTime.Now();
+            var eci = _sgp4.FindPosition(now);
             _geo = eci.ToGeodetic();
+            _geoPredictions.Add(eci.ToGeodetic());
+
+            for (var i = 0; i < 60; i++)
+            {
+                now = now.AddMinutes(1);
+                eci = _sgp4.FindPosition(now);
+                _geoPredictions.Add(eci.ToGeodetic());
+            }
         }
 
         private void MainWindow_Resize(object sender, EventArgs e)
@@ -142,18 +154,20 @@ namespace Sandbox
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Disable(EnableCap.Texture2D);
 
-
             GL.Disable(EnableCap.Lighting);
-            var posVec = new Vector3(
-                (float)(Math.Cos(_geo.latitude) * Math.Cos(-_geo.longitude + Math.PI) * (_geo.altitude + Global.kXKMPER)),
-                (float)(Math.Sin(_geo.latitude) * (_geo.altitude + Global.kXKMPER)),
-                (float)(Math.Cos(_geo.latitude) * Math.Sin(-_geo.longitude + Math.PI) * (_geo.altitude + Global.kXKMPER))
-                );
+            var posVec = _geo.ToSpherical();
             posVec *= 1 / 100f;
 
-            GL.Color3(Color.Black);
+            GL.Color3(Color.White);
             GL.Begin(PrimitiveType.Points);
             GL.Vertex3(posVec);
+            GL.End();
+
+            GL.Color3(Color.Yellow);
+            GL.LineWidth(1);
+            GL.Begin(PrimitiveType.LineStrip);
+            foreach (var prediction in _geoPredictions)
+                GL.Vertex3(prediction.ToSpherical() / 100);
             GL.End();
 
             GL.PopMatrix();
@@ -164,7 +178,7 @@ namespace Sandbox
             // Set up 2D mode
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, Width, Height, 0, 100, -100);
+            GL.Ortho(0, Width, Height, 0, 1000, -1000);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
@@ -172,19 +186,19 @@ namespace Sandbox
 
             GL.Enable(EnableCap.Blend);
             GL.Disable(EnableCap.Lighting);
+
             GL.Color3(Color.White);
 
             // Render diagnostic data
             GL.Enable(EnableCap.Texture2D);
             // Info footer
             GL.PushMatrix();
-            GL.Color3(posVec.Z < -30 ? Color.DarkGray : Color.Black);
             Font.RenderString($"Development Build");
 
             GL.StencilFunc(StencilFunction.Always, 1, 0x00);
             var mat = modelViewMatrix * projection;
             var proj = WorldToScreen(posVec, ref mat, ClientRectangle);
-            GL.Translate(proj.X + 3, proj.Y - Font.Common.LineHeight / 2f, 0);
+            GL.Translate((int)proj.X + 3, (int)(proj.Y - Font.Common.LineHeight / 2f), 0);
             Font.RenderString($"NOAA 19");
 
             GL.PopMatrix();
@@ -217,7 +231,7 @@ namespace Sandbox
         private void MainWindow_Load(object sender, EventArgs e)
         {
             // Setup OpenGL data
-            GL.ClearColor(Color.White);
+            GL.ClearColor(Color.FromArgb(13, 13, 13));
             GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
             GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Nicest);
             GL.Enable(EnableCap.Blend);

@@ -14,6 +14,7 @@ namespace Sandbox
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             //var tle = new Tle(
@@ -38,6 +39,7 @@ namespace Sandbox
             //Console.ReadKey();
 
             Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormLauncher());
         }
     }
