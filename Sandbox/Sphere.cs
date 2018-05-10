@@ -33,27 +33,12 @@ namespace Sandbox
 
         public GlslBufferInitializer MakeBuffers()
         {
-            var positions = new List<float>();
-            var uvs = new List<float>();
-            var normals = new List<float>();
-
-            foreach (var element in _sphereElements)
-            {
-                var vertex = _sphereVertices[element];
-
-                positions.Add(vertex.Position.X);
-                positions.Add(vertex.Position.Y);
-                positions.Add(vertex.Position.Z);
-
-                uvs.Add(vertex.TexCoord.X);
-                uvs.Add(vertex.TexCoord.Y);
-
-                normals.Add(vertex.Normal.X);
-                normals.Add(vertex.Normal.Y);
-                normals.Add(vertex.Normal.Z);
-            }
-
-            return new GlslBufferInitializer(positions, normals, uvs, _sphereElements);
+            return new GlslBufferInitializer(
+                _sphereVertices.SelectMany(vertex => new[] { vertex.Position.X, vertex.Position.Y, vertex.Position.Z }).ToList(),
+                _sphereVertices.SelectMany(vertex => new[] { vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z }).ToList(),
+                _sphereVertices.SelectMany(vertex => new[] { vertex.TexCoord.X, vertex.TexCoord.Y }).ToList(),
+                _sphereElements
+                );
         }
 
         public static Vertex[] CalculateVertices2(float radius, float height, byte segments, byte rings)

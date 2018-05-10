@@ -33,8 +33,6 @@ namespace Sandbox
         /// </summary>
         public KeyboardState KeyboardState { get; private set; }
 
-        private Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 40, 20);
-
         private Vector3 _rotation = Vector3.Zero;
 
         private static Tle _tle;
@@ -42,40 +40,7 @@ namespace Sandbox
         private static CoordGeodetic _geo = new CoordGeodetic(0, 0, 0);
         private static List<CoordGeodetic> _geoPredictions = new List<CoordGeodetic>();
 
-        private static ShaderProgram _earthShader;
-
-        /*
-         shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-        shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-        gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-        */
-
-        private static Uniform pMatrixUniform = new Uniform("uPMatrix");
-        private static Uniform mvMatrixUniform = new Uniform("uMVMatrix");
-        private static Uniform nMatrixUniform = new Uniform("uNMatrix");
-        private static Uniform colorMapSamplerUniform = new Uniform("uColorMapSampler");
-        private static Uniform specularMapSamplerUniform = new Uniform("uSpecularMapSampler");
-        private static Uniform useColorMapUniform = new Uniform("uUseColorMap");
-        private static Uniform useSpecularMapUniform = new Uniform("uUseSpecularMap");
-        private static Uniform useLightingUniform = new Uniform("uUseLighting");
-        private static Uniform ambientColorUniform = new Uniform("uAmbientColor");
-        private static Uniform pointLightingLocationUniform = new Uniform("uPointLightingLocation");
-        private static Uniform pointLightingSpecularColorUniform = new Uniform("uPointLightingSpecularColor");
-        private static Uniform pointLightingDiffuseColorUniform = new Uniform("uPointLightingDiffuseColor");
-        private static GlslBufferInitializer _earthBuffer;
-        private int _vertexPositionAttribute;
-        private int _vertexNormalAttribute;
-        private int _textureCoordAttribute;
-
-        private int _earthSpheremap;
-        private int _earthSpheremapSpecular;
-        private int _vNormBuf;
-        private int _vTexBuf;
-        private int _vPosBuffer;
-        private int _vIdxBuf;
+        private static Earth _earth = new Earth();
 
         public MainWindow() : base(960, 540)
         {
@@ -159,70 +124,7 @@ namespace Sandbox
 
             GL.PushMatrix();
 
-            pMatrixUniform.Value = projection;
-            mvMatrixUniform.Value = modelViewMatrix;
-
-            var normalMatrix = new Matrix3(modelViewMatrix);
-            normalMatrix.Invert();
-            normalMatrix.Transpose();
-            nMatrixUniform.Value = normalMatrix;
-
-            colorMapSamplerUniform.Value = 0;
-            specularMapSamplerUniform.Value = 1;
-
-            useColorMapUniform.Value = true;
-            useSpecularMapUniform.Value = true;
-            useLightingUniform.Value = true;
-
-            ambientColorUniform.Value = new Vector3(0.4f, 0.4f, 0.4f);
-            pointLightingLocationUniform.Value = new Vector3(-4, 10, -20);
-            pointLightingSpecularColorUniform.Value = new Vector3(5, 5, 5);
-            pointLightingDiffuseColorUniform.Value = new Vector3(0.8f, 0.8f, 0.8f);
-
-            var uniforms = new List<Uniform>
-            {
-                pMatrixUniform,
-                mvMatrixUniform,
-                nMatrixUniform,
-                colorMapSamplerUniform,
-                specularMapSamplerUniform,
-                useColorMapUniform,
-                useSpecularMapUniform,
-                useLightingUniform,
-                ambientColorUniform,
-                pointLightingLocationUniform,
-                pointLightingSpecularColorUniform,
-                pointLightingDiffuseColorUniform
-            };
-
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, _earthSpheremap);
-            GL.ActiveTexture(TextureUnit.Texture1);
-            GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapSpecular);
-
-            _earthShader.Use(uniforms);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.VertexAttribPointer(_vertexPositionAttribute, 3, VertexAttribPointerType.Float,
-                false, 0, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.VertexAttribPointer(_textureCoordAttribute, 2, VertexAttribPointerType.Float,
-                false, 0, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.VertexAttribPointer(_vertexNormalAttribute, 3, VertexAttribPointerType.Float,
-                false, 0, 0);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _vIdxBuf);
-            GL.DrawElements(BeginMode.Triangles, 1, DrawElementsType.UnsignedShort, 0);
-
-            //_sphere.Draw();
-            GL.UseProgram(0);
-
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Disable(EnableCap.Texture2D);
-
+            _earth.Draw(projection, modelViewMatrix);
 
             GL.Disable(EnableCap.Lighting);
             var posVec = _geo.ToSpherical();
@@ -231,6 +133,7 @@ namespace Sandbox
             GL.Color3(Color.White);
             GL.Begin(PrimitiveType.Points);
             GL.Vertex3(posVec);
+            //GL.Vertex3(new CoordGeodetic(0, 0, 10).ToSpherical() / 100);
             GL.End();
 
             GL.Color3(Color.Yellow);
@@ -294,11 +197,6 @@ namespace Sandbox
             return screenCenter + pos.Xy * screenSize / 2f;
         }
 
-        private Vector3 F(double u, double v, double r)
-        {
-            return new Vector3((float)(Math.Cos(u) * Math.Sin(v) * r), (float)(Math.Cos(v) * r), (float)(Math.Sin(u) * Math.Cos(v) * r));
-        }
-
         private void MainWindow_Load(object sender, EventArgs e)
         {
             // Setup OpenGL data
@@ -330,55 +228,13 @@ namespace Sandbox
             // Load the font
             Font = BitmapFont.LoadBinaryFont("dina", FontBank.FontDina, FontBank.BmDina);
 
-            var pair = new Bitmap("earth.jpg").LoadGlTexture();
-            _earthSpheremap = pair.Key;
-            pair = new Bitmap("earth-specular.gif").LoadGlTexture();
-            _earthSpheremapSpecular = pair.Key;
-
-            // Load the map
-            //if (!File.Exists("map.png"))
-            //    Lumberjack.Kill("Unable to locate 'map.png'", Util.ErrorCode.FnfMap);
-            //var pair = new Bitmap("map.png").LoadGlTexture();
-
             _tle = new Tle(
                 "1 33591U 09005A   18126.90753522  .00000083  00000-0  70028-4 0  9998",
                 "2 33591  99.1390 104.1221 0015038  83.2147 277.0734 14.12275499476086"
-                );
+            );
             _sgp4 = new SGP4(_tle);
 
-            _earthShader = new FragVertShaderProgram(
-                    File.ReadAllText("earth.frag"),
-                    File.ReadAllText("earth.vert")
-                );
-            _earthShader.InitProgram();
-
-            GL.UseProgram(_earthShader.GetId());
-            _vertexPositionAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aVertexPosition");
-            GL.EnableVertexAttribArray(_vertexPositionAttribute);
-            _vertexNormalAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aVertexNormal");
-            GL.EnableVertexAttribArray(_vertexNormalAttribute);
-            _textureCoordAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aTextureCoord");
-            GL.EnableVertexAttribArray(_textureCoordAttribute);
-
-            _earthBuffer = _sphere.MakeBuffers();
-
-            _vNormBuf = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Normals.Count, _earthBuffer.Normals.ToArray(), BufferUsageHint.StaticDraw);
-
-            _vTexBuf = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Uvs.Count, _earthBuffer.Uvs.ToArray(), BufferUsageHint.StaticDraw);
-
-            _vPosBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Positions.Count, _earthBuffer.Positions.ToArray(), BufferUsageHint.StaticDraw);
-
-            _vIdxBuf = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vIdxBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.SphereElements.Length, _earthBuffer.SphereElements, BufferUsageHint.StaticDraw);
-
-            GL.UseProgram(0);
+            _earth.Init();
         }
 
         /// <summary>

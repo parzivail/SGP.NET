@@ -20,5 +20,10 @@ namespace Sandbox
                          (geo.altitude + Global.kXKMPER))
             );
         }
+
+        public static double CalculateFootprintDiameter(this CoordGeodetic geo)
+        {
+            return 2 * Global.kXKMPER * Math.Acos(Global.kXKMPER / (Global.kXKMPER + geo.altitude));
+        }
     }
 }
