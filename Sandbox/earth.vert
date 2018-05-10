@@ -9,10 +9,12 @@ uniform mat3 uNMatrix;
 varying vec2 vTextureCoord;
 varying vec3 vTransformedNormal;
 varying vec4 vPosition;
+uniform sampler2D uNormalMapSampler;
 
 void main(void) {
     vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
     gl_Position = uPMatrix * vPosition;
     vTextureCoord = aTextureCoord;
-    vTransformedNormal = uNMatrix * aVertexNormal;
+	vec3 normalMap = normalize(texture(uNormalMapSampler, vec2(vTextureCoord.s, vTextureCoord.t)).rgb);
+    vTransformedNormal = uNMatrix * aVertexNormal * normalMap;
 }

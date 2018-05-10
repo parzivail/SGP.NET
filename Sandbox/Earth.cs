@@ -24,6 +24,7 @@ namespace Sandbox
         private static readonly Uniform ColorMapSamplerUniform = new Uniform("uColorMapSampler");
         private static readonly Uniform SpecularMapSamplerUniform = new Uniform("uSpecularMapSampler");
         private static readonly Uniform NightMapSamplerUniform = new Uniform("uNightMapSampler");
+        private static readonly Uniform NormalMapSamplerUniform = new Uniform("uNormalMapSampler");
         private static readonly Uniform AmbientColorUniform = new Uniform("uAmbientColor");
         private static readonly Uniform PointLightingLocationUniform = new Uniform("uPointLightingLocation");
         private static readonly Uniform PointLightingSpecularColorUniform = new Uniform("uPointLightingSpecularColor");
@@ -43,6 +44,7 @@ namespace Sandbox
         private int _earthSpheremap;
         private int _earthSpheremapNight;
         private int _earthSpheremapSpecular;
+        private int _earthSpheremapNormal;
 
         public void Init()
         {
@@ -52,6 +54,8 @@ namespace Sandbox
             _earthSpheremapNight = pair.Key;
             pair = new Bitmap("earth_specmap.png").LoadGlTexture();
             _earthSpheremapSpecular = pair.Key;
+            pair = new Bitmap("earth_normalmap.png").LoadGlTexture();
+            _earthSpheremapNormal = pair.Key;
 
             _earthShader = new FragVertShaderProgram(
                     File.ReadAllText("earth.frag"),
@@ -71,15 +75,15 @@ namespace Sandbox
 
             _vNormBuf = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Normals.Count * 3 * sizeof(float), _earthBuffer.Normals.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Normals.Length * 3 * sizeof(float), _earthBuffer.Normals, BufferUsageHint.StaticDraw);
 
             _vTexBuf = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Uvs.Count * 2 * sizeof(float), _earthBuffer.Uvs.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Uvs.Length * 2 * sizeof(float), _earthBuffer.Uvs, BufferUsageHint.StaticDraw);
 
             _vPosBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Positions.Count * 3 * sizeof(float), _earthBuffer.Positions.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Positions.Length * 3 * sizeof(float), _earthBuffer.Positions, BufferUsageHint.StaticDraw);
 
             _vIdxBuf = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vIdxBuf);
@@ -101,6 +105,7 @@ namespace Sandbox
             ColorMapSamplerUniform.Value = 0;
             SpecularMapSamplerUniform.Value = 1;
             NightMapSamplerUniform.Value = 2;
+            NormalMapSamplerUniform.Value = 3;
 
             // Percent through a day (1440m/day)
             var t = System.DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
@@ -119,6 +124,7 @@ namespace Sandbox
                 ColorMapSamplerUniform,
                 SpecularMapSamplerUniform,
                 NightMapSamplerUniform,
+                NormalMapSamplerUniform,
                 AmbientColorUniform,
                 PointLightingLocationUniform,
                 PointLightingSpecularColorUniform,
@@ -131,6 +137,8 @@ namespace Sandbox
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapSpecular);
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapNight);
+            GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapNormal);
 
             _earthShader.Use(uniforms);
 
