@@ -15,7 +15,7 @@ namespace Sandbox
 {
     class Earth
     {
-        private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 60, 20);
+        private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 40, 20);
         private static ShaderProgram _earthShader;
 
         private static readonly Uniform PMatrixUniform = new Uniform("uPMatrix");
@@ -48,7 +48,7 @@ namespace Sandbox
 
         public void Init()
         {
-            var pair = new Bitmap("earth_day.jpg").LoadGlTexture();
+            var pair = new Bitmap("earth_day.png").LoadGlTexture();
             _earthSpheremap = pair.Key;
             pair = new Bitmap("earth_night.jpg").LoadGlTexture();
             _earthSpheremapNight = pair.Key;
@@ -64,30 +64,33 @@ namespace Sandbox
             _earthShader.InitProgram();
 
             GL.UseProgram(_earthShader.GetId());
-            _vertexPositionAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aVertexPosition");
+
+            GL.BindAttribLocation(_earthShader.GetId(), _vertexPositionAttribute = 0, "aVertexPosition");
+            GL.BindAttribLocation(_earthShader.GetId(), _vertexNormalAttribute = 1, "aVertexNormal");
+            GL.BindAttribLocation(_earthShader.GetId(), _textureCoordAttribute = 2, "aTextureCoord");
+
             GL.EnableVertexAttribArray(_vertexPositionAttribute);
-            _vertexNormalAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aVertexNormal");
             GL.EnableVertexAttribArray(_vertexNormalAttribute);
-            _textureCoordAttribute = GL.GetAttribLocation(_earthShader.GetId(), "aTextureCoord");
             GL.EnableVertexAttribArray(_textureCoordAttribute);
 
             _earthBuffer = _sphere.MakeBuffers();
 
             _vNormBuf = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Normals.Length * 3 * sizeof(float), _earthBuffer.Normals, BufferUsageHint.StaticDraw);
-
             _vTexBuf = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Uvs.Length * 2 * sizeof(float), _earthBuffer.Uvs, BufferUsageHint.StaticDraw);
-
             _vPosBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.Positions.Length * 3 * sizeof(float), _earthBuffer.Positions, BufferUsageHint.StaticDraw);
-
             _vIdxBuf = GL.GenBuffer();
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Normals.Length * Vector3.SizeInBytes), _earthBuffer.Normals, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Uvs.Length * Vector2.SizeInBytes), _earthBuffer.Uvs, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Positions.Length * Vector3.SizeInBytes), _earthBuffer.Positions, BufferUsageHint.StaticDraw);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vIdxBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, _earthBuffer.SphereElements.Length * sizeof(ushort), _earthBuffer.SphereElements, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.SphereElements.Length * sizeof(ushort)), _earthBuffer.SphereElements, BufferUsageHint.StreamDraw);
 
             GL.UseProgram(0);
         }
@@ -112,7 +115,7 @@ namespace Sandbox
             const float d = 20000;
 
             AmbientColorUniform.Value = new Vector3(0.5f, 0.5f, 0.5f);
-            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(d * (float)Math.Cos(t), 0, d * (float)Math.Sin(t)), modelViewMatrix);
+            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(d * (float)Math.Cos(t), 8696, d * (float)Math.Sin(t)), modelViewMatrix);
             PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
             PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 

@@ -3,18 +3,19 @@
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
 attribute vec2 aTextureCoord;
+
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
+uniform sampler2D uNormalMapSampler;
+
 varying vec2 vTextureCoord;
 varying vec3 vTransformedNormal;
 varying vec4 vPosition;
-uniform sampler2D uNormalMapSampler;
 
 void main(void) {
     vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
     gl_Position = uPMatrix * vPosition;
     vTextureCoord = aTextureCoord;
-	vec3 normalMap = normalize(texture(uNormalMapSampler, vec2(vTextureCoord.s, vTextureCoord.t)).rgb);
-    vTransformedNormal = uNMatrix * aVertexNormal * normalMap;
+    vTransformedNormal = uNMatrix * aVertexNormal;
 }

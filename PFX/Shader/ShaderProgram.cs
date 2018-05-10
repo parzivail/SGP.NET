@@ -112,5 +112,15 @@ namespace PFX.Shader
         {
             return PgmId;
         }
+
+        public int GetVsId()
+        {
+            return VsId;
+        }
+
+        public int GetFsId()
+        {
+            return FsId;
+        }
     }
 }
