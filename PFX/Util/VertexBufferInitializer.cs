@@ -8,15 +8,15 @@ namespace PFX.Util
     {
         public List<Vector3> Vertices { get; }
         public List<Vector3> Normals { get; }
-        public List<int> Colors { get; }
+        public List<Vector2> TexCoords { get; }
         public List<int> Indices { get; }
 
-        public VertexBufferInitializer(List<Vector3> vertices, List<Vector3> normals, List<int> colors,
+        public VertexBufferInitializer(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords,
             List<int> indices)
         {
             Vertices = vertices;
             Normals = normals;
-            Colors = colors;
+            TexCoords = texCoords;
             Indices = indices;
         }
 
@@ -24,7 +24,7 @@ namespace PFX.Util
         {
             Vertices = new List<Vector3>();
             Normals = new List<Vector3>();
-            Colors = new List<int>();
+            TexCoords = new List<Vector2>();
             Indices = new List<int>();
         }
 
@@ -35,14 +35,14 @@ namespace PFX.Util
 
         public void AddVertex(Vector3 pos, Vector3 normal)
         {
-            AddVertex(pos, normal, 0xFFFFFF);
+            AddVertex(pos, normal, Vector2.Zero);
         }
 
-        public void AddVertex(Vector3 pos, Vector3 normal, int color)
+        public void AddVertex(Vector3 pos, Vector3 normal, Vector2 texCoord)
         {
             Vertices.Add(pos);
             Normals.Add(normal);
-            Colors.Add(color);
+            TexCoords.Add(texCoord);
             Indices.Add(Indices.Count);
         }
     }

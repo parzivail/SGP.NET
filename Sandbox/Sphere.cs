@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using PFX.Util;
 
 namespace Sandbox
 {
@@ -31,13 +32,13 @@ namespace Sandbox
             GL.End();
         }
 
-        public GlslBufferInitializer MakeBuffers()
+        public VertexBufferInitializer MakeBuffers()
         {
-            return new GlslBufferInitializer(
-                _sphereVertices.SelectMany(vertex => new[] { vertex.Position.X, vertex.Position.Y, vertex.Position.Z }).ToList(),
-                _sphereVertices.SelectMany(vertex => new[] { vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z }).ToList(),
-                _sphereVertices.SelectMany(vertex => new[] { vertex.TexCoord.X, vertex.TexCoord.Y }).ToList(),
-                _sphereElements
+            return new VertexBufferInitializer(
+                _sphereVertices.Select(vertex => vertex.Position).ToList(),
+                _sphereVertices.Select(vertex => vertex.Normal).ToList(),
+                _sphereVertices.Select(vertex => vertex.TexCoord).ToList(),
+                _sphereElements.Select(arg => (int)arg).ToList()
                 );
         }
 

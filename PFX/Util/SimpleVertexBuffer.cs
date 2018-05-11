@@ -8,16 +8,17 @@ namespace PFX.Util
 {
     public class SimpleVertexBuffer
     {
-        private List<int> _colors = new List<int>();
+        private List<Vector2> _texcoords = new List<Vector2>();
         private List<int> _indices = new List<int>();
         private List<Vector3> _normals = new List<Vector3>();
         private List<Vector3> _vertices = new List<Vector3>();
 
-        public int ColorBufferId;
+        public int UvBufferId;
         public int ElementBufferId;
         public int NormalBufferId;
-        public int NumElements;
         public int VertexBufferId;
+
+        public int NumElements;
 
         public void AddVertex(Vector3 pos)
         {
@@ -26,24 +27,24 @@ namespace PFX.Util
 
         public void AddVertex(Vector3 pos, Vector3 normal)
         {
-            AddVertex(pos, normal, 0xFFFFFF);
+            AddVertex(pos, normal, Vector2.Zero);
         }
 
-        public void AddVertex(Vector3 pos, Vector3 normal, int color)
+        public void AddVertex(Vector3 pos, Vector3 normal, Vector2 texcoord)
         {
             _vertices.Add(pos);
             _normals.Add(normal);
-            _colors.Add(color);
+            _texcoords.Add(texcoord);
             _indices.Add(_indices.Count);
         }
 
         public void InitializeVbo()
         {
-            InitializeVbo(_vertices.ToArray(), _normals.ToArray(), _colors.ToArray(), _indices.ToArray());
-            _vertices = new List<Vector3>();
-            _normals = new List<Vector3>();
-            _indices = new List<int>();
-            _colors = new List<int>();
+            InitializeVbo(_vertices.ToArray(), _normals.ToArray(), _texcoords.ToArray(), _indices.ToArray());
+            _vertices.Clear();
+            _normals.Clear();
+            _indices.Clear();
+            _texcoords.Clear();
         }
 
         public void InitializeVbo(VertexBufferInitializer vbi)
@@ -51,36 +52,34 @@ namespace PFX.Util
             _vertices = vbi.Vertices;
             _normals = vbi.Normals;
             _indices = vbi.Indices;
-            _colors = vbi.Colors;
+            _texcoords = vbi.TexCoords;
             InitializeVbo();
         }
 
-        public void InitializeVbo(Vector3[] vertices, Vector3[] vertexNormals, int[] vertexColors, int[] indices)
+        public void InitializeVbo(Vector3[] vertices, Vector3[] vertexNormals, Vector2[] vertexUVs, int[] indices)
         {
             if (vertices == null) return;
             if (indices == null) return;
-            
+
             try
             {
-                // Color Array Buffer
-                if (vertexColors != null)
+                // UV Array Buffer
+                if (vertexUVs != null)
                 {
                     // Generate Array Buffer Id
-                    GL.GenBuffers(1, out ColorBufferId);
-
-                    Lumberjack.Log($"VBO Thread: {Thread.CurrentThread.ManagedThreadId}");
+                    GL.GenBuffers(1, out UvBufferId);
 
                     // Bind current context to Array Buffer ID
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferId);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, UvBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr) (vertexColors.Length * sizeof(int)), vertexColors,
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexUVs.Length * Vector2.SizeInBytes), vertexUVs,
                         BufferUsageHint.StaticDraw);
 
                     // Validate that the buffer is the correct size
                     GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int bufferSize);
-                    if (vertexColors.Length * sizeof(int) != bufferSize)
-                        throw new ApplicationException("Vertex color array not uploaded correctly");
+                    if (vertexUVs.Length * Vector2.SizeInBytes != bufferSize)
+                        throw new ApplicationException("Vertex UV array not uploaded correctly");
 
                     // Clear the buffer Binding
                     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -96,7 +95,7 @@ namespace PFX.Util
                     GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr) (vertexNormals.Length * Vector3.SizeInBytes),
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexNormals.Length * Vector3.SizeInBytes),
                         vertexNormals, BufferUsageHint.StaticDraw);
 
                     // Validate that the buffer is the correct size
@@ -117,7 +116,7 @@ namespace PFX.Util
                     GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr) (vertices.Length * Vector3.SizeInBytes), vertices,
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * Vector3.SizeInBytes), vertices,
                         BufferUsageHint.DynamicDraw);
 
                     // Validate that the buffer is the correct size
@@ -138,8 +137,8 @@ namespace PFX.Util
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr) (indices.Length * sizeof(int)), indices,
-                        BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(int)), indices,
+                        BufferUsageHint.StreamDraw);
 
                     // Validate that the buffer is the correct size
                     GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize,
@@ -181,17 +180,17 @@ namespace PFX.Util
                 GL.EnableClientState(ArrayCap.NormalArray);
             }
 
-            // Color Array Buffer (Colors not used when lighting is enabled)
-            if (ColorBufferId != 0)
+            // UV Array Buffer
+            if (UvBufferId != 0)
             {
                 // Bind to the Array Buffer ID
-                GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferId);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, UvBufferId);
 
                 // Set the Pointer to the current bound array describing how the data ia stored
-                GL.ColorPointer(4, ColorPointerType.UnsignedByte, sizeof(int), IntPtr.Zero);
+                GL.ColorPointer(4, ColorPointerType.Float, Vector2.SizeInBytes, IntPtr.Zero);
 
                 // Enable the client state so it will use this array buffer pointer
-                GL.EnableClientState(ArrayCap.ColorArray);
+                GL.EnableClientState(ArrayCap.TextureCoordArray);
             }
 
             // Vertex Array Buffer
@@ -221,6 +220,30 @@ namespace PFX.Util
 
             // Restore the state
             GL.PopClientAttrib();
+        }
+
+        public void BindAttribs(int vertexBufferAttribName = -1, int uvBufferAttribName = -1, int normalBufferAttribName = -1)
+        {
+            if (vertexBufferAttribName != -1)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferId);
+                GL.VertexAttribPointer(vertexBufferAttribName, 3, VertexAttribPointerType.Float,
+                    false, 0, 0);
+            }
+
+            if (uvBufferAttribName != -1)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, UvBufferId);
+                GL.VertexAttribPointer(uvBufferAttribName, 2, VertexAttribPointerType.Float,
+                    false, 0, 0);
+            }
+
+            if (normalBufferAttribName != -1)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBufferId);
+                GL.VertexAttribPointer(normalBufferAttribName, 3, VertexAttribPointerType.Float,
+                    false, 0, 0);
+            }
         }
     }
 }

@@ -15,8 +15,10 @@ namespace Sandbox
 {
     class Earth
     {
-        private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 40, 20);
+        private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 60, 30);
+        private readonly Sphere _sphereAtmosphere = new Sphere((float)(Global.kXKMPER / 100) * 1.07f, (float)(Global.kXKMPER / 100) * 1.07f, 60, 30);
         private static ShaderProgram _earthShader;
+        private static ShaderProgram _earthAtmosShader;
 
         private static readonly Uniform PMatrixUniform = new Uniform("uPMatrix");
         private static readonly Uniform MvMatrixUniform = new Uniform("uMVMatrix");
@@ -29,13 +31,11 @@ namespace Sandbox
         private static readonly Uniform PointLightingLocationUniform = new Uniform("uPointLightingLocation");
         private static readonly Uniform PointLightingSpecularColorUniform = new Uniform("uPointLightingSpecularColor");
         private static readonly Uniform PointLightingDiffuseColorUniform = new Uniform("uPointLightingDiffuseColor");
-
-        private static GlslBufferInitializer _earthBuffer;
-
-        private int _vNormBuf;
-        private int _vTexBuf;
-        private int _vPosBuffer;
-        private int _vIdxBuf;
+        private static readonly Uniform InnerRadius = new Uniform("fInnerRadius");
+        private static readonly Uniform OuterRadius = new Uniform("fOuterRadius");
+        
+        private static SimpleVertexBuffer _earthVbo;
+        private static SimpleVertexBuffer _earthAtmosVbo;
 
         private int _vertexPositionAttribute;
         private int _vertexNormalAttribute;
@@ -63,6 +63,12 @@ namespace Sandbox
                 );
             _earthShader.InitProgram();
 
+            _earthAtmosShader = new FragVertShaderProgram(
+                    File.ReadAllText("earthAtmos.frag"),
+                    File.ReadAllText("earth.vert")
+                );
+            _earthAtmosShader.InitProgram();
+
             GL.UseProgram(_earthShader.GetId());
 
             GL.BindAttribLocation(_earthShader.GetId(), _vertexPositionAttribute = 0, "aVertexPosition");
@@ -73,26 +79,13 @@ namespace Sandbox
             GL.EnableVertexAttribArray(_vertexNormalAttribute);
             GL.EnableVertexAttribArray(_textureCoordAttribute);
 
-            _earthBuffer = _sphere.MakeBuffers();
-
-            _vNormBuf = GL.GenBuffer();
-            _vTexBuf = GL.GenBuffer();
-            _vPosBuffer = GL.GenBuffer();
-            _vIdxBuf = GL.GenBuffer();
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Normals.Length * Vector3.SizeInBytes), _earthBuffer.Normals, BufferUsageHint.StaticDraw);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Uvs.Length * Vector2.SizeInBytes), _earthBuffer.Uvs, BufferUsageHint.StaticDraw);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.Positions.Length * Vector3.SizeInBytes), _earthBuffer.Positions, BufferUsageHint.StaticDraw);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vIdxBuf);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(_earthBuffer.SphereElements.Length * sizeof(ushort)), _earthBuffer.SphereElements, BufferUsageHint.StreamDraw);
-
             GL.UseProgram(0);
+            
+            _earthVbo = new SimpleVertexBuffer();
+            _earthVbo.InitializeVbo(_sphere.MakeBuffers());
+
+            _earthAtmosVbo = new SimpleVertexBuffer();
+            _earthAtmosVbo.InitializeVbo(_sphereAtmosphere.MakeBuffers());
         }
 
         public void Draw(Matrix4 projectionMatrix, Matrix4 modelViewMatrix)
@@ -119,6 +112,9 @@ namespace Sandbox
             PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
             PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 
+            InnerRadius.Value = (float) (Global.kXKMPER / 100) * 3.2f;
+            OuterRadius.Value = (float) (Global.kXKMPER / 100) * 1.07f * 3.2f;
+
             var uniforms = new List<Uniform>
             {
                 PMatrixUniform,
@@ -131,7 +127,9 @@ namespace Sandbox
                 AmbientColorUniform,
                 PointLightingLocationUniform,
                 PointLightingSpecularColorUniform,
-                PointLightingDiffuseColorUniform
+                PointLightingDiffuseColorUniform,
+                InnerRadius,
+                OuterRadius
             };
 
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -144,21 +142,17 @@ namespace Sandbox
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapNormal);
 
             _earthShader.Use(uniforms);
+            _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute);
+            _earthVbo.Render(PrimitiveType.Triangles);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vPosBuffer);
-            GL.VertexAttribPointer(_vertexPositionAttribute, 3, VertexAttribPointerType.Float,
-                false, 0, 0);
+            _earthAtmosShader.Use(uniforms);
+            _earthAtmosVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vTexBuf);
-            GL.VertexAttribPointer(_textureCoordAttribute, 2, VertexAttribPointerType.Float,
-                false, 0, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vNormBuf);
-            GL.VertexAttribPointer(_vertexNormalAttribute, 3, VertexAttribPointerType.Float,
-                false, 0, 0);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _vIdxBuf);
-            GL.DrawElements(BeginMode.Triangles, _earthBuffer.SphereElements.Length, DrawElementsType.UnsignedShort, 0);
+            GL.PushAttrib(AttribMask.EnableBit);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.One, BlendingFactor.One);
+            _earthAtmosVbo.Render(PrimitiveType.Triangles);
+            GL.PopAttrib();
 
             //_sphere.Draw();
             GL.UseProgram(0);
