@@ -64,7 +64,7 @@ namespace Sandbox
             _earthShader.InitProgram();
 
             _earthAtmosShader = new FragVertShaderProgram(
-                    File.ReadAllText("earthAtmos.frag"),
+                    File.ReadAllText("atmos.frag"),
                     File.ReadAllText("earth.vert")
                 );
             _earthAtmosShader.InitProgram();
@@ -112,8 +112,8 @@ namespace Sandbox
             PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
             PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 
-            InnerRadius.Value = (float) (Global.kXKMPER / 100) * 3.2f;
-            OuterRadius.Value = (float) (Global.kXKMPER / 100) * 1.07f * 3.2f;
+            InnerRadius.Value = ((float) (Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
+            OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.25f * projectionMatrix.ExtractScale()).Length;
 
             var uniforms = new List<Uniform>
             {
@@ -150,7 +150,7 @@ namespace Sandbox
 
             GL.PushAttrib(AttribMask.EnableBit);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.One, BlendingFactor.One);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
             _earthAtmosVbo.Render(PrimitiveType.Triangles);
             GL.PopAttrib();
 

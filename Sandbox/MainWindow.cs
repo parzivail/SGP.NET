@@ -34,7 +34,7 @@ namespace Sandbox
         /// </summary>
         public KeyboardState KeyboardState { get; private set; }
 
-        private Vector3 _rotation = Vector3.Zero;
+        private Vector3 _rotation = new Vector3(0, 180, 0);
 
         private static readonly Earth Earth = new Earth();
         private static readonly SatelliteNetwork Network = new SatelliteNetwork(new CoordGeodetic(30.332184, -81.655647, 0));
@@ -123,8 +123,13 @@ namespace Sandbox
                 GL.Color3(Color.Yellow);
                 GL.LineWidth(1);
                 //GL.Begin(PrimitiveType.LineStrip);
-                //for (var i = 0; i < 60; i++)
-                //    GL.Vertex3(satellite.Predict(DateTime.Now().AddMinutes(i)).ToGeodetic().ToSpherical() / 100);
+                //for (var i = 0; i < 60 * 12; i++)
+                //{
+                //    var pos = satellite.Predict(DateTime.Now().AddMinutes(i)).ToGeodetic();
+                //    GL.Color3(Network.IsVisible(pos) ? Color.Blue : Color.Yellow);
+                //    GL.Vertex3(pos.ToSpherical() / 100);
+                //}
+
                 //GL.End();
 
                 var footprint = satellite.GetFootprint();
@@ -147,7 +152,7 @@ namespace Sandbox
             // Set up 2D mode
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, Width, Height, 0, 1000, -1000);
+            GL.Ortho(0, Width, Height, 0, -1000, 1000);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
@@ -166,10 +171,15 @@ namespace Sandbox
 
             foreach (var satellite in Network.Satellites)
             {
+                var posVec = satellite
+                    .Predict()
+                    .ToGeodetic()
+                    .ToSpherical() / 100;
+
                 GL.PushMatrix();
                 var mat = modelViewMatrix * projection;
-                var proj = WorldToScreen(satellite.Predict().ToGeodetic().ToSpherical() / 100f, mat, ClientRectangle);
-                GL.Translate((int)proj.X + 3, (int)(proj.Y - Font.Common.LineHeight / 2f), 0);
+                posVec = Vector3.Project(posVec, 0, Height, Width, -Height, -1, 1, mat);
+                GL.Translate((int)posVec.X + 3, (int)(posVec.Y - Font.Common.LineHeight / 2f), posVec.Z);
                 Font.RenderString(satellite.Name);
                 GL.PopMatrix();
             }
@@ -188,16 +198,6 @@ namespace Sandbox
 
             // Swap the graphics buffer
             SwapBuffers();
-        }
-
-        public static Vector2 WorldToScreen(Vector3 worldPos, Matrix4 viewProjMat, Rectangle clientRect)
-        {
-            var pos = Vector4.Transform(new Vector4(worldPos, 1f), viewProjMat);
-            pos /= pos.W;
-            pos.Y = -pos.Y;
-            var screenSize = new Vector2(clientRect.Width, clientRect.Height);
-            var screenCenter = new Vector2(clientRect.X, clientRect.Y) + screenSize / 2f;
-            return screenCenter + pos.Xy * screenSize / 2f;
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
@@ -233,11 +233,13 @@ namespace Sandbox
 
             Earth.Init();
 
-            Network.Satellites.Add(new Satellite(
+            var n19 = new Satellite(
                 "NOAA 19",
                 "1 33591U 09005A   18130.59156788  .00000107  00000-0  83181-4 0  9990",
                 "2 33591  99.1393 107.8779 0015028  73.6080 286.6741 14.12276632476607"
-            ));
+            );
+
+            Network.Satellites.Add(n19);
 
             Network.Satellites.Add(new Satellite(
                 "NOAA 18",

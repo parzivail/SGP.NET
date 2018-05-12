@@ -201,7 +201,7 @@ namespace SGP4_Sharp
 
 
     private DateTime m_dt;
-    private Vector m_position;
-    private Vector m_velocity;
+    private Vector m_position = new Vector();
+    private Vector m_velocity = new Vector();
   }
 }

@@ -41,7 +41,7 @@ namespace Sandbox
         {
             var center = Predict(time).ToGeodetic();
             var coords = new List<CoordGeodetic>();
-            var size = center.CalculateFootprintDiameterRad() / 2;
+            var size = center.CalculateFootprintRadiusRad();
 
             for (var i = 0; i < 60; i++)
             {

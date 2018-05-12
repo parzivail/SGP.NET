@@ -13,22 +13,37 @@ namespace Sandbox
         public static Vector3 ToSpherical(this CoordGeodetic geo)
         {
             return new Vector3(
-                (float) (Math.Cos(geo.latitude) * Math.Cos(-geo.longitude + Math.PI) *
+                (float)(Math.Cos(geo.latitude) * Math.Cos(-geo.longitude + Math.PI) *
                          (geo.altitude + Global.kXKMPER)),
-                (float) (Math.Sin(geo.latitude) * (geo.altitude + Global.kXKMPER)),
-                (float) (Math.Cos(geo.latitude) * Math.Sin(-geo.longitude + Math.PI) *
+                (float)(Math.Sin(geo.latitude) * (geo.altitude + Global.kXKMPER)),
+                (float)(Math.Cos(geo.latitude) * Math.Sin(-geo.longitude + Math.PI) *
                          (geo.altitude + Global.kXKMPER))
             );
         }
 
-        public static double CalculateFootprintDiameter(this CoordGeodetic geo)
+        public static double CalculateFootprintRadius(this CoordGeodetic geo)
         {
-            return geo.CalculateFootprintDiameterRad() * Global.kXKMPER;
+            return geo.CalculateFootprintRadiusRad() * Global.kXKMPER;
         }
 
-        public static double CalculateFootprintDiameterRad(this CoordGeodetic geo)
+        public static double CalculateFootprintRadiusRad(this CoordGeodetic geo)
         {
-            return 2 * Math.Acos(Global.kXKMPER / (Global.kXKMPER + geo.altitude));
+            return Math.Acos(Global.kXKMPER / (Global.kXKMPER + geo.altitude));
+        }
+
+        public static double DistanceToRad(this CoordGeodetic from, CoordGeodetic to)
+        {
+            var dist =
+                Math.Sin(from.latitude) * Math.Sin(to.latitude) + Math.Cos(from.latitude) *
+                Math.Cos(to.latitude) * Math.Cos(from.longitude - to.longitude);
+            dist = Math.Acos(dist);
+
+            return dist;
+        }
+
+        public static AzimuthElevation AzimuthElevationBetween(this CoordGeodetic from, Eci to)
+        {
+            throw new NotImplementedException();
         }
     }
 }
