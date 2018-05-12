@@ -158,7 +158,6 @@ namespace Sandbox
             GL.UseProgram(0);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Disable(EnableCap.Texture2D);
         }
     }
 }

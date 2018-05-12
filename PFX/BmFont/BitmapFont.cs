@@ -53,20 +53,23 @@ namespace PFX.BmFont
                 if (Characters.Any(fc => fc.Id == c))
                     fontChar = Characters.First(fc => fc.Id == c);
 
-                GL.PushMatrix();
-                GL.Translate(cursor.X + fontChar.OffsetX, cursor.Y + fontChar.OffsetY, 0);
-                GL.BindTexture(TextureTarget.Texture2D, fontChar.CharacterBitmap.Key);
-                GL.Begin(PrimitiveType.Quads);
-                GL.TexCoord2(0, 0);
-                GL.Vertex2(0, 0);
-                GL.TexCoord2(1, 0);
-                GL.Vertex2(fontChar.Width, 0);
-                GL.TexCoord2(1, 1);
-                GL.Vertex2(fontChar.Width, fontChar.Height);
-                GL.TexCoord2(0, 1);
-                GL.Vertex2(0, fontChar.Height);
-                GL.End();
-                GL.PopMatrix();
+                if (c != ' ')
+                {
+                    GL.PushMatrix();
+                    GL.Translate(cursor.X + fontChar.OffsetX, cursor.Y + fontChar.OffsetY, 0);
+                    GL.BindTexture(TextureTarget.Texture2D, fontChar.CharacterBitmap.Key);
+                    GL.Begin(PrimitiveType.Quads);
+                    GL.TexCoord2(0, 0);
+                    GL.Vertex2(0, 0);
+                    GL.TexCoord2(1, 0);
+                    GL.Vertex2(fontChar.Width, 0);
+                    GL.TexCoord2(1, 1);
+                    GL.Vertex2(fontChar.Width, fontChar.Height);
+                    GL.TexCoord2(0, 1);
+                    GL.Vertex2(0, fontChar.Height);
+                    GL.End();
+                    GL.PopMatrix();
+                }
 
                 cursor.X += fontChar.AdvanceX;
             }

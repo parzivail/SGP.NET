@@ -113,25 +113,15 @@ namespace Sandbox
                 var posVec = satellite
                     .Predict()
                     .ToGeodetic()
-                    .ToSpherical();
+                    .ToSpherical() / 100;
 
                 GL.Color3(Color.White);
                 GL.Begin(PrimitiveType.Points);
-                GL.Vertex3(posVec / 100f);
+                GL.Vertex3(posVec);
                 GL.End();
 
                 GL.Color3(Color.Yellow);
                 GL.LineWidth(1);
-                //GL.Begin(PrimitiveType.LineStrip);
-                //for (var i = 0; i < 60 * 12; i++)
-                //{
-                //    var pos = satellite.Predict(DateTime.Now().AddMinutes(i)).ToGeodetic();
-                //    GL.Color3(Network.IsVisible(pos) ? Color.Blue : Color.Yellow);
-                //    GL.Vertex3(pos.ToSpherical() / 100);
-                //}
-
-                //GL.End();
-
                 var footprint = satellite.GetFootprint();
                 var center = satellite.Predict().ToGeodetic();
                 GL.PushMatrix();
