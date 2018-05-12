@@ -108,6 +108,7 @@ namespace Sandbox
             GL.PushMatrix();
 
             GL.Disable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Blend);
             foreach (var satellite in Network.Satellites)
             {
                 var posVec = satellite
@@ -120,6 +121,8 @@ namespace Sandbox
                 GL.Vertex3(posVec);
                 GL.End();
 
+                GL.Enable(EnableCap.LineStipple);
+                GL.LineStipple(4, 0xAAAA);
                 GL.Color3(Color.Yellow);
                 GL.LineWidth(1);
                 var footprint = satellite.GetFootprint();
@@ -132,7 +135,9 @@ namespace Sandbox
                     GL.Vertex3(coord.ToSpherical() / 100f);
                 GL.End();
                 GL.PopMatrix();
+                GL.Disable(EnableCap.LineStipple);
             }
+            GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.Lighting);
 
             Earth.Draw(projection, modelViewMatrix);
@@ -248,6 +253,14 @@ namespace Sandbox
                 "1 00694U 63047A   18130.58476307  .00000390  00000-0  38670-4 0  9992",
                 "2 00694  30.3560 163.3191 0587017 352.3983   6.8031 14.02314778728702"
             ));
+
+            var observations = Network.Observe(n19);
+            foreach (var observation in observations)
+            {
+                Lumberjack.Log($"{observation.Start.ToSystemDateTime().ToLocalTime()}");
+                Lumberjack.Log($"\t{observation.StartAz / Math.PI * 180}");
+                Lumberjack.Log($"\t{observation.MaxEl / Math.PI * 180}");
+            }
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using PFX;
 using SGP4_Sharp;
 
 namespace Sandbox
@@ -43,7 +44,34 @@ namespace Sandbox
 
         public static AzimuthElevation AzimuthElevationBetween(this CoordGeodetic from, Eci to)
         {
-            throw new NotImplementedException();
+            var s = to.Position();
+            var o = new Eci(to.GetDateTime(), from).Position();
+
+            var longitude = from.longitude;
+            var latitude = from.latitude;
+
+            var rx = s.x - o.x;
+            var ry = s.y - o.y;
+            var rz = s.z - o.z;
+
+            var theta = to.GetDateTime().ToLocalMeanSiderealTime(longitude) % (Math.PI * 2);
+
+            var topS = Math.Sin(latitude) * Math.Cos(theta) * rx +
+            Math.Sin(latitude) * Math.Sin(theta) * ry -
+                Math.Cos(latitude) * rz;
+
+            var topE = -Math.Sin(theta) * rx +
+                Math.Cos(theta) * ry;
+
+            var topZ = Math.Cos(latitude) * Math.Cos(theta) * rx +
+                Math.Cos(latitude) * Math.Sin(theta) * ry +
+                Math.Sin(latitude) * rz;
+
+            var rangeSat = Math.Sqrt(topS * topS + topE * topE + topZ * topZ);
+            var el = Math.Asin(topZ / rangeSat);
+            var az = Math.Atan2(-topE, topS) + Math.PI;
+
+            return new AzimuthElevation(az, el, rangeSat);
         }
     }
 }
