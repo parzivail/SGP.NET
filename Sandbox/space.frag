@@ -1,8 +1,8 @@
-﻿#version 330
+﻿#version 410
 
-varying vec2 vTextureCoord;
-varying vec3 vTransformedNormal;
-varying vec4 vPosition;
+in vec2 vTextureCoord;
+in vec3 vTransformedNormal;
+in vec4 vPosition;
 
 uniform vec3 uAmbientColor;
 uniform vec3 uPointLightingLocation;
@@ -16,7 +16,9 @@ uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
 
+out vec4 fragColor;
+
 void main(void) {
     vec4 fragmentColor = texture2D(uColorMapSampler, vTextureCoord);
-    gl_FragColor = vec4(fragmentColor.rgb, fragmentColor.a);
+    fragColor = vec4(fragmentColor.rgb, fragmentColor.a);
 }

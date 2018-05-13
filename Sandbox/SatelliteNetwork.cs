@@ -47,9 +47,8 @@ namespace Sandbox
                 t += granularity;
 
                 var posEci = satellite.Predict(t);
-                var pos = posEci.ToGeodetic();
 
-                if (IsVisible(pos))
+                if (IsVisible(posEci))
                 {
                     if (state == SatelliteObservationState.Init)
                         continue;
@@ -106,9 +105,8 @@ namespace Sandbox
                 t += granularity;
 
                 var posEci = satellite.Predict(t);
-                var pos = posEci.ToGeodetic();
 
-                if (IsVisible(pos))
+                if (IsVisible(posEci))
                 {
                     if (state == SatelliteObservationState.Init)
                         continue;
@@ -139,10 +137,19 @@ namespace Sandbox
             return null;
         }
 
-        public bool IsVisible(CoordGeodetic pos)
+        public bool IsVisible(Eci pos, double minElevation = 5)
         {
-            var footprint = pos.CalculateFootprintRadiusRad();
-            return GroundStation.DistanceToRad(pos) < footprint;
+            var pGeo = pos.ToGeodetic();
+            var footprint = pGeo.CalculateFootprintRadiusRad();
+
+            if (GroundStation.DistanceToRad(pGeo) > footprint) return false;
+
+            if (minElevation == 0)
+                return true;
+
+            var aer = GroundStation.AzimuthElevationBetween(pos);
+            return aer.Elevation / Math.PI * 180 >= minElevation;
+
         }
     }
 

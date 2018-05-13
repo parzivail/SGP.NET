@@ -1,8 +1,8 @@
-﻿#version 330
+﻿#version 410
 
-varying vec2 vTextureCoord;
-varying vec3 vTransformedNormal;
-varying vec4 vPosition;
+in vec2 vTextureCoord;
+in vec3 vTransformedNormal;
+in vec4 vPosition;
 
 uniform vec3 uAmbientColor;
 uniform vec3 uPointLightingLocation;
@@ -15,6 +15,8 @@ uniform sampler2D uNormalMapSampler;
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
+
+out vec4 fragColor;
 
 void main(void) {
     vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
@@ -39,5 +41,6 @@ void main(void) {
 		texture2D(uColorMapSampler, vTextureCoord),
 		pow(diffuseLightWeighting, 1.0/1.5)
 	);
-    gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
+
+    fragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
 }

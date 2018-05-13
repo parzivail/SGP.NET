@@ -33,6 +33,7 @@ namespace PFX
             var label = string.Format(_label, formatArgs);
             var scalar = _font.Common.LineHeight / _maxValue;
 
+            GL.PushAttrib(AttribMask.EnableBit);
             GL.Disable(EnableCap.Lighting);
             GL.Disable(EnableCap.Texture2D);
 
@@ -64,10 +65,8 @@ namespace PFX
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
             _font.RenderString(label);
-            GL.Disable(EnableCap.Texture2D);
 
-            GL.Enable(EnableCap.Lighting);
-            GL.Disable(EnableCap.Blend);
+            GL.PopAttrib();
             GL.PopMatrix();
         }
 

@@ -105,7 +105,7 @@ namespace PFX.Shader
         {
             msg = msg.Trim();
             if (msg.Length > 0)
-                Lumberjack.Log(msg, ConsoleColor.DarkYellow, "GLSL");
+                Lumberjack.Log(msg, ConsoleColor.DarkYellow, OutputLevel.Debug, "GLSL");
         }
 
         public int GetId()

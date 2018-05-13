@@ -1,8 +1,8 @@
-﻿#version 330
+﻿#version 410
 
-varying vec2 vTextureCoord;
-varying vec3 vTransformedNormal;
-varying vec4 vPosition;
+in vec2 vTextureCoord;
+in vec3 vTransformedNormal;
+in vec4 vPosition;
 
 uniform vec3 uPointLightingLocation;
 
@@ -27,6 +27,8 @@ const int numOutScatter = 8;
 const float fNumOutScatter = 8.;
 const int numInScatter = 80;
 const float fNumInScatter = 80.0;
+
+out vec4 fragColor;
 
 mat3 rot3xy( vec2 angle ) {
 	vec2 c = cos( angle );
@@ -152,5 +154,5 @@ void main(void) {
 	
 	vec3 I = inScatter(eye, dir, e, l);
 	
-	gl_FragColor = vec4(I, 0.9);
+	fragColor = vec4(I, 0.9);
 }

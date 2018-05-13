@@ -35,6 +35,13 @@ namespace Sandbox
         /// </summary>
         public KeyboardState KeyboardState { get; private set; }
 
+        private readonly Profiler _profiler = new Profiler();
+        private Dictionary<string, TimeSpan> _profile = new Dictionary<string, TimeSpan>();
+        private Sparkline _fpsSparkline;
+        private Sparkline _renderTimeSparkline;
+
+        private static readonly BackgroundWorker ObserverBackgroundWorker = new BackgroundWorker();
+
         private Vector3 _rotation = new Vector3(0, 180, 0);
 
         private static readonly Earth Earth = new Earth();
@@ -43,7 +50,6 @@ namespace Sandbox
         private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
         private DateTime _observationsDirtyTime = DateTime.Now;
 
-        private BackgroundWorker _observerBackgroundWorker = new BackgroundWorker();
 
         public MainWindow() : base(960, 540)
         {
@@ -53,8 +59,8 @@ namespace Sandbox
             RenderFrame += MainWindow_RenderFrame;
             UpdateFrame += MainWindow_UpdateFrame;
 
-            _observerBackgroundWorker.DoWork += PredictFutureObservations;
-            _observerBackgroundWorker.RunWorkerCompleted += CollectPredictedObservations;
+            ObserverBackgroundWorker.DoWork += PredictFutureObservations;
+            ObserverBackgroundWorker.RunWorkerCompleted += CollectPredictedObservations;
         }
 
         private void CollectPredictedObservations(object sender, RunWorkerCompletedEventArgs args)
@@ -101,7 +107,7 @@ namespace Sandbox
 
             if (DateTime.Now >= _observationsDirtyTime)
             {
-                _observerBackgroundWorker.RunWorkerAsync();
+                ObserverBackgroundWorker.RunWorkerAsync();
                 _observationsDirtyTime = DateTime.Now + TimeSpan.FromMinutes(10);
             }
 
@@ -111,6 +117,7 @@ namespace Sandbox
         private void MainWindow_Resize(object sender, EventArgs e)
         {
             GL.Viewport(ClientRectangle);
+            Lumberjack.Debug($"Set viewport: {ClientRectangle}");
 
             // Set up the viewport
             GL.MatrixMode(MatrixMode.Projection);
@@ -122,6 +129,15 @@ namespace Sandbox
 
         private void MainWindow_RenderFrame(object sender, FrameEventArgs e)
         {
+            // Start profiling
+            _profiler.Start("render");
+
+            // Update sparklines
+            if (_profile.ContainsKey("render"))
+                _renderTimeSparkline.Enqueue((float)_profile["render"].TotalMilliseconds);
+
+            _fpsSparkline.Enqueue((float)RenderFrequency);
+
             // Reset the view
             GL.Clear(ClearBufferMask.ColorBufferBit |
                      ClearBufferMask.DepthBufferBit |
@@ -161,7 +177,6 @@ namespace Sandbox
                 GL.Vertex3(posVec);
                 GL.End();
 
-                GL.Color3(Color.Yellow);
                 GL.Enable(EnableCap.LineStipple);
                 GL.LineStipple(2, 0xAAAA);
                 GL.LineWidth(1);
@@ -170,16 +185,20 @@ namespace Sandbox
                 GL.Begin(PrimitiveType.LineStrip);
                 for (var i = 0; i < 8; i++)
                 {
-                    var predictPos = satellite
-                                     .Predict(time)
+                    var predictEci = satellite
+                        .Predict(time);
+                    var predictPos = predictEci
                                      .ToGeodetic()
                                      .ToSpherical() / 100;
+
+                    GL.Color3(Network.IsVisible(predictEci) ? Color.Blue : Color.Yellow);
 
                     GL.Vertex3(predictPos);
                     time = time.AddMinutes(1);
                 }
                 GL.End();
 
+                GL.Color3(Color.Yellow);
                 GL.LineStipple(4, 0xAAAA);
                 var footprint = satellite.GetFootprint();
                 var center = satellite.Predict().ToGeodetic();
@@ -218,20 +237,39 @@ namespace Sandbox
             GL.Enable(EnableCap.Texture2D);
             // Info footer
             GL.PushMatrix();
-            Font.RenderString($"Development Build");
 
             GL.PushMatrix();
-            GL.Translate(0, Height - Font.Common.LineHeight, 0);
-            if (_todaysObservations.Count > 0)
+            if (KeyboardState[Key.D])
             {
-                var next = GetNextObservation();
-                Font.RenderString(
-                    $"Next: {next.Satellite.Name} in {(next.Start.ToSystemDateTime().ToLocalTime() - System.DateTime.Now):h\\:mm\\:ss}");
+                // Static diagnostic header
+                GL.PushMatrix();
+                Font.RenderString($"FPS: {(int)Math.Ceiling(RenderFrequency)}");
+                GL.PopMatrix();
+
+                // Sparklines
+                GL.Translate(0, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
+                _fpsSparkline.Render();
+                GL.Translate(0, (int)(Font.Common.LineHeight * 1.4f), 0);
+                _renderTimeSparkline.Render();
             }
-            else if (_observerBackgroundWorker.IsBusy)
-                Font.RenderString($"Recalculating observations...");
             else
-                Font.RenderString($"No observations <1d");
+            {
+                Font.RenderString($"Development Build");
+
+                GL.Translate(0, Height - Font.Common.LineHeight, 0);
+                if (_todaysObservations.Count > 0)
+                {
+                    var next = GetNextObservation();
+                    var time = next.Start.ToSystemDateTime().ToLocalTime();
+                    Font.RenderString(
+                        $"Next: {next.Satellite.Name} at {(time):h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})");
+                }
+                else if (ObserverBackgroundWorker.IsBusy)
+                    Font.RenderString($"Recalculating observations...");
+                else
+                    Font.RenderString($"No observations <1d");
+            }
+
             GL.PopMatrix();
 
             foreach (var satellite in Network.Satellites)
@@ -263,6 +301,10 @@ namespace Sandbox
 
             // Swap the graphics buffer
             SwapBuffers();
+
+            // Stop profiling and get the results
+            _profiler.End();
+            _profile = _profiler.Reset();
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
@@ -276,13 +318,13 @@ namespace Sandbox
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.PointSize(4);
             GL.LineWidth(2);
-            Lumberjack.Log("Loaded OpenGL settings");
 
             const float diffuse = 1.5f;
             float[] matDiffuse = { diffuse, diffuse, diffuse };
             GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, matDiffuse);
             GL.Light(LightName.Light0, LightParameter.Position, new[] { 0.0f, 0.0f, 0.0f, 256.0f });
             GL.Light(LightName.Light0, LightParameter.Diffuse, new[] { diffuse, diffuse, diffuse, diffuse });
+            Lumberjack.Debug("Created lights");
 
             // Set up lighting
             GL.Enable(EnableCap.Lighting);
@@ -292,11 +334,19 @@ namespace Sandbox
             // Set up caps
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.RescaleNormal);
+            Lumberjack.Debug("Loaded OpenGL settings");
 
             // Load the font
             Font = BitmapFont.LoadBinaryFont("dina", FontBank.FontDina, FontBank.BmDina);
+            Lumberjack.Debug("Loaded fonts");
+
+            // Load sparklines
+            _fpsSparkline = new Sparkline(Font, $"0-{(int)TargetRenderFrequency}fps", 50,
+                (float)TargetRenderFrequency, Sparkline.SparklineStyle.Area);
+            _renderTimeSparkline = new Sparkline(Font, "0-50ms", 50, 50, Sparkline.SparklineStyle.Area);
 
             Earth.Init();
+            Lumberjack.Debug("Loaded Earth entity");
 
             Network.Satellites.Add(new Satellite(
                 "NOAA 19",
@@ -321,6 +371,8 @@ namespace Sandbox
                 "1 00694U 63047A   18130.58476307  .00000390  00000-0  38670-4 0  9992",
                 "2 00694  30.3560 163.3191 0587017 352.3983   6.8031 14.02314778728702"
             ));
+
+            Lumberjack.Info("Window loaded");
         }
 
         /// <summary>
