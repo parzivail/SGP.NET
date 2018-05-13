@@ -11,6 +11,12 @@ namespace Sandbox
 {
     static class Extensions
     {
+        public static System.DateTime Round(this System.DateTime date, System.TimeSpan span)
+        {
+            var ticks = (date.Ticks + (span.Ticks / 2) + 1) / span.Ticks;
+            return new System.DateTime(ticks * span.Ticks);
+        }
+
         public static Vector3 ToSpherical(this CoordGeodetic geo)
         {
             return new Vector3(

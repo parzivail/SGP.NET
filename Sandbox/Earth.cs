@@ -17,8 +17,10 @@ namespace Sandbox
     {
         private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 60, 30);
         private readonly Sphere _sphereAtmosphere = new Sphere((float)(Global.kXKMPER / 100) * 1.07f, (float)(Global.kXKMPER / 100) * 1.07f, 60, 30);
+        //private readonly Sphere _sphereSpace = new Sphere(257, 257, 60, 30);
         private static ShaderProgram _earthShader;
         private static ShaderProgram _earthAtmosShader;
+        //private static ShaderProgram _spaceShader;
 
         private static readonly Uniform PMatrixUniform = new Uniform("uPMatrix");
         private static readonly Uniform MvMatrixUniform = new Uniform("uMVMatrix");
@@ -36,6 +38,7 @@ namespace Sandbox
         
         private static SimpleVertexBuffer _earthVbo;
         private static SimpleVertexBuffer _earthAtmosVbo;
+        //private static SimpleVertexBuffer _spaceVbo;
 
         private int _vertexPositionAttribute;
         private int _vertexNormalAttribute;
@@ -45,6 +48,7 @@ namespace Sandbox
         private int _earthSpheremapNight;
         private int _earthSpheremapSpecular;
         private int _earthSpheremapNormal;
+        //private int _spaceSpheremap;
 
         public void Init()
         {
@@ -56,6 +60,8 @@ namespace Sandbox
             _earthSpheremapSpecular = pair.Key;
             pair = new Bitmap("earth_normalmap.png").LoadGlTexture();
             _earthSpheremapNormal = pair.Key;
+            pair = new Bitmap("space.jpg").LoadGlTexture();
+            //_spaceSpheremap = pair.Key;
 
             _earthShader = new FragVertShaderProgram(
                     File.ReadAllText("earth.frag"),
@@ -68,6 +74,12 @@ namespace Sandbox
                     File.ReadAllText("earth.vert")
                 );
             _earthAtmosShader.InitProgram();
+
+            //_spaceShader = new FragVertShaderProgram(
+            //        File.ReadAllText("space.frag"),
+            //        File.ReadAllText("earth.vert")
+            //    );
+            //_spaceShader.InitProgram();
 
             GL.UseProgram(_earthShader.GetId());
 
@@ -86,6 +98,9 @@ namespace Sandbox
 
             _earthAtmosVbo = new SimpleVertexBuffer();
             _earthAtmosVbo.InitializeVbo(_sphereAtmosphere.MakeBuffers());
+
+            //_spaceVbo = new SimpleVertexBuffer();
+            //_spaceVbo.InitializeVbo(_sphereSpace.MakeBuffers());
         }
 
         public void Draw(Matrix4 projectionMatrix, Matrix4 modelViewMatrix)
@@ -113,7 +128,7 @@ namespace Sandbox
             PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 
             InnerRadius.Value = ((float) (Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
-            OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.25f * projectionMatrix.ExtractScale()).Length;
+            OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.15f * projectionMatrix.ExtractScale()).Length;
 
             var uniforms = new List<Uniform>
             {
@@ -131,6 +146,13 @@ namespace Sandbox
                 InnerRadius,
                 OuterRadius
             };
+
+            //GL.ActiveTexture(TextureUnit.Texture0);
+            //GL.BindTexture(TextureTarget.Texture2D, _spaceSpheremap);
+
+            //_spaceShader.Use(uniforms);
+            //_spaceVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute);
+            //_spaceVbo.Render(PrimitiveType.Triangles);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremap);
@@ -153,8 +175,7 @@ namespace Sandbox
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
             _earthAtmosVbo.Render(PrimitiveType.Triangles);
             GL.PopAttrib();
-
-            //_sphere.Draw();
+            
             GL.UseProgram(0);
 
             GL.ActiveTexture(TextureUnit.Texture0);

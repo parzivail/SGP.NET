@@ -18,8 +18,9 @@ using PFX.BmFont;
 using PFX.Shader;
 using PFX.Util;
 using SGP4_Sharp;
-using DateTime = SGP4_Sharp.DateTime;
+using DateTime = System.DateTime;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using TimeSpan = System.TimeSpan;
 
 namespace Sandbox
 {
@@ -39,6 +40,11 @@ namespace Sandbox
         private static readonly Earth Earth = new Earth();
         private static readonly SatelliteNetwork Network = new SatelliteNetwork(new CoordGeodetic(30.332184, -81.655647, 0));
 
+        private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
+        private DateTime _observationsDirtyTime = DateTime.Now;
+
+        private BackgroundWorker _observerBackgroundWorker = new BackgroundWorker();
+
         public MainWindow() : base(960, 540)
         {
             Resize += MainWindow_Resize;
@@ -46,6 +52,32 @@ namespace Sandbox
             MouseWheel += OnMouseWheel;
             RenderFrame += MainWindow_RenderFrame;
             UpdateFrame += MainWindow_UpdateFrame;
+
+            _observerBackgroundWorker.DoWork += PredictFutureObservations;
+            _observerBackgroundWorker.RunWorkerCompleted += CollectPredictedObservations;
+        }
+
+        private void CollectPredictedObservations(object sender, RunWorkerCompletedEventArgs args)
+        {
+            _todaysObservations = (List<SatelliteObservation>)args.Result;
+        }
+
+        private static void PredictFutureObservations(object sender, DoWorkEventArgs args)
+        {
+            var observations = Network
+                .Satellites
+                .SelectMany(satellite => Network.Observe(satellite))
+                .OrderBy(observation => observation.Start.ToSystemDateTime())
+                .ToList();
+            args.Result = observations;
+        }
+
+        public SatelliteObservation GetNextObservation()
+        {
+            if (_todaysObservations.Count < 0)
+                return null;
+            return _todaysObservations.First(observation =>
+                observation.Start.ToSystemDateTime().ToLocalTime() > DateTime.Now);
         }
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs args)
@@ -66,6 +98,14 @@ namespace Sandbox
                 _rotation.X -= t;
             if (KeyboardState[Key.Down])
                 _rotation.X += t;
+
+            if (DateTime.Now >= _observationsDirtyTime)
+            {
+                _observerBackgroundWorker.RunWorkerAsync();
+                _observationsDirtyTime = DateTime.Now + TimeSpan.FromMinutes(10);
+            }
+
+            //_rotation.Y += t * 0.1f;
         }
 
         private void MainWindow_Resize(object sender, EventArgs e)
@@ -121,10 +161,26 @@ namespace Sandbox
                 GL.Vertex3(posVec);
                 GL.End();
 
-                GL.Enable(EnableCap.LineStipple);
-                GL.LineStipple(4, 0xAAAA);
                 GL.Color3(Color.Yellow);
+                GL.Enable(EnableCap.LineStipple);
+                GL.LineStipple(2, 0xAAAA);
                 GL.LineWidth(1);
+
+                var time = SGP4_Sharp.DateTime.Now().AddMinutes(-2);
+                GL.Begin(PrimitiveType.LineStrip);
+                for (var i = 0; i < 8; i++)
+                {
+                    var predictPos = satellite
+                                     .Predict(time)
+                                     .ToGeodetic()
+                                     .ToSpherical() / 100;
+
+                    GL.Vertex3(predictPos);
+                    time = time.AddMinutes(1);
+                }
+                GL.End();
+
+                GL.LineStipple(4, 0xAAAA);
                 var footprint = satellite.GetFootprint();
                 var center = satellite.Predict().ToGeodetic();
                 GL.PushMatrix();
@@ -163,6 +219,20 @@ namespace Sandbox
             // Info footer
             GL.PushMatrix();
             Font.RenderString($"Development Build");
+
+            GL.PushMatrix();
+            GL.Translate(0, Height - Font.Common.LineHeight, 0);
+            if (_todaysObservations.Count > 0)
+            {
+                var next = GetNextObservation();
+                Font.RenderString(
+                    $"Next: {next.Satellite.Name} in {(next.Start.ToSystemDateTime().ToLocalTime() - System.DateTime.Now):h\\:mm\\:ss}");
+            }
+            else if (_observerBackgroundWorker.IsBusy)
+                Font.RenderString($"Recalculating observations...");
+            else
+                Font.RenderString($"No observations <1d");
+            GL.PopMatrix();
 
             foreach (var satellite in Network.Satellites)
             {
@@ -228,13 +298,11 @@ namespace Sandbox
 
             Earth.Init();
 
-            var n19 = new Satellite(
+            Network.Satellites.Add(new Satellite(
                 "NOAA 19",
                 "1 33591U 09005A   18130.59156788  .00000107  00000-0  83181-4 0  9990",
                 "2 33591  99.1393 107.8779 0015028  73.6080 286.6741 14.12276632476607"
-            );
-
-            Network.Satellites.Add(n19);
+            ));
 
             Network.Satellites.Add(new Satellite(
                 "NOAA 18",
@@ -253,14 +321,6 @@ namespace Sandbox
                 "1 00694U 63047A   18130.58476307  .00000390  00000-0  38670-4 0  9992",
                 "2 00694  30.3560 163.3191 0587017 352.3983   6.8031 14.02314778728702"
             ));
-
-            var observations = Network.Observe(n19);
-            foreach (var observation in observations)
-            {
-                Lumberjack.Log($"{observation.Start.ToSystemDateTime().ToLocalTime()}");
-                Lumberjack.Log($"\t{observation.StartAz / Math.PI * 180}");
-                Lumberjack.Log($"\t{observation.MaxEl / Math.PI * 180}");
-            }
         }
 
         /// <summary>

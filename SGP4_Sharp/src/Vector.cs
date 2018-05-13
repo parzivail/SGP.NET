@@ -138,10 +138,10 @@ namespace SGP4_Sharp
     public override string ToString()
     {
       StringBuilder builder = new StringBuilder();
-      builder.Append(String.Format("X: {0}", x));
-      builder.Append(String.Format(", Y: ", y));
-      builder.Append(String.Format(", Z: ", z));
-      builder.Append(String.Format(", W: ", w));
+      builder.Append($"X: {x}");
+      builder.Append($", Y: {y}");
+      builder.Append($", Z: {z}");
+      builder.Append($", W: {w}");
       
       return builder.ToString();
     }
