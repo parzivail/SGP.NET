@@ -263,6 +263,7 @@ namespace Sandbox
             GL.PushMatrix();
 
             GL.PushMatrix();
+            GL.Color3(Color.White);
             if (KeyboardState[Key.D])
             {
                 // Static diagnostic header

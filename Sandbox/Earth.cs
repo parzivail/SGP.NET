@@ -102,6 +102,14 @@ namespace Sandbox
 
             //_spaceVbo = new SimpleVertexBuffer();
             //_spaceVbo.InitializeVbo(_sphereSpace.MakeBuffers());
+
+            ColorMapSamplerUniform.Value = 0;
+            SpecularMapSamplerUniform.Value = 1;
+            NightMapSamplerUniform.Value = 2;
+            NormalMapSamplerUniform.Value = 3;
+            PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
+            PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
+            AmbientColorUniform.Value = new Vector3(0.5f, 0.5f, 0.5f);
         }
 
         public void Draw(Matrix4 projectionMatrix, Matrix4 modelViewMatrix)
@@ -114,26 +122,18 @@ namespace Sandbox
             normalMatrix.Transpose();
             NMatrixUniform.Value = normalMatrix;
 
-            ColorMapSamplerUniform.Value = 0;
-            SpecularMapSamplerUniform.Value = 1;
-            NightMapSamplerUniform.Value = 2;
-            NormalMapSamplerUniform.Value = 3;
-
             // Percent through a day (1440m/day)
             var t = System.DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
             const float d = 20000;
 
-            AmbientColorUniform.Value = new Vector3(0.5f, 0.5f, 0.5f);
             PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(d * (float)Math.Cos(t), 8696, d * (float)Math.Sin(t)), modelViewMatrix);
-            PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
-            PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 
             InnerRadius.Value = ((float)(Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
             OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.15f * projectionMatrix.ExtractScale()).Length;
 
             Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
 
-            var uniforms = new List<Uniform>
+            var uniforms = new[]
             {
                 PMatrixUniform,
                 MvMatrixUniform,
