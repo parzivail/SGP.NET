@@ -1,8 +1,8 @@
 ﻿#version 410
 
-in vec3 aVertexPosition;
-in vec3 aVertexNormal;
-in vec2 aTextureCoord;
+layout(location = 0) in vec3 aVertexPosition;
+layout(location = 1) in vec3 aVertexNormal;
+layout(location = 2) in vec2 aTextureCoord;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;

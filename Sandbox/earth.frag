@@ -1,8 +1,8 @@
 ﻿#version 410
 
-in vec2 vTextureCoord;
-in vec3 vTransformedNormal;
 in vec4 vPosition;
+in vec3 vTransformedNormal;
+in vec2 vTextureCoord;
 
 uniform vec3 uAmbientColor;
 uniform vec3 uPointLightingLocation;
@@ -42,5 +42,5 @@ void main(void) {
 		pow(diffuseLightWeighting, 1.0/1.5)
 	);
 
-    fragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
+    fragColor = vec4(fragmentColor.rgb, fragmentColor.a);
 }
