@@ -23,10 +23,11 @@ uniform float fOuterRadius;
 float SCALE_H = 4.0 / (fOuterRadius - fInnerRadius);
 float SCALE_L = 1.0 / (fOuterRadius - fInnerRadius);
 
-const int numOutScatter = 8;
-const float fNumOutScatter = 8.;
-const int numInScatter = 80;
-const float fNumInScatter = 80.0;
+uniform int iScatter;
+int numOutScatter = iScatter;
+float fNumOutScatter = float(numOutScatter);
+int numInScatter = 10 * iScatter;
+float fNumInScatter = float(numInScatter);
 
 out vec4 fragColor;
 

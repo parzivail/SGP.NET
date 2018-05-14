@@ -19,6 +19,7 @@ using PFX.Shader;
 using PFX.Util;
 using SGP4_Sharp;
 using DateTime = System.DateTime;
+using KeyPressEventArgs = OpenTK.KeyPressEventArgs;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using TimeSpan = System.TimeSpan;
 
@@ -26,6 +27,8 @@ namespace Sandbox
 {
     class MainWindow : GameWindow
     {
+        public static bool FastGraphics;
+
         /// <summary>
         /// Onscreen font
         /// </summary>
@@ -59,10 +62,31 @@ namespace Sandbox
             RenderFrame += MainWindow_RenderFrame;
             UpdateFrame += MainWindow_UpdateFrame;
 
+            KeyDown += MainWindow_KeyDown;
+            KeyUp += MainWindow_KeyUp;
+
+            KeyPress += MainWindow_KeyPress;
+
             ObserverBackgroundWorker.DoWork += PredictFutureObservations;
             ObserverBackgroundWorker.RunWorkerCompleted += CollectPredictedObservations;
 
             Lumberjack.TraceLevel = OutputLevel.Debug;
+        }
+
+        private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 'q')
+                FastGraphics = !FastGraphics;
+        }
+        
+        private void MainWindow_KeyUp(object sender, KeyboardKeyEventArgs e)
+        {
+            KeyboardState = Keyboard.GetState();
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            KeyboardState = Keyboard.GetState();
         }
 
         private void CollectPredictedObservations(object sender, RunWorkerCompletedEventArgs args)
@@ -94,8 +118,6 @@ namespace Sandbox
 
         private void MainWindow_UpdateFrame(object sender, FrameEventArgs e)
         {
-            KeyboardState = Keyboard.GetState();
-
             var t = (float)(50 * e.Time);
 
             if (KeyboardState[Key.Left])
@@ -245,7 +267,8 @@ namespace Sandbox
             {
                 // Static diagnostic header
                 GL.PushMatrix();
-                Font.RenderString($"FPS: {(int)Math.Ceiling(RenderFrequency)}");
+                Font.RenderString($"FPS: {(int)Math.Ceiling(RenderFrequency)}\n" +
+                                  $"Fast Graphics: {FastGraphics}");
                 GL.PopMatrix();
 
                 // Sparklines

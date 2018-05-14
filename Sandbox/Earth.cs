@@ -35,7 +35,8 @@ namespace Sandbox
         private static readonly Uniform PointLightingDiffuseColorUniform = new Uniform("uPointLightingDiffuseColor");
         private static readonly Uniform InnerRadius = new Uniform("fInnerRadius");
         private static readonly Uniform OuterRadius = new Uniform("fOuterRadius");
-        
+        private static readonly Uniform Scatter = new Uniform("iScatter");
+
         private static SimpleVertexBuffer _earthVbo;
         private static SimpleVertexBuffer _earthAtmosVbo;
         //private static SimpleVertexBuffer _spaceVbo;
@@ -92,7 +93,7 @@ namespace Sandbox
             GL.EnableVertexAttribArray(_textureCoordAttribute);
 
             GL.UseProgram(0);
-            
+
             _earthVbo = new SimpleVertexBuffer();
             _earthVbo.InitializeVbo(_sphere.MakeBuffers());
 
@@ -127,8 +128,10 @@ namespace Sandbox
             PointLightingSpecularColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
             PointLightingDiffuseColorUniform.Value = new Vector3(0.9f, 0.9f, 0.9f);
 
-            InnerRadius.Value = ((float) (Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
+            InnerRadius.Value = ((float)(Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
             OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.15f * projectionMatrix.ExtractScale()).Length;
+
+            Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
 
             var uniforms = new List<Uniform>
             {
@@ -144,7 +147,8 @@ namespace Sandbox
                 PointLightingSpecularColorUniform,
                 PointLightingDiffuseColorUniform,
                 InnerRadius,
-                OuterRadius
+                OuterRadius,
+                Scatter
             };
 
             //GL.ActiveTexture(TextureUnit.Texture0);
@@ -175,7 +179,7 @@ namespace Sandbox
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
             _earthAtmosVbo.Render(PrimitiveType.Triangles);
             GL.PopAttrib();
-            
+
             GL.UseProgram(0);
 
             GL.ActiveTexture(TextureUnit.Texture0);
