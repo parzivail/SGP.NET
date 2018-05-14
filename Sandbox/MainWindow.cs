@@ -61,6 +61,8 @@ namespace Sandbox
 
             ObserverBackgroundWorker.DoWork += PredictFutureObservations;
             ObserverBackgroundWorker.RunWorkerCompleted += CollectPredictedObservations;
+
+            Lumberjack.TraceLevel = OutputLevel.Debug;
         }
 
         private void CollectPredictedObservations(object sender, RunWorkerCompletedEventArgs args)
