@@ -37,7 +37,7 @@ namespace PFX.Util
             {
                 var x = Lerp(a.X, b.X, f);
                 var y = Lerp(a.Y, b.Y, f);
-                return new Vector2((float) x, (float) y);
+                return new Vector2((float)x, (float)y);
             }
 
             public static void GlNormal1V(Vector3 v)
@@ -52,7 +52,7 @@ namespace PFX.Util
 
             public static float HzPercent(float hz)
             {
-                return DateTime.Now.Ticks % (long) (1000 / hz) / (1000 / hz);
+                return DateTime.Now.Ticks % (long)(1000 / hz) / (1000 / hz);
             }
 
             /// <summary>
@@ -68,9 +68,9 @@ namespace PFX.Util
             /// </returns>
             public static Color ChangeColorBrightness(Color color, float correctionFactor)
             {
-                var red = (float) color.R;
-                var green = (float) color.G;
-                var blue = (float) color.B;
+                var red = (float)color.R;
+                var green = (float)color.G;
+                var blue = (float)color.B;
 
                 if (correctionFactor < 0)
                 {
@@ -86,26 +86,26 @@ namespace PFX.Util
                     blue = (255 - blue) * correctionFactor + blue;
                 }
 
-                return Color.FromArgb(color.A, (int)red, (int) green, (int) blue);
+                return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
             }
 
             public static byte[] MakeStipple(string imagePath)
             {
-                var img = (Bitmap) Image.FromFile(imagePath);
+                var img = (Bitmap)Image.FromFile(imagePath);
                 if (img.Width != 32 || img.Height != 32)
                     throw new ArgumentException("Image must be exactly 32x32!");
 
                 var bytes = new List<byte>();
                 for (var y = 0; y < 32; y++)
-                for (var x = 0; x < 32; x += 8)
-                    bytes.Add((byte) (((img.GetPixel(x, y).R > 0 ? 1 : 0) << 7) +
-                                      ((img.GetPixel(x + 1, y).R > 0 ? 1 : 0) << 6) +
-                                      ((img.GetPixel(x + 2, y).R > 0 ? 1 : 0) << 5) +
-                                      ((img.GetPixel(x + 3, y).R > 0 ? 1 : 0) << 4) +
-                                      ((img.GetPixel(x + 4, y).R > 0 ? 1 : 0) << 3) +
-                                      ((img.GetPixel(x + 5, y).R > 0 ? 1 : 0) << 2) +
-                                      ((img.GetPixel(x + 6, y).R > 0 ? 1 : 0) << 1) +
-                                      (img.GetPixel(x + 7, y).R > 0 ? 1 : 0)));
+                    for (var x = 0; x < 32; x += 8)
+                        bytes.Add((byte)(((img.GetPixel(x, y).R > 0 ? 1 : 0) << 7) +
+                                          ((img.GetPixel(x + 1, y).R > 0 ? 1 : 0) << 6) +
+                                          ((img.GetPixel(x + 2, y).R > 0 ? 1 : 0) << 5) +
+                                          ((img.GetPixel(x + 3, y).R > 0 ? 1 : 0) << 4) +
+                                          ((img.GetPixel(x + 4, y).R > 0 ? 1 : 0) << 3) +
+                                          ((img.GetPixel(x + 5, y).R > 0 ? 1 : 0) << 2) +
+                                          ((img.GetPixel(x + 6, y).R > 0 ? 1 : 0) << 1) +
+                                          (img.GetPixel(x + 7, y).R > 0 ? 1 : 0)));
                 return bytes.ToArray();
             }
 
@@ -188,22 +188,10 @@ namespace PFX.Util
             private static void Rectangle(float x, float y, float w, float h, PrimitiveType mode)
             {
                 GL.Begin(mode);
-                if (mode == PrimitiveType.LineLoop)
-                {
-                    GL.Vertex3(x, y - 1, 0);
-                    GL.Vertex3(x, y + h + 1, 0);
-                    GL.Vertex3(x + w, y + h, 0);
-                    GL.Vertex3(x + w, y - 1, 0);
-                }
-                else
-                {
-                    // Need to change coordinates since there's an off-by-one error
-                    // in GL where the corners don't add up
-                    GL.Vertex3(x, y, 0);
-                    GL.Vertex3(x, y + h, 0);
-                    GL.Vertex3(x + w, y + h, 0);
-                    GL.Vertex3(x + w, y, 0);
-                }
+                GL.Vertex3(x, y, 0);
+                GL.Vertex3(x, y + h, 0);
+                GL.Vertex3(x + w, y + h, 0);
+                GL.Vertex3(x + w, y, 0);
 
                 GL.End();
             }
@@ -309,8 +297,8 @@ namespace PFX.Util
                 double t = percentageAcross,
                     t2 = t * t,
                     t3 = t2 * t;
-                return new Vector2((float) (c0X + c1X * t + c2X * t2 + c3X * t3),
-                    (float) (c0Y + c1Y * t + c2Y * t2 + c3Y * t3));
+                return new Vector2((float)(c0X + c1X * t + c2X * t2 + c3X * t3),
+                    (float)(c0Y + c1Y * t + c2Y * t2 + c3Y * t3));
             }
         }
 
@@ -549,8 +537,8 @@ namespace PFX.Util
                 for (i = rings - 1; i >= 0; i--)
                 {
                     theta1 = theta + ringDelta;
-                    cosTheta1 = Math.Cos((float) theta1);
-                    sinTheta1 = Math.Sin((float) theta1);
+                    cosTheta1 = Math.Cos((float)theta1);
+                    sinTheta1 = Math.Sin((float)theta1);
                     GL.Begin(type);
                     phi = 0.0;
                     for (j = nsides; j >= 0; j--)
@@ -558,8 +546,8 @@ namespace PFX.Util
                         double cosPhi, sinPhi, dist;
 
                         phi += sideDelta;
-                        cosPhi = Math.Cos((float) phi);
-                        sinPhi = Math.Sin((float) phi);
+                        cosPhi = Math.Cos((float)phi);
+                        sinPhi = Math.Sin((float)phi);
                         dist = rOuter + r * cosPhi;
 
                         GL.Normal3(cosTheta1 * cosPhi, -sinTheta1 * cosPhi, sinPhi);

@@ -76,9 +76,36 @@ namespace Sandbox
         private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 'q')
+            {
                 FastGraphics = !FastGraphics;
+                SetHints();
+            }
         }
-        
+
+        private static void SetHints()
+        {
+            if (FastGraphics)
+            {
+                GL.Disable(EnableCap.LineSmooth);
+                GL.Disable(EnableCap.PolygonSmooth);
+                GL.Disable(EnableCap.PointSmooth);
+
+                GL.Hint(HintTarget.LineSmoothHint, HintMode.Fastest);
+                GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Fastest);
+                GL.Hint(HintTarget.PointSmoothHint, HintMode.Fastest);
+            }
+            else
+            {
+                GL.Enable(EnableCap.LineSmooth);
+                GL.Enable(EnableCap.PolygonSmooth);
+                GL.Enable(EnableCap.PointSmooth);
+
+                GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
+                GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Nicest);
+                GL.Hint(HintTarget.PointSmoothHint, HintMode.Nicest);
+            }
+        }
+
         private void MainWindow_KeyUp(object sender, KeyboardKeyEventArgs e)
         {
             KeyboardState = Keyboard.GetState();
@@ -273,10 +300,10 @@ namespace Sandbox
                 GL.PopMatrix();
 
                 // Sparklines
-                GL.Translate(0, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
-                _fpsSparkline.Render();
+                GL.Translate(1, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
+                _fpsSparkline.Render(Color.White, Color.Blue);
                 GL.Translate(0, (int)(Font.Common.LineHeight * 1.4f), 0);
-                _renderTimeSparkline.Render();
+                _renderTimeSparkline.Render(Color.White, Color.Red);
             }
             else
             {
@@ -288,7 +315,7 @@ namespace Sandbox
                     var next = GetNextObservation();
                     var time = next.Start.ToSystemDateTime().ToLocalTime();
                     Font.RenderString(
-                        $"Next: {next.Satellite.Name} at {(time):h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})");
+                        $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})");
                 }
                 else if (ObserverBackgroundWorker.IsBusy)
                     Font.RenderString($"Recalculating observations...");
@@ -337,10 +364,8 @@ namespace Sandbox
         {
             // Setup OpenGL data
             GL.ClearColor(Color.FromArgb(13, 13, 13));
-            GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
-            GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Nicest);
             GL.Enable(EnableCap.Blend);
-            GL.Enable(EnableCap.LineSmooth);
+            SetHints();
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.PointSize(4);
             GL.LineWidth(2);

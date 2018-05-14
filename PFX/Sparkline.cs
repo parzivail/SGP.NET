@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
 using PFX.BmFont;
+using PFX.Util;
 
 namespace PFX
 {
@@ -27,7 +28,7 @@ namespace PFX
 
         public int MaxEntries { get; }
 
-        public void Render(params object[] formatArgs)
+        public void Render(Color foreColor, Color backColor, params object[] formatArgs)
         {
             GL.PushMatrix();
             var label = string.Format(_label, formatArgs);
@@ -36,7 +37,15 @@ namespace PFX
             GL.PushAttrib(AttribMask.EnableBit);
             GL.Disable(EnableCap.Lighting);
             GL.Disable(EnableCap.Texture2D);
+            GL.Disable(EnableCap.LineSmooth);
+            GL.Disable(EnableCap.PolygonSmooth);
+            GL.Disable(EnableCap.PointSmooth);
+            GL.Disable(EnableCap.DepthTest);
+            
+            GL.Color3(backColor);
+            Fx.D2.DrawSolidRectangle(0, 0, MaxEntries, _font.Common.LineHeight);
 
+            GL.Color3(foreColor);
             GL.LineWidth(1);
             switch (_style)
             {
