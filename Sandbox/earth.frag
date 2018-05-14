@@ -42,5 +42,5 @@ void main(void) {
 		pow(diffuseLightWeighting, 1.0/1.5)
 	);
 
-    fragColor = vec4(fragmentColor.rgb, fragmentColor.a);
+    fragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
 }

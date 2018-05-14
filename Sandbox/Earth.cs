@@ -15,8 +15,9 @@ namespace Sandbox
 {
     class Earth
     {
-        private readonly Sphere _sphere = new Sphere((float)(Global.kXKMPER / 100), (float)(Global.kXKMPER / 100), 60, 30);
-        private readonly Sphere _sphereAtmosphere = new Sphere((float)(Global.kXKMPER / 100) * 1.07f, (float)(Global.kXKMPER / 100) * 1.07f, 60, 30);
+        private static readonly float EarthRadiusScaled = (float) (Global.kXKMPER / 100);
+        private readonly Sphere _sphere = new Sphere(EarthRadiusScaled, EarthRadiusScaled, 60, 30);
+        private readonly Sphere _sphereAtmosphere = new Sphere(EarthRadiusScaled * 1.07f, EarthRadiusScaled * 1.07f, 60, 30);
         //private readonly Sphere _sphereSpace = new Sphere(257, 257, 60, 30);
         private static ShaderProgram _earthShader;
         private static ShaderProgram _earthAtmosShader;
@@ -124,12 +125,13 @@ namespace Sandbox
 
             // Percent through a day (1440m/day)
             var t = System.DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
-            const float d = 20000;
+            const float sunDistance = 20000;
 
-            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(d * (float)Math.Cos(t), 8696, d * (float)Math.Sin(t)), modelViewMatrix);
+            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), 8696, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
 
-            InnerRadius.Value = ((float)(Global.kXKMPER / 100) * 1.1f * projectionMatrix.ExtractScale()).Length;
-            OuterRadius.Value = ((float)(Global.kXKMPER / 100) * 1.15f * projectionMatrix.ExtractScale()).Length;
+            var scale = projectionMatrix.ExtractScale();
+            InnerRadius.Value = (EarthRadiusScaled * 1.1f * scale).Length;
+            OuterRadius.Value = (EarthRadiusScaled * 1.15f * scale).Length;
 
             Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
 
