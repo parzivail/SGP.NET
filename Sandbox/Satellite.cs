@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using SGP4_Sharp;
-using DateTime = SGP4_Sharp.DateTime;
 
 namespace Sandbox
 {
     class Satellite
     {
-        private readonly SGP4 _sgp4;
+        private readonly Sgp4 _sgp4;
 
         public string Name { get; }
 
@@ -19,12 +18,12 @@ namespace Sandbox
         {
             Name = name;
 
-            _sgp4 = new SGP4(new Tle(name, tle1, tle2));
+            _sgp4 = new Sgp4(new Tle(name, tle1, tle2));
         }
 
         public Eci Predict()
         {
-            return Predict(DateTime.Now());
+            return Predict(DateTime.UtcNow);
         }
 
         public Eci Predict(DateTime time)
@@ -34,7 +33,7 @@ namespace Sandbox
 
         public List<CoordGeodetic> GetFootprint()
         {
-            return GetFootprint(DateTime.Now());
+            return GetFootprint(DateTime.UtcNow);
         }
 
         public List<CoordGeodetic> GetFootprint(DateTime time)

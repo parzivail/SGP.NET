@@ -15,7 +15,7 @@ namespace Sandbox
 {
     class Earth
     {
-        private static readonly float EarthRadiusScaled = (float) (Global.kXKMPER / 100);
+        private static readonly float EarthRadiusScaled = (float) (Global.EarthRadiusKm / 100);
         private readonly Sphere _sphere = new Sphere(EarthRadiusScaled, EarthRadiusScaled, 60, 30);
         private readonly Sphere _sphereAtmosphere = new Sphere(EarthRadiusScaled * 1.07f, EarthRadiusScaled * 1.07f, 60, 30);
         //private readonly Sphere _sphereSpace = new Sphere(257, 257, 60, 30);

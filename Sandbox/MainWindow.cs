@@ -48,7 +48,7 @@ namespace Sandbox
         private Vector3 _rotation = new Vector3(0, 180, 0);
 
         private static readonly Earth Earth = new Earth();
-        private static readonly SatelliteNetwork Network = new SatelliteNetwork(new CoordGeodetic(30.332184, -81.655647, 0));
+        private static readonly GroundStation GroundStation = new GroundStation(new CoordGeodetic(30.2333, -81.6744, 0));
 
         private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
         private DateTime _observationsDirtyTime = DateTime.Now;
@@ -123,10 +123,10 @@ namespace Sandbox
 
         private static void PredictFutureObservations(object sender, DoWorkEventArgs args)
         {
-            var observations = Network
-                .Satellites
-                .SelectMany(satellite => Network.Observe(satellite))
-                .OrderBy(observation => observation.Start.ToSystemDateTime())
+            var observations = GroundStation
+                .TrackedSatellites
+                .SelectMany(satellite => GroundStation.Observe(satellite))
+                .OrderBy(observation => observation.Start)
                 .ToList();
             args.Result = observations;
         }
@@ -136,7 +136,7 @@ namespace Sandbox
             if (_todaysObservations.Count < 0)
                 return null;
             return _todaysObservations.First(observation =>
-                observation.Start.ToSystemDateTime().ToLocalTime() > DateTime.Now);
+                observation.Start.ToLocalTime() > DateTime.Now);
         }
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs args)
@@ -183,7 +183,7 @@ namespace Sandbox
             // Start profiling
             _profiler.Start("render");
 
-            // Update sparklines
+            // FromGeodetic sparklines
             if (_profile.ContainsKey("render"))
                 _renderTimeSparkline.Enqueue((float)_profile["render"].TotalMilliseconds);
 
@@ -216,7 +216,7 @@ namespace Sandbox
 
             GL.Disable(EnableCap.Lighting);
             GL.Enable(EnableCap.Blend);
-            foreach (var satellite in Network.Satellites)
+            foreach (var satellite in GroundStation.TrackedSatellites)
             {
                 var posVec = satellite
                     .Predict()
@@ -232,7 +232,7 @@ namespace Sandbox
                 GL.LineStipple(2, 0xAAAA);
                 GL.LineWidth(1);
 
-                var time = SGP4_Sharp.DateTime.Now().AddMinutes(-2);
+                var time = DateTime.UtcNow.AddMinutes(-2);
                 GL.Begin(PrimitiveType.LineStrip);
                 for (var i = 0; i < 8; i++)
                 {
@@ -242,7 +242,7 @@ namespace Sandbox
                                      .ToGeodetic()
                                      .ToSpherical() / 100;
 
-                    GL.Color3(Network.IsVisible(predictEci) ? Color.Blue : Color.Yellow);
+                    GL.Color3(GroundStation.IsVisible(predictEci) ? Color.DodgerBlue : Color.Yellow);
 
                     GL.Vertex3(predictPos);
                     time = time.AddMinutes(1);
@@ -251,15 +251,25 @@ namespace Sandbox
 
                 GL.Color3(Color.Yellow);
                 GL.LineStipple(4, 0xAAAA);
-                var footprint = satellite.GetFootprint();
+
                 var center = satellite.Predict().ToGeodetic();
+                var centerOnSurface = center;
+                centerOnSurface.Altitude = 0;
+
+                GL.Begin(PrimitiveType.LineStrip);
+                GL.Vertex3(center.ToSpherical() / 100);
+                GL.Vertex3(centerOnSurface.ToSpherical() / 100);
+                GL.End();
+
+                var footprint = satellite.GetFootprint();
                 GL.PushMatrix();
-                GL.Rotate((float)(center.longitude / Math.PI * 180) - 90, 0, 1, 0);
-                GL.Rotate(90 - (float)(center.latitude / Math.PI * 180), 1, 0, 0);
+                GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
+                GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
                 GL.Begin(PrimitiveType.LineLoop);
                 foreach (var coord in footprint)
                     GL.Vertex3(coord.ToSpherical() / 100f);
                 GL.End();
+
                 GL.PopMatrix();
                 GL.Disable(EnableCap.LineStipple);
             }
@@ -300,7 +310,7 @@ namespace Sandbox
                 GL.PopMatrix();
 
                 // Sparklines
-                GL.Translate(1, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
+                GL.Translate(0, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
                 _fpsSparkline.Render(Color.White, Color.Blue);
                 GL.Translate(0, (int)(Font.Common.LineHeight * 1.4f), 0);
                 _renderTimeSparkline.Render(Color.White, Color.Red);
@@ -313,7 +323,7 @@ namespace Sandbox
                 if (_todaysObservations.Count > 0)
                 {
                     var next = GetNextObservation();
-                    var time = next.Start.ToSystemDateTime().ToLocalTime();
+                    var time = next.Start.ToLocalTime();
                     Font.RenderString(
                         $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})");
                 }
@@ -325,7 +335,7 @@ namespace Sandbox
 
             GL.PopMatrix();
 
-            foreach (var satellite in Network.Satellites)
+            foreach (var satellite in GroundStation.TrackedSatellites)
             {
                 var posVec = satellite
                     .Predict()
@@ -399,25 +409,25 @@ namespace Sandbox
             Earth.Init();
             Lumberjack.Debug("Loaded Earth entity");
 
-            Network.Satellites.Add(new Satellite(
+            GroundStation.TrackedSatellites.Add(new Satellite(
                 "NOAA 19",
                 "1 33591U 09005A   18133.56712982  .00000090  00000-0  73994-4 0  9996",
                 "2 33591  99.1396 110.9116 0014982  65.8583 294.4152 14.12277340477026"
             ));
 
-            Network.Satellites.Add(new Satellite(
+            GroundStation.TrackedSatellites.Add(new Satellite(
                 "NOAA 18",
-                "1 28654U 05018A   18133.60637508  .00000026  00000-0  39118-4 0  9994",
-                "2 28654  99.1482 168.3501 0013661 221.0542 138.9601 14.12375330668802"
+                "1 28654U 05018A   18133.96058456  .00000029  00000-0  40795-4 0  9998",
+                "2 28654  99.1481 168.7116 0013686 220.0166 139.9997 14.12375358668859"
             ));
 
-            Network.Satellites.Add(new Satellite(
+            GroundStation.TrackedSatellites.Add(new Satellite(
                 "ISS (ZARYA)",
                 "1 25544U 98067A   18133.55965878  .00079487  00000-0  11977-2 0  9991",
                 "2 25544  51.6395 191.3285 0003974  83.9302  21.4973 15.54083292113132"
             ));
 
-            Network.Satellites.Add(new Satellite(
+            GroundStation.TrackedSatellites.Add(new Satellite(
                 "ATLAS CENTAUR 2",
                 "1 00694U 63047A   18133.50403603  .00000393  00000-0  40022-4 0  9993",
                 "2 00694  30.3551 147.2516 0586973  17.7385 344.2819 14.02316828729119"

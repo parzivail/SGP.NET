@@ -48,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzimuthElevation.cs" />
     <Compile Include="BackgroundRenderArgs.cs" />
     <Compile Include="Earth.cs" />
     <Compile Include="Extensions.cs" />
@@ -64,7 +63,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Satellite.cs" />
-    <Compile Include="SatelliteNetwork.cs" />
+    <Compile Include="GroundStation.cs" />
     <Compile Include="SatelliteObservation.cs" />
     <Compile Include="Sphere.cs" />
   </ItemGroup>
@@ -101,9 +100,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="debug.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="earth_day.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
