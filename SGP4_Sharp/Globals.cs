@@ -1,18 +1,3 @@
-/*
- * Copyright 2013 Daniel Warner <contact@danrw.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 using System;
 
 namespace SGP4_Sharp
@@ -49,13 +34,19 @@ namespace SGP4_Sharp
         public const double KMinutesPerDay = 1440.0;
         public const double KHoursPerDay = 24.0;
 
-        // Jan 1.0 1900 = Jan 1 1900 00h UTC
+        /// <summary>
+        /// Jan 1.0 1900 = Jan 1 1900 00h UTC
+        /// </summary>
         public const double KEpochJan100H1900 = 2415019.5;
 
-        // Jan 1.5 1900 = Jan 1 1900 12h UTC
+        /// <summary>
+        /// Jan 1.5 1900 = Jan 1 1900 12h UTC
+        /// </summary>
         public const double KEpochJan112H1900 = 2415020.0;
 
-        // Jan 1.5 2000 = Jan 1 2000 12h UTC
+        /// <summary>
+        /// Jan 1.5 2000 = Jan 1 2000 12h UTC
+        /// </summary>
         public const double KEpochJan112H2000 = 2451545.0;
     }
 }

@@ -1,51 +1,21 @@
-/*
- * Copyright 2013 Daniel Warner <contact@danrw.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 using System;
 
 namespace SGP4_Sharp
 {
-    /**
-   * @mainpage
-   *
-   * This documents the SGP4 tracking library.
-   */
-
-    /**
-   * @brief The simplified perturbations model 4 propagater.
-   */
+    /// <summary>
+    /// The simplified perturbations model 4 propagater.
+    /// </summary>
     public class Sgp4
     {
-        /*
-         * flags
-         */
         private bool _useSimpleModel;
         private bool _useDeepSpace;
 
-        /*
-         * the ants used
-         */
         private CommonConstants _commonConsts;
         private NearSpaceConstants _nearspaceConsts;
         private DeepSpaceConstants _deepspaceConsts;
         private IntegratorConstants _integratorConsts;
         private IntegratorParams _integratorParams;
 
-        /*
-         * the orbit data
-         */
         private OrbitalElements _elements;
 
         private static readonly CommonConstants EmptyCommonConstants = new CommonConstants();
@@ -84,9 +54,9 @@ namespace SGP4_Sharp
         /// <returns></returns>
         public Eci FindPosition(DateTime date)
         {
-            return FindPosition((date - _elements.GetEpoch()).TotalMinutes);
+            return FindPosition((date - _elements.Epoch).TotalMinutes);
         }
-        
+
         private static double EvaluateCubicPolynomial(double x, double constant, double linear, double squared, double cubed)
         {
             return constant + x * (linear + x * (squared + x * cubed));
@@ -107,12 +77,18 @@ namespace SGP4_Sharp
             public double Xnodcf;
             public double C1;
             public double C4;
+            /// <summary>
+            /// secular rate of omega (radians/sec)
+            /// </summary>
             public double Omgdot;
-            // secular rate of omega (radians/sec)
+            /// <summary>
+            /// secular rate of xnode (radians/sec)
+            /// </summary>
             public double Xnodot;
-            // secular rate of xnode (radians/sec)
+            /// <summary>
+            /// ecular rate of xnode (radians/sec)
+            /// </summary>
             public double Xmdot;
-            // secular rate of xmo   (radians/sec)
         }
 
         private struct NearSpaceConstants
@@ -135,29 +111,25 @@ namespace SGP4_Sharp
             public double Gsto;
             public double Zmol;
             public double Zmos;
-            /*
-               * whether the deep space orbit is
-               * geopotential resonance for 12 hour orbits
-               */
+            /// <summary>
+            /// whether the deep space orbit is geopotential resonance for 12 hour orbits
+            /// </summary>
             public bool ResonanceFlag;
-            /*
-               * whether the deep space orbit is
-               * 24h synchronous resonance
-               */
+            /// <summary>
+            /// whether the deep space orbit is 24h synchronous resonance
+            /// </summary>
             public bool SynchronousFlag;
-            /*
-               * lunar / solar ants for epoch
-               * applied during DeepSpaceSecular()
-               */
+
+            // lunar / solar constants for epoch applied during DeepSpaceSecular()
+
             public double Sse;
             public double Ssi;
             public double Ssl;
             public double Ssg;
             public double Ssh;
-            /*
-               * lunar / solar ants
-               * used during DeepSpaceCalculateLunarSolarTerms()
-               */
+
+            // lunar / solar constants used during DeepSpaceCalculateLunarSolarTerms()
+
             public double Se2;
             public double Si2;
             public double Sl2;
@@ -182,9 +154,9 @@ namespace SGP4_Sharp
             public double Xgh4;
             public double Xh2;
             public double Xh3;
-            /*
-               * used during DeepSpaceCalcDotTerms()
-               */
+
+            // used during DeepSpaceCalcDotTerms()
+
             public double D2201;
             public double D2211;
             public double D3210;
@@ -209,86 +181,74 @@ namespace SGP4_Sharp
 
         private struct IntegratorConstants
         {
-            /*
-               * integrator ants
-               */
+            // integrator constants
             public double Xfact;
             public double Xlamo;
 
-            /*
-               * integrator values for epoch
-               */
+            // integrator values for epoch
             public IntegratorValues Values0;
         }
 
         private struct IntegratorParams
         {
-            /*
-               * integrator values
-               */
+            // integrator values
             public double Xli;
             public double Xni;
             public double Atime;
-            /*
-               * itegrator values for current d_atime_
-               */
+
+            // integrator values for current d_atime_
             public IntegratorValues ValuesT;
         }
 
         private void Initialize()
         {
-            /*
-           * reset all constants etc
-           */
             Reset();
 
-            /*
-           * error checks
-           */
-            if (_elements.GetEccentricity() < 0.0 || _elements.GetEccentricity() > 0.999)
+            if (_elements.Eccentricity < 0.0 || _elements.Eccentricity > 0.999)
             {
                 throw new SatelliteException("GetEccentricity out of range");
             }
 
-            if (_elements.GetInclination() < 0.0 || _elements.GetInclination() > Global.KPi)
+            if (_elements.Inclination < 0.0 || _elements.Inclination > Global.KPi)
             {
                 throw new SatelliteException("GetInclination out of range");
             }
 
-            _commonConsts.Cosio = Math.Cos(_elements.GetInclination());
-            _commonConsts.Sinio = Math.Sin(_elements.GetInclination());
+            _commonConsts.Cosio = Math.Cos(_elements.Inclination);
+            _commonConsts.Sinio = Math.Sin(_elements.Inclination);
             var theta2 = _commonConsts.Cosio * _commonConsts.Cosio;
             _commonConsts.X3Thm1 = 3.0 * theta2 - 1.0;
-            var eosq = _elements.GetEccentricity() * _elements.GetEccentricity();
+            var eosq = _elements.Eccentricity * _elements.Eccentricity;
             var betao2 = 1.0 - eosq;
             var betao = Math.Sqrt(betao2);
 
-            if (_elements.GetPeriod() >= 225.0)
+            if (_elements.Period >= 225.0)
             {
                 _useDeepSpace = true;
             }
             else
             {
                 _useDeepSpace = false;
-                _useSimpleModel = _elements.GetPerigee() < 220.0;
+
                 /*
                  * for perigee less than 220 kilometers, the simple_model flag is set
                  * and the equations are truncated to linear variation in sqrt a and
                  * quadratic variation in mean anomly. also, the c3 term, the
                  * delta omega term and the delta m term are dropped
                  */
+                _useSimpleModel = _elements.Perigee < 220.0;
             }
 
             /*
-           * for perigee below 156km, the values of
-           * s4 and qoms2t are altered
-           */
+             * for perigee below 156km, the values of
+             * s4 and qoms2t are altered
+             */
             var s4 = Global.Ks;
             var qoms24 = Global.KQoms2T;
-            if (_elements.GetPerigee() < 156.0)
+            if (_elements.Perigee < 156.0)
             {
-                s4 = _elements.GetPerigee() - 78.0;
-                if (_elements.GetPerigee() < 98.0)
+                s4 = _elements.Perigee - 78.0;
+                if (_elements.Perigee < 98.0)
                 {
                     s4 = 20.0;
                 }
@@ -297,42 +257,42 @@ namespace SGP4_Sharp
             }
 
             /*
-           * generate constants
-           */
+             * generate constants
+             */
             var pinvsq = 1.0
-                            / (_elements.GetRecoveredSemiMajorAxis()
-                            * _elements.GetRecoveredSemiMajorAxis()
+                            / (_elements.RecoveredSemiMajorAxis
+                            * _elements.RecoveredSemiMajorAxis
                             * betao2 * betao2);
-            var tsi = 1.0 / (_elements.GetRecoveredSemiMajorAxis() - s4);
-            _commonConsts.Eta = _elements.GetRecoveredSemiMajorAxis()
-            * _elements.GetEccentricity() * tsi;
+            var tsi = 1.0 / (_elements.RecoveredSemiMajorAxis - s4);
+            _commonConsts.Eta = _elements.RecoveredSemiMajorAxis
+            * _elements.Eccentricity * tsi;
             var etasq = _commonConsts.Eta * _commonConsts.Eta;
-            var eeta = _elements.GetEccentricity() * _commonConsts.Eta;
+            var eeta = _elements.Eccentricity * _commonConsts.Eta;
             var psisq = Math.Abs(1.0 - etasq);
             var coef = qoms24 * Math.Pow(tsi, 4.0);
             var coef1 = coef / Math.Pow(psisq, 3.5);
-            var c2 = coef1 * _elements.GetRecoveredMeanMotion()
-                        * (_elements.GetRecoveredSemiMajorAxis()
+            var c2 = coef1 * _elements.RecoveredMeanMotion
+                        * (_elements.RecoveredSemiMajorAxis
                         * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
                         + 0.75 * Global.KCk2 * tsi / psisq * _commonConsts.X3Thm1
                         * (8.0 + 3.0 * etasq * (8.0 + etasq)));
-            _commonConsts.C1 = _elements.GetBStar() * c2;
+            _commonConsts.C1 = _elements.BStar * c2;
             _commonConsts.A3Ovk2 = -Global.KXj3 / Global.KCk2 * Global.KAe * Global.KAe * Global.KAe;
             _commonConsts.X1Mth2 = 1.0 - theta2;
-            _commonConsts.C4 = 2.0 * _elements.GetRecoveredMeanMotion()
-            * coef1 * _elements.GetRecoveredSemiMajorAxis() * betao2
-            * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.GetEccentricity()
+            _commonConsts.C4 = 2.0 * _elements.RecoveredMeanMotion
+            * coef1 * _elements.RecoveredSemiMajorAxis * betao2
+            * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.Eccentricity
             * (0.5 + 2.0 * etasq)
-            - 2.0 * Global.KCk2 * tsi / (_elements.GetRecoveredSemiMajorAxis() * psisq)
+            - 2.0 * Global.KCk2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
             * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
             * (1.5 - 0.5 * eeta))
             + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
-            (1.0 + etasq)) * Math.Cos(2.0 * _elements.GetArgumentPerigee())));
+            (1.0 + etasq)) * Math.Cos(2.0 * _elements.ArgumentPerigee)));
             var theta4 = theta2 * theta2;
-            var temp1 = 3.0 * Global.KCk2 * pinvsq * _elements.GetRecoveredMeanMotion();
+            var temp1 = 3.0 * Global.KCk2 * pinvsq * _elements.RecoveredMeanMotion;
             var temp2 = temp1 * Global.KCk2 * pinvsq;
-            var temp3 = 1.25 * Global.KCk4 * pinvsq * pinvsq * _elements.GetRecoveredMeanMotion();
-            _commonConsts.Xmdot = _elements.GetRecoveredMeanMotion() + 0.5 * temp1 * betao *
+            var temp3 = 1.25 * Global.KCk4 * pinvsq * pinvsq * _elements.RecoveredMeanMotion;
+            _commonConsts.Xmdot = _elements.RecoveredMeanMotion + 0.5 * temp1 * betao *
             _commonConsts.X3Thm1 + 0.0625 * temp2 * betao *
             (13.0 - 78.0 * theta2 + 137.0 * theta4);
             var x1M5Th = 1.0 - 5.0 * theta2;
@@ -359,7 +319,7 @@ namespace SGP4_Sharp
 
             if (_useDeepSpace)
             {
-                _deepspaceConsts.Gsto = _elements.GetEpoch().ToGreenwichSiderealTime();
+                _deepspaceConsts.Gsto = _elements.Epoch.ToGreenwichSiderealTime();
 
                 DeepSpaceInitialise(eosq, _commonConsts.Sinio, _commonConsts.Cosio, betao,
                   theta2, betao2,
@@ -368,33 +328,33 @@ namespace SGP4_Sharp
             else
             {
                 var c3 = 0.0;
-                if (_elements.GetEccentricity() > 1.0e-4)
+                if (_elements.Eccentricity > 1.0e-4)
                 {
-                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.GetRecoveredMeanMotion() * Global.KAe *
-                    _commonConsts.Sinio / _elements.GetEccentricity();
+                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion * Global.KAe *
+                    _commonConsts.Sinio / _elements.Eccentricity;
                 }
 
-                _nearspaceConsts.C5 = 2.0 * coef1 * _elements.GetRecoveredSemiMajorAxis() * betao2 * (1.0 + 2.75 *
+                _nearspaceConsts.C5 = 2.0 * coef1 * _elements.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
                 (etasq + eeta) + eeta * etasq);
-                _nearspaceConsts.Omgcof = _elements.GetBStar() * c3 * Math.Cos(_elements.GetArgumentPerigee());
+                _nearspaceConsts.Omgcof = _elements.BStar * c3 * Math.Cos(_elements.ArgumentPerigee);
 
                 _nearspaceConsts.Xmcof = 0.0;
-                if (_elements.GetEccentricity() > 1.0e-4)
+                if (_elements.Eccentricity > 1.0e-4)
                 {
-                    _nearspaceConsts.Xmcof = -Global.KTwothird * coef * _elements.GetBStar() * Global.KAe / eeta;
+                    _nearspaceConsts.Xmcof = -Global.KTwothird * coef * _elements.BStar * Global.KAe / eeta;
                 }
 
-                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * (Math.Cos(_elements.GetMeanAnomoly())), 3.0);
-                _nearspaceConsts.Sinmo = Math.Sin(_elements.GetMeanAnomoly());
+                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * (Math.Cos(_elements.MeanAnomoly)), 3.0);
+                _nearspaceConsts.Sinmo = Math.Sin(_elements.MeanAnomoly);
 
                 if (_useSimpleModel) return;
 
                 var c1Sq = _commonConsts.C1 * _commonConsts.C1;
-                _nearspaceConsts.D2 = 4.0 * _elements.GetRecoveredSemiMajorAxis() * tsi * c1Sq;
+                _nearspaceConsts.D2 = 4.0 * _elements.RecoveredSemiMajorAxis * tsi * c1Sq;
                 var temp = _nearspaceConsts.D2 * tsi * _commonConsts.C1 / 3.0;
-                _nearspaceConsts.D3 = (17.0 * _elements.GetRecoveredSemiMajorAxis() + s4) * temp;
-                _nearspaceConsts.D4 = 0.5 * temp * _elements.GetRecoveredSemiMajorAxis() *
-                                       tsi * (221.0 * _elements.GetRecoveredSemiMajorAxis() + 31.0 * s4) * _commonConsts.C1;
+                _nearspaceConsts.D3 = (17.0 * _elements.RecoveredSemiMajorAxis + s4) * temp;
+                _nearspaceConsts.D4 = 0.5 * temp * _elements.RecoveredSemiMajorAxis *
+                                       tsi * (221.0 * _elements.RecoveredSemiMajorAxis + 31.0 * s4) * _commonConsts.C1;
                 _nearspaceConsts.T3Cof = _nearspaceConsts.D2 + 2.0 * c1Sq;
                 _nearspaceConsts.T4Cof = 0.25 * (3.0 * _nearspaceConsts.D3 + _commonConsts.C1 *
                                                   (12.0 * _nearspaceConsts.D2 + 10.0 * c1Sq));
@@ -407,26 +367,26 @@ namespace SGP4_Sharp
         private Eci FindPositionSdp4(double tsince)
         {
             /*
-           * update for secular gravity and atmospheric drag
-           */
-            var xmdf = _elements.GetMeanAnomoly()
+             * update for secular gravity and atmospheric drag
+             */
+            var xmdf = _elements.MeanAnomoly
                           + _commonConsts.Xmdot * tsince;
-            var omgadf = _elements.GetArgumentPerigee()
+            var omgadf = _elements.ArgumentPerigee
                             + _commonConsts.Omgdot * tsince;
-            var xnoddf = _elements.GetAscendingNode()
+            var xnoddf = _elements.AscendingNode
                             + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
             var xnode = xnoddf + _commonConsts.Xnodcf * tsq;
             var tempa = 1.0 - _commonConsts.C1 * tsince;
-            var tempe = _elements.GetBStar() * _commonConsts.C4 * tsince;
+            var tempe = _elements.BStar * _commonConsts.C4 * tsince;
             var templ = _commonConsts.T2Cof * tsq;
 
-            var xn = _elements.GetRecoveredMeanMotion();
-            var e = _elements.GetEccentricity();
-            var xincl = _elements.GetInclination();
+            var xn = _elements.RecoveredMeanMotion;
+            var e = _elements.Eccentricity;
+            var xincl = _elements.Inclination;
 
-            DeepSpaceSecular(tsince, xmdf, omgadf, xnode, e, xincl, xn);
+            DeepSpaceSecular(tsince, ref xmdf, omgadf, xnode, ref e, ref xincl, ref xn);
 
             if (xn <= 0.0)
             {
@@ -435,14 +395,14 @@ namespace SGP4_Sharp
 
             var a = Math.Pow(Global.KXke / xn, Global.KTwothird) * tempa * tempa;
             e -= tempe;
-            var xmam = xmdf + _elements.GetRecoveredMeanMotion() * templ;
+            var xmam = xmdf + _elements.RecoveredMeanMotion * templ;
 
-            DeepSpacePeriodics(tsince, e, xincl, omgadf, xnode, xmam);
+            DeepSpacePeriodics(tsince, ref e, ref xincl, ref omgadf, ref xnode, ref xmam);
 
             /*
-           * keeping xincl positive important unless you need to display xincl
-           * and dislike negative inclinations
-           */
+             * keeping xincl positive important unless you need to display xincl
+             * and dislike negative inclinations
+             */
             if (xincl < 0.0)
             {
                 xincl = -xincl;
@@ -454,8 +414,8 @@ namespace SGP4_Sharp
             var omega = omgadf;
 
             /*
-           * fix tolerance for error recognition
-           */
+             * fix tolerance for error recognition
+             */
             if (e <= -0.001)
             {
                 throw new SatelliteException("Error: (e <= -0.001)");
@@ -471,8 +431,8 @@ namespace SGP4_Sharp
             }
 
             /*
-           * re-compute the perturbed values
-           */
+             * re-compute the perturbed values
+             */
             var perturbedSinio = Math.Sin(xincl);
             var perturbedCosio = Math.Cos(xincl);
 
@@ -498,8 +458,8 @@ namespace SGP4_Sharp
                                      * perturbedSinio;
 
             /*
-           * using calculated values, find position and velocity
-           */
+             * using calculated values, find position and velocity
+             */
             return CalculateFinalPositionVelocity(tsince, e,
               a, omega, xl, xnode,
               xincl, perturbedXlcof, perturbedAycof,
@@ -511,22 +471,22 @@ namespace SGP4_Sharp
         private Eci FindPositionSgp4(double tsince)
         {
             /*
-           * update for secular gravity and atmospheric drag
-           */
-            var xmdf = _elements.GetMeanAnomoly()
+             * update for secular gravity and atmospheric drag
+             */
+            var xmdf = _elements.MeanAnomoly
                           + _commonConsts.Xmdot * tsince;
-            var omgadf = _elements.GetArgumentPerigee()
+            var omgadf = _elements.ArgumentPerigee
                             + _commonConsts.Omgdot * tsince;
-            var xnoddf = _elements.GetAscendingNode()
+            var xnoddf = _elements.AscendingNode
                             + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
             var xnode = xnoddf + _commonConsts.Xnodcf * tsq;
             var tempa = 1.0 - _commonConsts.C1 * tsince;
-            var tempe = _elements.GetBStar() * _commonConsts.C4 * tsince;
+            var tempe = _elements.BStar * _commonConsts.C4 * tsince;
             var templ = _commonConsts.T2Cof * tsq;
 
-            var xincl = _elements.GetInclination();
+            var xincl = _elements.Inclination;
             var omega = omgadf;
             var xmp = xmdf;
 
@@ -546,19 +506,19 @@ namespace SGP4_Sharp
 
                 tempa = tempa - _nearspaceConsts.D2 * tsq - _nearspaceConsts.D3
                 * tcube - _nearspaceConsts.D4 * tfour;
-                tempe += _elements.GetBStar() * _nearspaceConsts.C5
+                tempe += _elements.BStar * _nearspaceConsts.C5
                 * (Math.Sin(xmp) - _nearspaceConsts.Sinmo);
                 templ += _nearspaceConsts.T3Cof * tcube + tfour
                 * (_nearspaceConsts.T4Cof + tsince * _nearspaceConsts.T5Cof);
             }
 
-            var a = _elements.GetRecoveredSemiMajorAxis() * tempa * tempa;
-            var e = _elements.GetEccentricity() - tempe;
-            var xl = xmp + omega + xnode + _elements.GetRecoveredMeanMotion() * templ;
+            var a = _elements.RecoveredSemiMajorAxis * tempa * tempa;
+            var e = _elements.Eccentricity - tempe;
+            var xl = xmp + omega + xnode + _elements.RecoveredMeanMotion * templ;
 
             /*
-           * fix tolerance for error recognition
-           */
+             * fix tolerance for error recognition
+             */
             if (e <= -0.001)
             {
                 throw new SatelliteException("Error: (e <= -0.001)");
@@ -573,9 +533,9 @@ namespace SGP4_Sharp
             }
 
             /*
-           * using calculated values, find position and velocity
-           * we can pass in constants from Initialise() as these dont change
-           */
+             * using calculated values, find position and velocity
+             * we can pass in constants from Initialise() as these dont change
+             */
             return CalculateFinalPositionVelocity(tsince, e,
               a, omega, xl, xnode,
               xincl, _commonConsts.Xlcof, _commonConsts.Aycof,
@@ -602,8 +562,8 @@ namespace SGP4_Sharp
             var beta2 = 1.0 - e * e;
             var xn = Global.KXke / Math.Pow(a, 1.5);
             /*
-           * long period periodics
-           */
+             * long period periodics
+             */
             var axn = e * Math.Cos(omega);
             var temp11 = 1.0 / (a * beta2);
             var xll = temp11 * xlcof * axn;
@@ -618,13 +578,13 @@ namespace SGP4_Sharp
             }
 
             /*
-           * solve keplers equation
-           * - solve using Newton-Raphson root solving
-           * - here capu is almost the mean anomoly
-           * - initialise the eccentric anomaly term epw
-           * - The fmod saves reduction of angle to +/-2pi in sin/cos() and prevents
-           * convergence problems.
-           */
+             * solve keplers equation
+             * - solve using Newton-Raphson root solving
+             * - here capu is almost the mean anomoly
+             * - initialise the eccentric anomaly term epw
+             * - The fmod saves reduction of angle to +/-2pi in sin/cos() and prevents
+             * convergence problems.
+             */
             var capu = (xlt - xnode) % Global.KTwopi;
             var epw = capu;
 
@@ -656,15 +616,15 @@ namespace SGP4_Sharp
                 else
                 {
                     /*
-                       * 1st order Newton-Raphson correction
-                       */
+                     * 1st order Newton-Raphson correction
+                     */
                     var fdot = 1.0 - ecose;
                     var deltaEpw = f / fdot;
 
                     /*
-                       * 2nd order Newton-Raphson correction.
-                       * f / (fdot - 0.5 * d2f * f/fdot)
-                       */
+                     * 2nd order Newton-Raphson correction.
+                     * f / (fdot - 0.5 * d2f * f/fdot)
+                     */
                     if (i == 0)
                     {
                         if (deltaEpw > maxNewtonNaphson)
@@ -682,14 +642,14 @@ namespace SGP4_Sharp
                     }
 
                     /*
-                       * Newton-Raphson correction of -F/DF
-                       */
+                     * Newton-Raphson correction of -F/DF
+                     */
                     epw += deltaEpw;
                 }
             }
             /*
-           * short period preliminary quantities
-           */
+             * short period preliminary quantities
+             */
             var temp21 = 1.0 - elsq;
             var pl = a * temp21;
 
@@ -712,8 +672,8 @@ namespace SGP4_Sharp
             var cos2U = 2.0 * cosu * cosu - 1.0;
 
             /*
-           * update for short periodics
-           */
+             * update for short periodics
+             */
             var temp41 = 1.0 / pl;
             var temp42 = Global.KCk2 * temp41;
             var temp43 = temp42 * temp41;
@@ -727,8 +687,8 @@ namespace SGP4_Sharp
             var rfdotk = rfdot + xn * temp42 * (x1Mth2 * cos2U + 1.5 * x3Thm1);
 
             /*
-           * orientation vectors
-           */
+             * orientation vectors
+             */
             var sinuk = Math.Sin(uk);
             var cosuk = Math.Cos(uk);
             var sinik = Math.Sin(xinck);
@@ -744,8 +704,8 @@ namespace SGP4_Sharp
             var vy = xmy * cosuk - sinnok * sinuk;
             var vz = sinik * cosuk;
             /*
-           * position and velocity
-           */
+             * position and velocity
+             */
             var x = rk * ux * Global.EarthRadiusKm;
             var y = rk * uy * Global.EarthRadiusKm;
             var z = rk * uz * Global.EarthRadiusKm;
@@ -758,12 +718,12 @@ namespace SGP4_Sharp
             if (rk < 1.0)
             {
                 throw new DecayedException(
-                  _elements.GetEpoch().AddMinutes(tsince),
+                  _elements.Epoch.AddMinutes(tsince),
                   position,
                   velocity);
             }
 
-            return new Eci(_elements.GetEpoch().AddMinutes(tsince), position, velocity);
+            return new Eci(_elements.Epoch.AddMinutes(tsince), position, velocity);
         }
 
         private void DeepSpaceInitialise(
@@ -804,17 +764,17 @@ namespace SGP4_Sharp
             const double root52 = 1.1428639E-7;
             const double root54 = 2.1765803E-9;
 
-            var aqnv = 1.0 / _elements.GetRecoveredSemiMajorAxis();
+            var aqnv = 1.0 / _elements.RecoveredSemiMajorAxis;
             var xpidot = omgdot + xnodot;
-            var sinq = Math.Sin(_elements.GetAscendingNode());
-            var cosq = Math.Cos(_elements.GetAscendingNode());
-            var sing = Math.Sin(_elements.GetArgumentPerigee());
-            var cosg = Math.Cos(_elements.GetArgumentPerigee());
+            var sinq = Math.Sin(_elements.AscendingNode);
+            var cosq = Math.Cos(_elements.AscendingNode);
+            var sing = Math.Sin(_elements.ArgumentPerigee);
+            var cosg = Math.Cos(_elements.ArgumentPerigee);
 
             /*
-           * initialize lunar / solar terms
-           */
-            var jday = _elements.GetEpoch().ToJulian() - Global.KEpochJan112H2000;
+             * initialize lunar / solar terms
+             */
+            var jday = _elements.Epoch.ToJulian() - Global.KEpochJan112H2000;
 
             var xnodce = 4.5236020 - 9.2422029e-4 * jday;
             var xnodceTemp = xnodce % Global.KTwopi;
@@ -837,8 +797,8 @@ namespace SGP4_Sharp
             _deepspaceConsts.Zmos = Util.WrapTwoPi(6.2565837 + 0.017201977 * jday);
 
             /*
-           * do solar terms
-           */
+             * do solar terms
+             */
             var zcosg = zcosgs;
             var zsing = zsings;
             var zcosi = zcosis;
@@ -848,7 +808,7 @@ namespace SGP4_Sharp
             var cc = c1Ss;
             var zn = zns;
             var ze = zes;
-            var xnoi = 1.0 / _elements.GetRecoveredMeanMotion();
+            var xnoi = 1.0 / _elements.RecoveredMeanMotion;
 
             for (var cnt = 0; cnt < 2; cnt++)
             {
@@ -900,7 +860,7 @@ namespace SGP4_Sharp
                 var s3 = cc * xnoi;
                 var s2 = -0.5 * s3 / betao;
                 var s4 = s3 * betao;
-                var s1 = -15.0 * _elements.GetEccentricity() * s4;
+                var s1 = -15.0 * _elements.Eccentricity * s4;
                 var s5 = x1 * x3 + x2 * x4;
                 var s6 = x2 * x3 + x1 * x4;
                 var s7 = x2 * x4 - x1 * x3;
@@ -916,8 +876,8 @@ namespace SGP4_Sharp
                  * with
                  * shdq = (-zn * s2 * (z21 + z23)) / sinio
                  */
-                if (_elements.GetInclination() < 5.2359877e-2
-                    || _elements.GetInclination() > Global.KPi - 5.2359877e-2)
+                if (_elements.Inclination < 5.2359877e-2
+                    || _elements.Inclination > Global.KPi - 5.2359877e-2)
                 {
                     shdq = 0.0;
                 }
@@ -984,8 +944,8 @@ namespace SGP4_Sharp
             _deepspaceConsts.SynchronousFlag = false;
             var initialiseIntegrator = true;
 
-            if (_elements.GetRecoveredMeanMotion() < 0.0052359877
-                && _elements.GetRecoveredMeanMotion() > 0.0034906585)
+            if (_elements.RecoveredMeanMotion < 0.0052359877
+                && _elements.RecoveredMeanMotion > 0.0034906585)
             {
                 /*
                  * 24h synchronous resonance terms initialisation
@@ -1001,8 +961,8 @@ namespace SGP4_Sharp
                               - 0.75 * (1.0 + cosio);
                 var f330 = 1.0 + cosio;
                 f330 = 1.875 * f330 * f330 * f330;
-                _deepspaceConsts.Del1 = 3.0 * _elements.GetRecoveredMeanMotion()
-                * _elements.GetRecoveredMeanMotion()
+                _deepspaceConsts.Del1 = 3.0 * _elements.RecoveredMeanMotion
+                * _elements.RecoveredMeanMotion
                 * aqnv * aqnv;
                 _deepspaceConsts.Del2 = 2.0 * _deepspaceConsts.Del1
                 * f220 * g200 * q22;
@@ -1011,18 +971,18 @@ namespace SGP4_Sharp
                 _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                 * f311 * g310 * q31 * aqnv;
 
-                _integratorConsts.Xlamo = _elements.GetMeanAnomoly()
-                + _elements.GetAscendingNode()
-                + _elements.GetArgumentPerigee()
+                _integratorConsts.Xlamo = _elements.MeanAnomoly
+                + _elements.AscendingNode
+                + _elements.ArgumentPerigee
                 - _deepspaceConsts.Gsto;
                 bfact = xmdot + xpidot - Global.KThdt;
                 bfact += _deepspaceConsts.Ssl
                 + _deepspaceConsts.Ssg
                 + _deepspaceConsts.Ssh;
             }
-            else if (_elements.GetRecoveredMeanMotion() < 8.26e-3
-                     || _elements.GetRecoveredMeanMotion() > 9.24e-3
-                     || _elements.GetEccentricity() < 0.5)
+            else if (_elements.RecoveredMeanMotion < 8.26e-3
+                     || _elements.RecoveredMeanMotion > 9.24e-3
+                     || _elements.Eccentricity < 0.5)
             {
                 initialiseIntegrator = false;
             }
@@ -1040,44 +1000,44 @@ namespace SGP4_Sharp
                 double g422;
                 double g520;
 
-                var g201 = -0.306 - (_elements.GetEccentricity() - 0.64) * 0.440;
+                var g201 = -0.306 - (_elements.Eccentricity - 0.64) * 0.440;
 
-                if (_elements.GetEccentricity() <= 0.65)
+                if (_elements.Eccentricity <= 0.65)
                 {
-                    g211 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g211 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       3.616, -13.247, +16.290, 0.0);
-                    g310 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g310 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -19.302, 117.390, -228.419, 156.591);
-                    g322 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g322 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -18.9068, 109.7927, -214.6334, 146.5816);
-                    g410 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g410 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -41.122, 242.694, -471.094, 313.953);
-                    g422 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g422 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -146.407, 841.880, -1629.014, 1083.435);
-                    g520 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -532.114, 3017.977, -5740.032, 3708.276);
                 }
                 else
                 {
-                    g211 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g211 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -72.099, 331.819, -508.738, 266.724);
-                    g310 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g310 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -346.844, 1582.851, -2415.925, 1246.113);
-                    g322 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g322 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -342.585, 1554.908, -2366.899, 1215.972);
-                    g410 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g410 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -1052.797, 4758.686, -7193.992, 3651.957);
-                    g422 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g422 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -3581.69, 16178.11, -24462.77, 12422.52);
 
-                    if (_elements.GetEccentricity() <= 0.715)
+                    if (_elements.Eccentricity <= 0.715)
                     {
-                        g520 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                        g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
                           1464.74, -4664.75, 3763.64, 0.0);
                     }
                     else
                     {
-                        g520 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                        g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
                           -5149.66, 29936.92, -54087.36, 31324.56);
                     }
                 }
@@ -1086,22 +1046,22 @@ namespace SGP4_Sharp
                 double g521;
                 double g532;
 
-                if (_elements.GetEccentricity() < 0.7)
+                if (_elements.Eccentricity < 0.7)
                 {
-                    g533 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g533 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -919.2277, 4988.61, -9064.77, 5542.21);
-                    g521 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g521 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -822.71072, 4568.6173, -8491.4146, 5337.524);
-                    g532 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g532 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -853.666, 4690.25, -8624.77, 5341.4);
                 }
                 else
                 {
-                    g533 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g533 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -37995.78, 161616.52, -229838.2, 109377.94);
-                    g521 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g521 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -51752.104, 218913.95, -309468.16, 146349.42);
-                    g532 = EvaluateCubicPolynomial(_elements.GetEccentricity(),
+                    g532 = EvaluateCubicPolynomial(_elements.Eccentricity,
                       -40023.88, 170470.89, -242699.48, 115605.82);
                 }
 
@@ -1123,8 +1083,8 @@ namespace SGP4_Sharp
                 var f543 = 29.53125 * sinio * (-2.0 - 8.0 * cosio + theta2 *
                               (12.0 + 8.0 * cosio - 10.0 * theta2));
 
-                var xno2 = _elements.GetRecoveredMeanMotion()
-                              * _elements.GetRecoveredMeanMotion();
+                var xno2 = _elements.RecoveredMeanMotion
+                              * _elements.RecoveredMeanMotion;
                 var ainv2 = aqnv * aqnv;
 
                 var temp1 = 3.0 * xno2 * ainv2;
@@ -1147,9 +1107,9 @@ namespace SGP4_Sharp
                 _deepspaceConsts.D5421 = temp * f542 * g521;
                 _deepspaceConsts.D5433 = temp * f543 * g533;
 
-                _integratorConsts.Xlamo = _elements.GetMeanAnomoly()
-                + _elements.GetAscendingNode()
-                + _elements.GetAscendingNode()
+                _integratorConsts.Xlamo = _elements.MeanAnomoly
+                + _elements.AscendingNode
+                + _elements.AscendingNode
                 - _deepspaceConsts.Gsto
                 - _deepspaceConsts.Gsto;
                 bfact = xmdot
@@ -1165,9 +1125,9 @@ namespace SGP4_Sharp
                 /*
                  * initialise integrator
                  */
-                _integratorConsts.Xfact = bfact - _elements.GetRecoveredMeanMotion();
+                _integratorConsts.Xfact = bfact - _elements.RecoveredMeanMotion;
                 _integratorParams.Atime = 0.0;
-                _integratorParams.Xni = _elements.GetRecoveredMeanMotion();
+                _integratorParams.Xni = _elements.RecoveredMeanMotion;
                 _integratorParams.Xli = _integratorConsts.Xlamo;
                 /*
                  * precompute dot terms for epoch
@@ -1176,7 +1136,7 @@ namespace SGP4_Sharp
             }
         }
 
-        private void DeepSpaceCalculateLunarSolarTerms(double tsince, double pe, double pinc, double pl, double pgh, double ph)
+        private void DeepSpaceCalculateLunarSolarTerms(double tsince, ref double pe, ref double pinc, ref double pl, ref double pgh, ref double ph)
         {
             const double zes = 0.01675;
             const double zns = 1.19459E-5;
@@ -1184,8 +1144,8 @@ namespace SGP4_Sharp
             const double zel = 0.05490;
 
             /*
-           * calculate solar terms for time tsince
-           */
+             * calculate solar terms for time tsince
+             */
             var zm = _deepspaceConsts.Zmos + zns * tsince;
             var zf = zm + 2.0 * zes * Math.Sin(zm);
             var sinzf = Math.Sin(zf);
@@ -1206,8 +1166,8 @@ namespace SGP4_Sharp
                          + _deepspaceConsts.Sh3 * f3;
 
             /*
-           * calculate lunar terms for time tsince
-           */
+             * calculate lunar terms for time tsince
+             */
             zm = _deepspaceConsts.Zmol + znl * tsince;
             zf = zm + 2.0 * zel * Math.Sin(zm);
             sinzf = Math.Sin(zf);
@@ -1228,8 +1188,8 @@ namespace SGP4_Sharp
                          + _deepspaceConsts.Xh3 * f3;
 
             /*
-           * merge calculated values
-           */
+             * merge calculated values
+             */
             pe = ses + sel;
             pinc = sis + sil;
             pl = sls + sll;
@@ -1237,12 +1197,12 @@ namespace SGP4_Sharp
             ph = shs + shl;
         }
 
-        private void DeepSpacePeriodics(double tsince, double em, double xinc, double omgasm, double xnodes, double xll)
+        private void DeepSpacePeriodics(double tsince, ref double em, ref double xinc, ref double omgasm, ref double xnodes, ref double xll)
         {
             /*
-           * storage for lunar / solar terms
-           * set by DeepSpaceCalculateLunarSolarTerms()
-           */
+             * storage for lunar / solar terms
+             * set by DeepSpaceCalculateLunarSolarTerms()
+             */
             var pe = 0.0;
             var pinc = 0.0;
             var pl = 0.0;
@@ -1250,22 +1210,22 @@ namespace SGP4_Sharp
             var ph = 0.0;
 
             /*
-           * calculate lunar / solar terms for current time
-           */
-            DeepSpaceCalculateLunarSolarTerms(tsince, pe, pinc, pl, pgh, ph);
+             * calculate lunar / solar terms for current time
+             */
+            DeepSpaceCalculateLunarSolarTerms(tsince, ref pe, ref pinc, ref pl, ref pgh, ref ph);
 
             xinc += pinc;
             em += pe;
 
             /* Spacetrack report #3 has sin/cos from before perturbations
-           * added to xinc (oldxinc), but apparently report # 6 has then
-           * from after they are added.
-           * use for strn3
-           * if (elements_.GetInclination() >= 0.2)
-           * use for gsfc
-           * if (xinc >= 0.2)
-           * (moved from start of function)
-           */
+             * added to xinc (oldxinc), but apparently report # 6 has then
+             * from after they are added.
+             * use for strn3
+             * if (elements_.GetInclination() >= 0.2)
+             * use for gsfc
+             * if (xinc >= 0.2)
+             * (moved from start of function)
+             */
             var sinis = Math.Sin(xinc);
             var cosis = Math.Cos(xinc);
 
@@ -1334,7 +1294,7 @@ namespace SGP4_Sharp
             }
         }
 
-        private void DeepSpaceSecular(double tsince, double xll, double omgasm, double xnodes, double em, double xinc, double xn)
+        private void DeepSpaceSecular(double tsince, ref double xll, double omgasm, double xnodes, ref double em, ref double xinc, ref double xn)
         {
             const double step = 720.0;
             const double step2 = 259200.0;
@@ -1359,15 +1319,15 @@ namespace SGP4_Sharp
                     Math.Abs(tsince) < Math.Abs(_integratorParams.Atime))
                 {
                     /*
-                       * restart from epoch
-                       */
+                     * restart from epoch
+                     */
                     _integratorParams.Atime = 0.0;
-                    _integratorParams.Xni = _elements.GetRecoveredMeanMotion();
+                    _integratorParams.Xni = _elements.RecoveredMeanMotion;
                     _integratorParams.Xli = _integratorConsts.Xlamo;
 
                     /*
-                       * restore precomputed values for epoch
-                       */
+                     * restore precomputed values for epoch
+                     */
                     _integratorParams.ValuesT = _integratorConsts.Values0;
                 }
 
@@ -1381,9 +1341,9 @@ namespace SGP4_Sharp
                 if (Math.Abs(ft) >= step)
                 {
                     /*
-                       * calculate step direction to allow integrator_params_.atime
-                       * to catch up with tsince
-                       */
+                     * calculate step direction to allow integrator_params_.atime
+                     * to catch up with tsince
+                     */
                     var delt = -step;
                     if (ft >= 0.0)
                     {
@@ -1393,13 +1353,13 @@ namespace SGP4_Sharp
                     do
                     {
                         /*
-                             * integrate using current dot terms
-                             */
+                         * integrate using current dot terms
+                         */
                         DeepSpaceIntegrator(delt, step2, _integratorParams.ValuesT);
 
                         /*
-                             * calculate dot terms for next integration
-                             */
+                         * calculate dot terms for next integration
+                         */
                         DeepSpaceCalcDotTerms(_integratorParams.ValuesT);
 
                         ft = tsince - _integratorParams.Atime;
@@ -1457,7 +1417,7 @@ namespace SGP4_Sharp
             }
             else
             {
-                var xomi = _elements.GetArgumentPerigee()
+                var xomi = _elements.ArgumentPerigee
                               + _commonConsts.Omgdot * _integratorParams.Atime;
                 var x2Omi = xomi + xomi;
                 var x2Li = _integratorParams.Xli + _integratorParams.Xli;

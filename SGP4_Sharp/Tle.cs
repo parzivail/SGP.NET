@@ -1,31 +1,12 @@
-/*
- * Copyright 2013 Daniel Warner <contact@danrw.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 using System;
 using System.Text;
 
 
 namespace SGP4_Sharp
 {
-
-
-    /**
- * @brief Processes a two-line element set used to convey OrbitalElements.
- *
- * Used to extract the various raw fields from a two-line element set.
- */
+    /// <summary>
+    /// Processes a two-line element set used to convey OrbitalElements. Used to extract the various raw fields from a two-line element set.
+    /// </summary>
     public class Tle
     {
         private const int Tle1ColNoradnum = 2;
@@ -257,10 +238,7 @@ namespace SGP4_Sharp
                     Tle1LenMeanmotionddt6), ref _meanMotionDdt6);
             ExtractExponential(Line1.Substring(Tle1ColBstar,
                     Tle1LenBstar), ref _bstar);
-
-            /*
-     * line 2
-     */
+            
             ExtractDouble(Line2.Substring(Tle2ColInclination,
                     Tle2LenInclination), 4, ref _inclination);
             ExtractDouble(Line2.Substring(Tle2ColRaascendnode,
