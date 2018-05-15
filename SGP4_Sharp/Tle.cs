@@ -1,11 +1,12 @@
 using System;
+using System.Globalization;
 using System.Text;
-
 
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Processes a two-line element set used to convey OrbitalElements. Used to extract the various raw fields from a two-line element set.
+    ///     Processes a two-line element set used to convey OrbitalElements. Used to extract the various raw fields from a
+    ///     two-line element set.
     /// </summary>
     public class Tle
     {
@@ -43,34 +44,21 @@ namespace SGP4_Sharp
         private const int Tle2ColRevatepoch = 63;
         private const int Tle2LenRevatepoch = 5;
 
-        private double _meanMotionDt2;
-        private double _meanMotionDdt6;
-        private double _bstar;
-        private double _inclination;
-        private double _rightAscendingNode;
-        private double _eccentricity;
+        private const uint TleLenLineData = 69;
         private double _argumentPerigee;
+        private double _bstar;
+        private double _eccentricity;
+        private double _inclination;
         private double _meanAnomaly;
         private double _meanMotion;
+        private double _meanMotionDdt6;
+
+        private double _meanMotionDt2;
         private uint _orbitNumber;
-
-        private const uint TleLenLineData = 69;
-
-        public string Name { get; private set; }
-        public string Line1 { get; }
-        public string Line2 { get; }
-        public uint NoradNumber { get; private set; }
-        public string IntDesignator { get; private set; }
-        public DateTime Epoch { get; private set; }
-        public double MeanMotionDtOver2 => _meanMotionDt2;
-        public double MeanMotionDdtOver6 => _meanMotionDdt6;
-        public double BStarDragTerm => _bstar;
-        public double MeanMotionRevPerDay => _meanMotion;
-        public uint OrbitNumber => _orbitNumber;
-        public double Eccentricity => _eccentricity;
+        private double _rightAscendingNode;
 
         /// <summary>
-        /// Initialise TLE with two lines
+        ///     Initialise TLE with two lines
         /// </summary>
         /// <param name="lineOne"></param>
         /// <param name="lineTwo"></param>
@@ -82,7 +70,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Initialise TLE with two lines and a name
+        ///     Initialise TLE with two lines and a name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="lineOne"></param>
@@ -96,7 +84,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Initialise TLE with another TLE
+        ///     Initialise TLE with another TLE
         /// </summary>
         /// <param name="tle">the TLE to copy</param>
         public Tle(Tle tle)
@@ -120,8 +108,21 @@ namespace SGP4_Sharp
             _orbitNumber = tle._orbitNumber;
         }
 
+        public string Name { get; private set; }
+        public string Line1 { get; }
+        public string Line2 { get; }
+        public uint NoradNumber { get; private set; }
+        public string IntDesignator { get; private set; }
+        public DateTime Epoch { get; private set; }
+        public double MeanMotionDtOver2 => _meanMotionDt2;
+        public double MeanMotionDdtOver6 => _meanMotionDdt6;
+        public double BStarDragTerm => _bstar;
+        public double MeanMotionRevPerDay => _meanMotion;
+        public uint OrbitNumber => _orbitNumber;
+        public double Eccentricity => _eccentricity;
+
         /// <summary>
-        /// Gets the inclination
+        ///     Gets the inclination
         /// </summary>
         /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
@@ -131,7 +132,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Gets the right ascension of the ascending node
+        ///     Gets the right ascension of the ascending node
         /// </summary>
         /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
@@ -141,7 +142,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Gets the argument of perigee
+        ///     Gets the argument of perigee
         /// </summary>
         /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
@@ -151,7 +152,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Gets the mean anomaly
+        ///     Gets the mean anomaly
         /// </summary>
         /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
@@ -183,44 +184,32 @@ namespace SGP4_Sharp
         private void Initialize()
         {
             if (!IsValidLineLength(Line1))
-            {
                 throw new TleException("Invalid length for line one");
-            }
 
             if (!IsValidLineLength(Line2))
-            {
                 throw new TleException("Invalid length for line two");
-            }
 
             if (Line1[0] != '1')
-            {
                 throw new TleException("Invalid line beginning for line one");
-            }
 
             if (Line2[0] != '2')
-            {
                 throw new TleException("Invalid line beginning for line two");
-            }
 
             uint satNumber1 = 0;
             uint satNumber2 = 0;
 
             ExtractInteger(Line1.Substring(Tle1ColNoradnum,
-                    Tle1LenNoradnum), ref satNumber1);
+                Tle1LenNoradnum), ref satNumber1);
             ExtractInteger(Line2.Substring(Tle2ColNoradnum,
-                    Tle2LenNoradnum), ref satNumber2);
+                Tle2LenNoradnum), ref satNumber2);
 
             if (satNumber1 != satNumber2)
-            {
                 throw new TleException("Satellite numbers do not match");
-            }
 
             NoradNumber = satNumber1;
 
             if (Name == "")
-            {
                 Name = Line1.Substring(Tle1ColNoradnum, Tle1LenNoradnum);
-            }
 
             IntDesignator = Line1.Substring(Tle1ColIntldescA,
                 Tle1LenIntldescA + Tle1LenIntldescB + Tle1LenIntldescC);
@@ -229,36 +218,36 @@ namespace SGP4_Sharp
             var day = 0.0;
 
             ExtractInteger(Line1.Substring(Tle1ColEpochA,
-                    Tle1LenEpochA), ref year);
+                Tle1LenEpochA), ref year);
             ExtractDouble(Line1.Substring(Tle1ColEpochB,
-                    Tle1LenEpochB), 4, ref day);
+                Tle1LenEpochB), 4, ref day);
             ExtractDouble(Line1.Substring(Tle1ColMeanmotiondt2,
-                    Tle1LenMeanmotiondt2), 2, ref _meanMotionDt2);
+                Tle1LenMeanmotiondt2), 2, ref _meanMotionDt2);
             ExtractExponential(Line1.Substring(Tle1ColMeanmotionddt6,
-                    Tle1LenMeanmotionddt6), ref _meanMotionDdt6);
+                Tle1LenMeanmotionddt6), ref _meanMotionDdt6);
             ExtractExponential(Line1.Substring(Tle1ColBstar,
-                    Tle1LenBstar), ref _bstar);
-            
+                Tle1LenBstar), ref _bstar);
+
             ExtractDouble(Line2.Substring(Tle2ColInclination,
-                    Tle2LenInclination), 4, ref _inclination);
+                Tle2LenInclination), 4, ref _inclination);
             ExtractDouble(Line2.Substring(Tle2ColRaascendnode,
-                    Tle2LenRaascendnode), 4, ref _rightAscendingNode);
+                Tle2LenRaascendnode), 4, ref _rightAscendingNode);
             ExtractDouble(Line2.Substring(Tle2ColEccentricity,
-                    Tle2LenEccentricity), -1, ref _eccentricity);
+                Tle2LenEccentricity), -1, ref _eccentricity);
             ExtractDouble(Line2.Substring(Tle2ColArgperigee,
-                    Tle2LenArgperigee), 4, ref _argumentPerigee);
+                Tle2LenArgperigee), 4, ref _argumentPerigee);
             ExtractDouble(Line2.Substring(Tle2ColMeananomaly,
-                    Tle2LenMeananomaly), 4, ref _meanAnomaly);
+                Tle2LenMeananomaly), 4, ref _meanAnomaly);
             ExtractDouble(Line2.Substring(Tle2ColMeanmotion,
-                    Tle2LenMeanmotion), 3, ref _meanMotion);
+                Tle2LenMeanmotion), 3, ref _meanMotion);
             ExtractInteger(Line2.Substring(Tle2ColRevatepoch,
-                    Tle2LenRevatepoch), ref _orbitNumber);
+                Tle2LenRevatepoch), ref _orbitNumber);
 
             if (year < 57)
                 year += 2000;
             else
                 year += 1900;
-            Epoch = new DateTime((int)year, 1, 1).AddDays(day - 1);
+            Epoch = new DateTime((int) year, 1, 1).AddDays(day - 1);
         }
 
         private static bool IsValidLineLength(string str)
@@ -272,11 +261,10 @@ namespace SGP4_Sharp
             uint temp = 0;
 
             for (var i = 0; i != str.Length; ++i)
-            {
                 if (char.IsDigit(str[i]))
                 {
                     foundDigit = true;
-                    temp = (temp * 10) + (uint)(str[i] - '0');
+                    temp = temp * 10 + (uint) (str[i] - '0');
                 }
                 else if (foundDigit)
                 {
@@ -286,7 +274,6 @@ namespace SGP4_Sharp
                 {
                     throw new TleException("Invalid character");
                 }
-            }
 
             val = !foundDigit ? 0 : temp;
         }
@@ -294,10 +281,7 @@ namespace SGP4_Sharp
         private static void ExtractDouble(string str, int pointPos, ref double val)
         {
             if (pointPos == -1)
-            {
-                // Add decimal point at the beginning
                 str = "0." + str;
-            }
             val = double.Parse(str);
         }
 
@@ -314,27 +298,25 @@ namespace SGP4_Sharp
                 correctedString += "-";
 
                 // requires LastIndexOf to skip the first '-' in the string
-                correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" + str.Substring(str.LastIndexOf("-"));
+                correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" +
+                                   str.Substring(str.LastIndexOf("-"));
             }
             else
             {
                 correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" + str.Substring(str.IndexOf("-"));
             }
 
-            val = (double)decimal.Parse(correctedString, System.Globalization.NumberStyles.Float);
+            val = (double) decimal.Parse(correctedString, NumberStyles.Float);
 
             var temp = "";
 
             for (var i = 0; i != str.Length; ++i)
-            {
                 if (i == 0)
                 {
                     if (str[i] == '-' || str[i] == '+' || str[i] == ' ')
                     {
                         if (str[i] == '-')
-                        {
                             temp += str[i];
-                        }
                         temp += '0';
                         temp += '.';
                     }
@@ -358,20 +340,13 @@ namespace SGP4_Sharp
                 else
                 {
                     if (char.IsDigit(str[i]))
-                    {
                         temp += str[i];
-                    }
                     else
-                    {
                         throw new TleException("Invalid digit");
-                    }
                 }
-            }
 
             if (!double.TryParse(temp, out val))
-            {
                 throw new TleException("Failed to convert value to double");
-            }
         }
     }
 }

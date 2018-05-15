@@ -3,17 +3,12 @@ using System;
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Stores an observers location in Eci coordinates.
+    ///     Stores an observers location in Eci coordinates.
     /// </summary>
     public class Observer
     {
         /// <summary>
-        /// The observer Eci for a particular time
-        /// </summary>
-        public Eci Location;
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="latitude">observer latitude in degrees</param>
         /// <param name="longitude">observer longitude in degrees</param>
@@ -24,7 +19,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="geo">observer position</param>
         public Observer(CoordGeodetic geo)
@@ -33,23 +28,18 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Sets the observer's location
+        ///     The observer Eci for a particular time
         /// </summary>
-        /// <param name="geo">observer location</param>
-        public void SetLocation(CoordGeodetic geo)
+        public Eci Location { get; }
+
+        public override bool Equals(object obj)
         {
-            Location.FromGeodetic(Location.Time, geo);
+            return obj is Observer observer && Location.Equals(observer.Location);
         }
 
-        /// <summary>
-        /// Sets the time of this location
-        /// </summary>
-        /// <param name="dt"></param>
-        private void SetTime(DateTime dt)
+        public override int GetHashCode()
         {
-            if (Location is null)
-                return;
-            Location.Time = dt;
+            return 1369928374 + Location.GetHashCode();
         }
     }
 }

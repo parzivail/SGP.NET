@@ -1,6 +1,5 @@
 using System;
 
-
 namespace SGP4_Sharp
 {
     public class Util
@@ -9,12 +8,11 @@ namespace SGP4_Sharp
          * always positive result
          * Mod(-3,4)= 1   fmod(-3,4)= -3
          */
+
         public static double Mod(double x, double y)
         {
             if (y == 0)
-            {
                 return x;
-            }
 
             return x - y * Math.Floor(x / y);
         }
@@ -54,20 +52,15 @@ namespace SGP4_Sharp
             if (cosx == 0.0)
             {
                 if (sinx > 0.0)
-                {
                     return Global.KPi / 2.0;
-                }
 
                 return 3.0 * Global.KPi / 2.0;
             }
 
             if (cosx > 0.0)
-            {
                 return Math.Atan(sinx / cosx);
-            }
 
             return Global.KPi + Math.Atan(sinx / cosx);
         }
     }
 }
-

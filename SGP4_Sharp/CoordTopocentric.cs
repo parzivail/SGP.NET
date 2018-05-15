@@ -1,34 +1,17 @@
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Stores a topocentric location (azimuth, elevation, range and range rate).
-    /// Azimuth and elevation are stored in radians. Range in kilometers. Range rate in kilometers/second.
+    ///     Stores a topocentric location (azimuth, elevation, range and range rate).
+    ///     Azimuth and elevation are stored in radians. Range in kilometers. Range rate in kilometers/second.
     /// </summary>
     public class CoordTopocentric
     {
-        /// <summary>
-        /// Azimuth in radians
-        /// </summary>
-        public double Azimuth;
-        /// <summary>
-        /// Elevation in radians
-        /// </summary>
-        public double Elevation;
-        /// <summary>
-        /// Range in kilometers
-        /// </summary>
-        public double Range;
-        /// <summary>
-        /// Range rate in kilometers/second
-        /// </summary>
-        public double RangeRate;
-
         public CoordTopocentric()
         {
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="az">azimuth in radians</param>
         /// <param name="el">elevation in radians</param>
@@ -43,7 +26,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Copy constructor
+        ///     Copy constructor
         /// </summary>
         /// <param name="topo">object to copy from</param>
         public CoordTopocentric(CoordTopocentric topo)
@@ -54,6 +37,26 @@ namespace SGP4_Sharp
             RangeRate = topo.RangeRate;
         }
 
+        /// <summary>
+        ///     Azimuth in radians
+        /// </summary>
+        public double Azimuth { get; }
+
+        /// <summary>
+        ///     Elevation in radians
+        /// </summary>
+        public double Elevation { get; }
+
+        /// <summary>
+        ///     Range in kilometers
+        /// </summary>
+        public double Range { get; }
+
+        /// <summary>
+        ///     Range rate in kilometers/second
+        /// </summary>
+        public double RangeRate { get; }
+
         public override bool Equals(object obj)
         {
             return obj is CoordGeodetic geodetic &&
@@ -62,7 +65,8 @@ namespace SGP4_Sharp
 
         protected bool Equals(CoordTopocentric other)
         {
-            return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) && RangeRate.Equals(other.RangeRate);
+            return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
+                   RangeRate.Equals(other.RangeRate);
         }
 
         public override int GetHashCode()
@@ -79,7 +83,7 @@ namespace SGP4_Sharp
 
         public override string ToString()
         {
-            return $"CoordTopocentric{{Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}}}";
+            return $"CoordTopocentric[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
         }
     }
 }

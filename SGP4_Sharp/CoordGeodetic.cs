@@ -3,29 +3,16 @@ using System;
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Stores a geodetic location (latitude, longitude, altitude).
+    ///     Stores a geodetic location (latitude, longitude, altitude).
     /// </summary>
     public class CoordGeodetic
     {
-        /// <summary>
-        /// Latitude in radians, where -PI &lt;= latitude &lt; PI
-        /// </summary>
-        public double Latitude;
-        /// <summary>
-        /// Longitude in radians, where -PI/2 &lt;= latitude &lt; PI/2
-        /// </summary>
-        public double Longitude;
-        /// <summary>
-        /// Altitude in kilometers
-        /// </summary>
-        public double Altitude;
-
         public CoordGeodetic()
         {
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="lat">the latitude (degrees by default)</param>
         /// <param name="lon">the longitude (degrees by default)</param>
@@ -47,7 +34,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Copy constructor
+        ///     Copy constructor
         /// </summary>
         /// <param name="geo">object to copy from</param>
         public CoordGeodetic(CoordGeodetic geo)
@@ -58,7 +45,22 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Converts this geodedic position to a ECI one
+        ///     Latitude in radians, where -PI &lt;= latitude &lt; PI
+        /// </summary>
+        public double Latitude { get; }
+
+        /// <summary>
+        ///     Longitude in radians, where -PI/2 &lt;= latitude &lt; PI/2
+        /// </summary>
+        public double Longitude { get; }
+
+        /// <summary>
+        ///     Altitude in kilometers
+        /// </summary>
+        public double Altitude { get; set; }
+
+        /// <summary>
+        ///     Converts this geodedic position to a ECI one
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
@@ -67,36 +69,23 @@ namespace SGP4_Sharp
             var time = dt;
 
             const double mfactor = Global.KTwopi * (Global.EarthRotationPerSiderealDay / Global.KSecondsPerDay);
-            
+
             var theta = time.ToLocalMeanSiderealTime(Longitude);
-            
+
             var c = 1.0
-                    / Math.Sqrt(1.0 + Global.EarthFlatteningConstant * (Global.EarthFlatteningConstant - 2.0) * Math.Pow(Math.Sin(Latitude), 2.0));
+                    /
+                    Math.Sqrt(1.0 +
+                              Global.EarthFlatteningConstant * (Global.EarthFlatteningConstant - 2.0) *
+                              Math.Pow(Math.Sin(Latitude), 2.0));
             var s = Math.Pow(1.0 - Global.EarthFlatteningConstant, 2.0) * c;
             var achcp = (Global.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude);
 
-            var position = new Vector
-            {
-                X = achcp * Math.Cos(theta),
-                Y = achcp * Math.Sin(theta),
-                Z = (Global.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude)
-            };
-            position.W = position.Magnitude();
+            var position = new Vector(achcp * Math.Cos(theta), achcp * Math.Sin(theta),
+                (Global.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
 
-            var velocity = new Vector
-            {
-                X = -mfactor * position.Y,
-                Y = mfactor * position.X,
-                Z = 0.0
-            };
-            velocity.W = velocity.Magnitude();
+            var velocity = new Vector(-mfactor * position.Y, mfactor * position.X, 0);
 
-            return new Eci
-            {
-                Time = time,
-                Position = position,
-                Velocity = velocity
-            };
+            return new Eci(time, position, velocity);
         }
 
         public override bool Equals(object obj)
@@ -107,7 +96,8 @@ namespace SGP4_Sharp
 
         protected bool Equals(CoordGeodetic other)
         {
-            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) && Altitude.Equals(other.Altitude);
+            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) &&
+                   Altitude.Equals(other.Altitude);
         }
 
         public override int GetHashCode()
@@ -123,7 +113,7 @@ namespace SGP4_Sharp
 
         public override string ToString()
         {
-            return $"CoordGeodetic{{Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}}}";
+            return $"CoordGeodetic[Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}]";
         }
     }
 }

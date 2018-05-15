@@ -3,7 +3,7 @@ using System;
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// The exception that the SGP4 class throws when a satellite decays.
+    ///     The exception that the SGP4 class throws when a satellite decays.
     /// </summary>
     public class DecayedException : Exception
     {
@@ -12,7 +12,7 @@ namespace SGP4_Sharp
         private readonly Vector _vel;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dt">time of the event</param>
         /// <param name="pos">position of the satellite at dt</param>
@@ -25,7 +25,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Gets the DateTime at the time of decay
+        ///     Gets the DateTime at the time of decay
         /// </summary>
         /// <returns></returns>
         public DateTime Decayed()
@@ -34,7 +34,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Gets the position at the time of decay
+        ///     Gets the position at the time of decay
         /// </summary>
         /// <returns></returns>
         public Vector Position()
@@ -43,7 +43,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Returns the velocity at the time of decay
+        ///     Returns the velocity at the time of decay
         /// </summary>
         /// <returns></returns>
         public Vector Velocity()

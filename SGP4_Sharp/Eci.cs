@@ -1,48 +1,46 @@
 using System;
 
-
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Stores an Earth-centered inertial position for a particular time.
+    ///     Stores an Earth-centered inertial position for a particular time.
     /// </summary>
     public class Eci
     {
-        public DateTime Time;
-        public Vector Position = new Vector();
-        public Vector Velocity = new Vector();
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public Eci()
         {
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dt">the date to be used for this position</param>
         /// <param name="latitude">the latitude in degrees</param>
         /// <param name="longitude">the longitude in degrees</param>
         /// <param name="altitude">the altitude in kilometers</param>
         public Eci(DateTime dt, double latitude, double longitude, double altitude)
+            : this(dt, new CoordGeodetic(latitude, longitude, altitude))
         {
-            FromGeodetic(dt, new CoordGeodetic(latitude, longitude, altitude));
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dt">the date to be used for this position</param>
         /// <param name="geo">the geocentric position</param>
         public Eci(DateTime dt, CoordGeodetic geo)
         {
-            FromGeodetic(dt, geo);
+            var eci = geo.ToEci(dt);
+            Time = dt;
+            Position = eci.Position;
+            Velocity = eci.Velocity;
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dt">the date to be used for this position</param>
         /// <param name="position">the ECI vector position</param>
@@ -50,10 +48,11 @@ namespace SGP4_Sharp
         {
             Time = dt;
             Position = position;
+            Velocity = new Vector();
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dt">the date to be used for this position</param>
         /// <param name="position">the ECI position vector</param>
@@ -65,21 +64,12 @@ namespace SGP4_Sharp
             Velocity = velocity;
         }
 
-        /// <summary>
-        /// FromGeodetic this object with a new date and geodetic position
-        /// </summary>
-        /// <param name="dt">new date</param>
-        /// <param name="geo">new geodetic position</param>
-        public void FromGeodetic(DateTime dt, CoordGeodetic geo)
-        {
-            var eci = geo.ToEci(dt);
-            Time = dt;
-            Position = eci.Position;
-            Velocity = eci.Velocity;
-        }
+        public DateTime Time { get; }
+        public Vector Position { get; }
+        public Vector Velocity { get; }
 
         /// <summary>
-        /// Converts this ECI position to a geodedic one
+        ///     Converts this ECI position to a geodedic one
         /// </summary>
         /// <returns></returns>
         public CoordGeodetic ToGeodetic()
@@ -112,7 +102,7 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        /// Get the look angle between this position and the object
+        ///     Get the look angle between this position and the object
         /// </summary>
         /// <param name="eci">The object to look at</param>
         /// <returns></returns>
@@ -120,17 +110,9 @@ namespace SGP4_Sharp
         {
             var geo = ToGeodetic();
 
-            /*
-           * calculate differences
-           */
             var rangeRate = eci.Velocity - Velocity;
             var range = eci.Position - Position;
 
-            range.W = range.Magnitude();
-
-            /*
-           * Calculate Local Mean Sidereal Time for observers longitude
-           */
             var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude);
 
             var sinLat = Math.Sin(geo.Latitude);
@@ -152,10 +134,32 @@ namespace SGP4_Sharp
             if (az < 0.0)
                 az += 2.0 * Global.KPi;
 
-            var el = Math.Asin(topZ / range.W);
-            var rate = range.Dot(rangeRate) / range.W;
+            var el = Math.Asin(topZ / range.Length);
+            var rate = range.Dot(rangeRate) / range.Length;
 
-            return new CoordTopocentric(az, el, range.W, rate);
+            return new CoordTopocentric(az, el, range.Length, rate);
+        }
+
+        public override string ToString()
+        {
+            return $"Eci[Position={Position}, Velocity={Velocity}]";
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 818017616;
+            hashCode = hashCode * -1521134295 + Time.GetHashCode();
+            hashCode = hashCode * -1521134295 + Position.GetHashCode();
+            hashCode = hashCode * -1521134295 + Velocity.GetHashCode();
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Eci eci &&
+                   Time == eci.Time &&
+                   Position.Equals(eci.Position) &&
+                   Velocity.Equals(eci.Velocity);
         }
     }
 }

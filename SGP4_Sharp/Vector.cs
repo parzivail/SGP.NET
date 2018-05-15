@@ -1,109 +1,83 @@
 using System;
-using System.Text;
-
 
 namespace SGP4_Sharp
 {
     /// <summary>
-    /// Generic vector
+    ///     Generic 3-dimensional vector
     /// </summary>
     public class Vector
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-        public double W { get; set; }
-
-        public Vector() : this(0, 0, 0, 0)
+        public Vector() : this(0, 0, 0)
         {
         }
 
-        /**
-         * Constructor
-         * @param x x value
-         * @param y y value
-         * @param z z value
-         */
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Vector(double x,
-                      double y,
-                      double z)
+            double y,
+            double z)
         {
             X = x;
             Y = y;
             Z = z;
-            W = 0.0;
         }
 
-        /**
-         * Constructor
-         * @param x x value
-         * @param y y value
-         * @param z z value
-         * @param w w value
-         */
-        public Vector(double x,
-                      double y,
-                      double z,
-                      double w)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-            W = w;
-        }
-
-        /**
-         * Copy constructor
-         * @param v value to copy from
-         */
+        /// <summary>
+        ///     Copy constructor
+        /// </summary>
+        /// <param name="v"></param>
         public Vector(Vector v)
         {
             X = v.X;
             Y = v.Y;
             Z = v.Z;
-            W = v.W;
         }
 
-        /**
-         * Subtract operator
-         * @param v value to suctract from
-         */
+        public double X { get; }
+        public double Y { get; }
+        public double Z { get; }
+
+        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
+
         public static Vector operator -(Vector v, Vector v2)
         {
-            return new Vector(v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z, 0);
+            return new Vector(v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z);
         }
 
-        /**
-         * Calculates the magnitude of the vector
-         * @returns magnitude of the vector
-         */
-        public double Magnitude()
-        {
-            return Math.Sqrt(X * X + Y * Y + Z * Z);
-        }
-
-        /**
-         * Calculates the dot product
-         * @returns dot product
-         */
+        /// <summary>
+        ///     Calculates the dot product of this vector and another
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
         public double Dot(Vector vec)
         {
             return X * vec.X + Y * vec.Y + Z * vec.Z;
         }
 
-        /**
-         * Converts this vector to a string
-         * @returns this vector as a string
-         */
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append($"X: {X}");
-            builder.Append($", Y: {Y}");
-            builder.Append($", Z: {Z}");
-            builder.Append($", W: {W}");
+            return $"Vector[X={X}, Y={Y}, Z={Z}, Length={Length}]";
+        }
 
-            return builder.ToString();
+        public override bool Equals(object obj)
+        {
+            return obj is Vector vector &&
+                   Equals(X, vector.X) &&
+                   Equals(Y, vector.Y) &&
+                   Equals(Z, vector.Z);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 707706286;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            hashCode = hashCode * -1521134295 + Z.GetHashCode();
+            return hashCode;
         }
     }
 }

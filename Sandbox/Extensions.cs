@@ -41,8 +41,8 @@ namespace Sandbox
         public static double DistanceToRad(this CoordGeodetic from, CoordGeodetic to)
         {
             var dist =
-                Math.Sin(from.Latitude) * Math.Sin(to.Latitude) + Math.Cos(from.Latitude) *
-                Math.Cos(to.Latitude) * Math.Cos(from.Longitude - to.Longitude);
+                Math.Sin(@from.Latitude) * Math.Sin(to.Latitude) + Math.Cos(@from.Latitude) *
+                Math.Cos(to.Latitude) * Math.Cos(@from.Longitude - to.Longitude);
             dist = Math.Acos(dist);
 
             return dist;
