@@ -84,15 +84,15 @@ namespace SGP4_Sharp
         /// <returns></returns>
         public CoordGeodetic ToGeodetic()
         {
-            var theta = Util.AcTan(Position.y, Position.x);
+            var theta = Util.AcTan(Position.Y, Position.X);
 
             var lon = Util.WrapNegPosPi(theta - Time.ToGreenwichSiderealTime());
 
-            var r = Math.Sqrt(Position.x * Position.x + Position.y * Position.y);
+            var r = Math.Sqrt(Position.X * Position.X + Position.Y * Position.Y);
 
             const double e2 = Global.EarthFlatteningConstant * (2.0 - Global.EarthFlatteningConstant);
 
-            var lat = Util.AcTan(Position.z, r);
+            var lat = Util.AcTan(Position.Z, r);
             double phi;
             double c;
             var cnt = 0;
@@ -102,7 +102,7 @@ namespace SGP4_Sharp
                 phi = lat;
                 var sinphi = Math.Sin(phi);
                 c = 1.0 / Math.Sqrt(1.0 - e2 * sinphi * sinphi);
-                lat = Util.AcTan(Position.z + Global.EarthRadiusKm * c * e2 * sinphi, r);
+                lat = Util.AcTan(Position.Z + Global.EarthRadiusKm * c * e2 * sinphi, r);
                 cnt++;
             } while (Math.Abs(lat - phi) >= 1e-10 && cnt < 10);
 
@@ -126,7 +126,7 @@ namespace SGP4_Sharp
             var rangeRate = eci.Velocity - Velocity;
             var range = eci.Position - Position;
 
-            range.w = range.Magnitude();
+            range.W = range.Magnitude();
 
             /*
            * Calculate Local Mean Sidereal Time for observers longitude
@@ -138,12 +138,12 @@ namespace SGP4_Sharp
             var sinTheta = Math.Sin(theta);
             var cosTheta = Math.Cos(theta);
 
-            var topS = sinLat * cosTheta * range.x
-                       + sinLat * sinTheta * range.y - cosLat * range.z;
-            var topE = -sinTheta * range.x
-                       + cosTheta * range.y;
-            var topZ = cosLat * cosTheta * range.x
-                       + cosLat * sinTheta * range.y + sinLat * range.z;
+            var topS = sinLat * cosTheta * range.X
+                       + sinLat * sinTheta * range.Y - cosLat * range.Z;
+            var topE = -sinTheta * range.X
+                       + cosTheta * range.Y;
+            var topZ = cosLat * cosTheta * range.X
+                       + cosLat * sinTheta * range.Y + sinLat * range.Z;
             var az = Math.Atan(-topE / topS);
 
             if (topS > 0.0)
@@ -152,10 +152,10 @@ namespace SGP4_Sharp
             if (az < 0.0)
                 az += 2.0 * Global.KPi;
 
-            var el = Math.Asin(topZ / range.w);
-            var rate = range.Dot(rangeRate) / range.w;
+            var el = Math.Asin(topZ / range.W);
+            var rate = range.Dot(rangeRate) / range.W;
 
-            return new CoordTopocentric(az, el, range.w, rate);
+            return new CoordTopocentric(az, el, range.W, rate);
         }
     }
 }

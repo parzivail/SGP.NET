@@ -77,19 +77,19 @@ namespace SGP4_Sharp
 
             var position = new Vector
             {
-                x = achcp * Math.Cos(theta),
-                y = achcp * Math.Sin(theta),
-                z = (Global.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude)
+                X = achcp * Math.Cos(theta),
+                Y = achcp * Math.Sin(theta),
+                Z = (Global.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude)
             };
-            position.w = position.Magnitude();
+            position.W = position.Magnitude();
 
             var velocity = new Vector
             {
-                x = -mfactor * position.y,
-                y = mfactor * position.x,
-                z = 0.0
+                X = -mfactor * position.Y,
+                Y = mfactor * position.X,
+                Z = 0.0
             };
-            velocity.w = velocity.Magnitude();
+            velocity.W = velocity.Magnitude();
 
             return new Eci
             {
