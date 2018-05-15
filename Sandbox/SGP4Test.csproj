@@ -89,9 +89,9 @@
       <Project>{4eccd5a4-2f81-4693-bcab-2306bb96a1da}</Project>
       <Name>PFX</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SGP4_Sharp\SGP4_Sharp.csproj">
+    <ProjectReference Include="..\SGP.NET\SGP.NET.csproj">
       <Project>{a8c667b9-1875-4083-829d-72566a69c0f6}</Project>
-      <Name>SGP4_Sharp</Name>
+      <Name>SGP.NET</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

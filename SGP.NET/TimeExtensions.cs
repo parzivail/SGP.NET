@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     public static class TimeExtensions
     {
         /// <summary>
         ///     Converts a DateTime to a Julian date
         /// </summary>
-        /// <param name="dt">the time to convert</param>
-        /// <returns>a Julian date</returns>
+        /// <param name="dt">The time to convert</param>
+        /// <returns>The Julian representation the DateTime</returns>
         public static double ToJulian(this DateTime dt)
         {
             var ts = new TimeSpan(dt.Ticks);
@@ -18,8 +18,8 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Converts a DateTime to Greenwich Sidereal Time
         /// </summary>
-        /// <param name="dt">the time to convert</param>
-        /// <returns>the Greenwich Sidereal Time</returns>
+        /// <param name="dt">The time to convert</param>
+        /// <returns>The Greenwich Sidereal Time representation the DateTime</returns>
         public static double ToGreenwichSiderealTime(this DateTime dt)
         {
             // t = Julian centuries from 2000 Jan. 1 12h UT1
@@ -38,9 +38,9 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Converts a DateTime to Local Mean Sidereal Time
         /// </summary>
-        /// <param name="dt">the time to convert</param>
-        /// <param name="longitude">the longitude of observation</param>
-        /// <returns>the Local Mean Sidereal Time</returns>
+        /// <param name="dt">The time to convert</param>
+        /// <param name="longitude">The longitude of observation</param>
+        /// <returns>The Local Mean Sidereal Time representation the DateTime</returns>
         public static double ToLocalMeanSiderealTime(this DateTime dt, double longitude)
         {
             return Util.WrapTwoPi(dt.ToGreenwichSiderealTime() + longitude);

@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
-using PFX;
-using SGP4_Sharp;
+using SGPdotNET;
+using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox
 {
     static class Extensions
     {
-        public static System.DateTime Round(this System.DateTime date, System.TimeSpan span)
+        public static DateTime Round(this DateTime date, TimeSpan span)
         {
             var ticks = (date.Ticks + (span.Ticks / 2) + 1) / span.Ticks;
             return new DateTime(ticks * span.Ticks);
@@ -21,21 +17,21 @@ namespace Sandbox
         {
             return new Vector3(
                 (float)(Math.Cos(geo.Latitude) * Math.Cos(-geo.Longitude + Math.PI) *
-                         (geo.Altitude + Global.EarthRadiusKm)),
-                (float)(Math.Sin(geo.Latitude) * (geo.Altitude + Global.EarthRadiusKm)),
+                         (geo.Altitude + SgpConstants.EarthRadiusKm)),
+                (float)(Math.Sin(geo.Latitude) * (geo.Altitude + SgpConstants.EarthRadiusKm)),
                 (float)(Math.Cos(geo.Latitude) * Math.Sin(-geo.Longitude + Math.PI) *
-                         (geo.Altitude + Global.EarthRadiusKm))
+                         (geo.Altitude + SgpConstants.EarthRadiusKm))
             );
         }
 
         public static double CalculateFootprintRadius(this CoordGeodetic geo)
         {
-            return geo.CalculateFootprintRadiusRad() * Global.EarthRadiusKm;
+            return geo.CalculateFootprintRadiusRad() * SgpConstants.EarthRadiusKm;
         }
 
         public static double CalculateFootprintRadiusRad(this CoordGeodetic geo)
         {
-            return Math.Acos(Global.EarthRadiusKm / (Global.EarthRadiusKm + geo.Altitude));
+            return Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude));
         }
 
         public static double DistanceToRad(this CoordGeodetic from, CoordGeodetic to)

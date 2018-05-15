@@ -1,9 +1,9 @@
 using System;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     /// <summary>
-    ///     The simplified perturbations model 4 propagater.
+    ///     The Simplified General Perturbations (Model 4) propagater
     /// </summary>
     public class Sgp4
     {
@@ -39,8 +39,8 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Predicts the ECI position of a satellite at a time relative to the satellite's epoch
         /// </summary>
-        /// <param name="tsince">time since the satellite's epoch</param>
-        /// <returns></returns>
+        /// <param name="tsince">Time since the satellite's epoch</param>
+        /// <returns>The predicted position of the satellite at a time relative to the satellite's epoch</returns>
         public Eci FindPosition(double tsince)
         {
             return _useDeepSpace ? FindPositionSdp4(tsince) : FindPositionSgp4(tsince);
@@ -50,7 +50,7 @@ namespace SGP4_Sharp
         ///     Predicts the ECI position of a satellite at a specific date and time
         /// </summary>
         /// <param name="date">the date and time to predict</param>
-        /// <returns></returns>
+        /// <returns>The predicted position of the satellite at a specific date and time</returns>
         public Eci FindPosition(DateTime date)
         {
             return FindPosition((date - _elements.Epoch).TotalMinutes);
@@ -69,7 +69,7 @@ namespace SGP4_Sharp
             if (_elements.Eccentricity < 0.0 || _elements.Eccentricity > 0.999)
                 throw new SatelliteException("GetEccentricity out of range");
 
-            if (_elements.Inclination < 0.0 || _elements.Inclination > Global.KPi)
+            if (_elements.Inclination < 0.0 || _elements.Inclination > Math.PI)
                 throw new SatelliteException("GetInclination out of range");
 
             _commonConsts.Cosio = Math.Cos(_elements.Inclination);
@@ -101,15 +101,15 @@ namespace SGP4_Sharp
              * for perigee below 156km, the values of
              * s4 and qoms2t are altered
              */
-            var s4 = Global.Ks;
-            var qoms24 = Global.KQoms2T;
+            var s4 = SgpConstants.DensityParameter;
+            var qoms24 = SgpConstants.Qoms2T;
             if (_elements.Perigee < 156.0)
             {
                 s4 = _elements.Perigee - 78.0;
                 if (_elements.Perigee < 98.0)
                     s4 = 20.0;
-                qoms24 = Math.Pow((120.0 - s4) * Global.KAe / Global.EarthRadiusKm, 4.0);
-                s4 = s4 / Global.EarthRadiusKm + Global.KAe;
+                qoms24 = Math.Pow((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm, 4.0);
+                s4 = s4 / SgpConstants.EarthRadiusKm + SgpConstants.DistanceUnitsPerEarthRadii;
             }
 
             /*
@@ -130,25 +130,26 @@ namespace SGP4_Sharp
             var c2 = coef1 * _elements.RecoveredMeanMotion
                      * (_elements.RecoveredSemiMajorAxis
                         * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
-                        + 0.75 * Global.KCk2 * tsi / psisq * _commonConsts.X3Thm1
+                        + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
                         * (8.0 + 3.0 * etasq * (8.0 + etasq)));
             _commonConsts.C1 = _elements.BStar * c2;
-            _commonConsts.A3Ovk2 = -Global.KXj3 / Global.KCk2 * Global.KAe * Global.KAe * Global.KAe;
+            _commonConsts.A3Ovk2 = -SgpConstants.ZonalHarmonicJ3 / SgpConstants.Ck2 * SgpConstants.DistanceUnitsPerEarthRadii * SgpConstants.DistanceUnitsPerEarthRadii *
+                                   SgpConstants.DistanceUnitsPerEarthRadii;
             _commonConsts.X1Mth2 = 1.0 - theta2;
             _commonConsts.C4 = 2.0 * _elements.RecoveredMeanMotion
                                * coef1 * _elements.RecoveredSemiMajorAxis * betao2
                                * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.Eccentricity
                                   * (0.5 + 2.0 * etasq)
-                                  - 2.0 * Global.KCk2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
+                                  - 2.0 * SgpConstants.Ck2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
                                   * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
                                                                     * (1.5 - 0.5 * eeta))
                                      + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
                                                                       (1.0 + etasq)) *
                                      Math.Cos(2.0 * _elements.ArgumentPerigee)));
             var theta4 = theta2 * theta2;
-            var temp1 = 3.0 * Global.KCk2 * pinvsq * _elements.RecoveredMeanMotion;
-            var temp2 = temp1 * Global.KCk2 * pinvsq;
-            var temp3 = 1.25 * Global.KCk4 * pinvsq * pinvsq * _elements.RecoveredMeanMotion;
+            var temp1 = 3.0 * SgpConstants.Ck2 * pinvsq * _elements.RecoveredMeanMotion;
+            var temp2 = temp1 * SgpConstants.Ck2 * pinvsq;
+            var temp3 = 1.25 * SgpConstants.Ck4 * pinvsq * pinvsq * _elements.RecoveredMeanMotion;
             _commonConsts.Xmdot = _elements.RecoveredMeanMotion + 0.5 * temp1 * betao *
                                   _commonConsts.X3Thm1 + 0.0625 * temp2 * betao *
                                   (13.0 - 78.0 * theta2 + 137.0 * theta4);
@@ -184,7 +185,7 @@ namespace SGP4_Sharp
             {
                 var c3 = 0.0;
                 if (_elements.Eccentricity > 1.0e-4)
-                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion * Global.KAe *
+                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion * SgpConstants.DistanceUnitsPerEarthRadii *
                          _commonConsts.Sinio / _elements.Eccentricity;
 
                 _nearspaceConsts.C5 = 2.0 * coef1 * _elements.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
@@ -194,7 +195,7 @@ namespace SGP4_Sharp
 
                 _nearspaceConsts.Xmcof = 0.0;
                 if (_elements.Eccentricity > 1.0e-4)
-                    _nearspaceConsts.Xmcof = -Global.KTwothird * coef * _elements.BStar * Global.KAe / eeta;
+                    _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * _elements.BStar * SgpConstants.DistanceUnitsPerEarthRadii / eeta;
 
                 _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(_elements.MeanAnomoly), 3.0);
                 _nearspaceConsts.Sinmo = Math.Sin(_elements.MeanAnomoly);
@@ -244,7 +245,7 @@ namespace SGP4_Sharp
             if (xn <= 0.0)
                 throw new SatelliteException("Error: (xn <= 0.0)");
 
-            var a = Math.Pow(Global.KXke / xn, Global.KTwothird) * tempa * tempa;
+            var a = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / xn, SgpConstants.TwoThirds) * tempa * tempa;
             e -= tempe;
             var xmam = xmdf + _elements.RecoveredMeanMotion * templ;
 
@@ -257,8 +258,8 @@ namespace SGP4_Sharp
             if (xincl < 0.0)
             {
                 xincl = -xincl;
-                xnode += Global.KPi;
-                omgadf -= Global.KPi;
+                xnode += Math.PI;
+                omgadf -= Math.PI;
             }
 
             var xl = xmam + omgadf + xnode;
@@ -394,7 +395,7 @@ namespace SGP4_Sharp
             double sinio)
         {
             var beta2 = 1.0 - e * e;
-            var xn = Global.KXke / Math.Pow(a, 1.5);
+            var xn = SgpConstants.ReciprocalOfMinutesPerTimeUnit / Math.Pow(a, 1.5);
             /*
              * long period periodics
              */
@@ -417,7 +418,7 @@ namespace SGP4_Sharp
              * - The fmod saves reduction of angle to +/-2pi in sin/cos() and prevents
              * convergence problems.
              */
-            var capu = (xlt - xnode) % Global.KTwopi;
+            var capu = (xlt - xnode) % SgpConstants.TwoPi;
             var epw = capu;
 
             var sinepw = 0.0;
@@ -486,8 +487,8 @@ namespace SGP4_Sharp
 
             var r = a * (1.0 - ecose);
             var temp31 = 1.0 / r;
-            var rdot = Global.KXke * Math.Sqrt(a) * esine * temp31;
-            var rfdot = Global.KXke * Math.Sqrt(pl) * temp31;
+            var rdot = SgpConstants.ReciprocalOfMinutesPerTimeUnit * Math.Sqrt(a) * esine * temp31;
+            var rfdot = SgpConstants.ReciprocalOfMinutesPerTimeUnit * Math.Sqrt(pl) * temp31;
             var temp32 = a * temp31;
             var betal = Math.Sqrt(temp21);
             var temp33 = 1.0 / (1.0 + betal);
@@ -501,7 +502,7 @@ namespace SGP4_Sharp
              * update for short periodics
              */
             var temp41 = 1.0 / pl;
-            var temp42 = Global.KCk2 * temp41;
+            var temp42 = SgpConstants.Ck2 * temp41;
             var temp43 = temp42 * temp41;
 
             var rk = r * (1.0 - 1.5 * temp43 * betal * x3Thm1)
@@ -532,14 +533,14 @@ namespace SGP4_Sharp
             /*
              * position and velocity
              */
-            var x = rk * ux * Global.EarthRadiusKm;
-            var y = rk * uy * Global.EarthRadiusKm;
-            var z = rk * uz * Global.EarthRadiusKm;
-            var position = new Vector(x, y, z);
-            var xdot = (rdotk * ux + rfdotk * vx) * Global.EarthRadiusKm / 60.0;
-            var ydot = (rdotk * uy + rfdotk * vy) * Global.EarthRadiusKm / 60.0;
-            var zdot = (rdotk * uz + rfdotk * vz) * Global.EarthRadiusKm / 60.0;
-            var velocity = new Vector(xdot, ydot, zdot);
+            var x = rk * ux * SgpConstants.EarthRadiusKm;
+            var y = rk * uy * SgpConstants.EarthRadiusKm;
+            var z = rk * uz * SgpConstants.EarthRadiusKm;
+            var position = new Vector3(x, y, z);
+            var xdot = (rdotk * ux + rfdotk * vx) * SgpConstants.EarthRadiusKm / 60.0;
+            var ydot = (rdotk * uy + rfdotk * vy) * SgpConstants.EarthRadiusKm / 60.0;
+            var zdot = (rdotk * uz + rfdotk * vz) * SgpConstants.EarthRadiusKm / 60.0;
+            var velocity = new Vector3(xdot, ydot, zdot);
 
             if (rk < 1.0)
                 throw new DecayedException(
@@ -598,10 +599,10 @@ namespace SGP4_Sharp
             /*
              * initialize lunar / solar terms
              */
-            var jday = _elements.Epoch.ToJulian() - Global.KEpochJan112H2000;
+            var jday = _elements.Epoch.ToJulian() - SgpConstants.EpochJan112H2000;
 
             var xnodce = 4.5236020 - 9.2422029e-4 * jday;
-            var xnodceTemp = xnodce % Global.KTwopi;
+            var xnodceTemp = xnodce % SgpConstants.TwoPi;
             var stem = Math.Sin(xnodceTemp);
             var ctem = Math.Cos(xnodceTemp);
             var zcosil = 0.91375164 - 0.03568096 * ctem;
@@ -614,7 +615,7 @@ namespace SGP4_Sharp
             var zx = 0.39785416 * stem / zsinil;
             var zy = zcoshl * ctem + 0.91744867 * zsinhl * stem;
             zx = Math.Atan2(zx, zy);
-            zx = (gam + zx - xnodce) % Global.KTwopi;
+            zx = (gam + zx - xnodce) % SgpConstants.TwoPi;
 
             var zcosgl = Math.Cos(zx);
             var zsingl = Math.Sin(zx);
@@ -701,7 +702,7 @@ namespace SGP4_Sharp
                  * shdq = (-zn * s2 * (z21 + z23)) / sinio
                  */
                 if (_elements.Inclination < 5.2359877e-2
-                    || _elements.Inclination > Global.KPi - 5.2359877e-2)
+                    || _elements.Inclination > Math.PI - 5.2359877e-2)
                     shdq = 0.0;
                 else
                     shdq = -zn * s2 * (z21 + z23) / sinio;
@@ -793,7 +794,7 @@ namespace SGP4_Sharp
                                           + _elements.AscendingNode
                                           + _elements.ArgumentPerigee
                                           - _deepspaceConsts.Gsto;
-                bfact = xmdot + xpidot - Global.KThdt;
+                bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad;
                 bfact += _deepspaceConsts.Ssl
                          + _deepspaceConsts.Ssg
                          + _deepspaceConsts.Ssh;
@@ -928,7 +929,7 @@ namespace SGP4_Sharp
                                           - _deepspaceConsts.Gsto;
                 bfact = xmdot
                         + xnodot + xnodot
-                        - Global.KThdt - Global.KThdt;
+                        - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad;
                 bfact = bfact + _deepspaceConsts.Ssl
                         + _deepspaceConsts.Ssh
                         + _deepspaceConsts.Ssh;
@@ -1084,18 +1085,18 @@ namespace SGP4_Sharp
 
                 xnodes = Math.Atan2(alfdp, betdp);
                 if (xnodes < 0.0)
-                    xnodes += Global.KTwopi;
+                    xnodes += SgpConstants.TwoPi;
 
                 /*
                  * Get perturbed xnodes in to same quadrant as original.
                  * RAAN is in the range of 0 to 360 degrees
                  * atan2 is in the range of -180 to 180 degrees
                  */
-                if (Math.Abs(oldxnodes - xnodes) > Global.KPi)
+                if (Math.Abs(oldxnodes - xnodes) > Math.PI)
                     if (xnodes < oldxnodes)
-                        xnodes += Global.KTwopi;
+                        xnodes += SgpConstants.TwoPi;
                     else
-                        xnodes -= Global.KTwopi;
+                        xnodes -= SgpConstants.TwoPi;
 
                 xll += pl;
                 omgasm = xls - xll - cosis * xnodes;
@@ -1182,7 +1183,7 @@ namespace SGP4_Sharp
                 var xl = _integratorParams.Xli
                          + _integratorParams.ValuesT.Xldot * ft
                          + _integratorParams.ValuesT.Xndot * ft * ft * 0.5;
-                var temp = -xnodes + _deepspaceConsts.Gsto + tsince * Global.KThdt;
+                var temp = -xnodes + _deepspaceConsts.Gsto + tsince * SgpConstants.EarthRotationPerMinRad;
 
                 if (_deepspaceConsts.SynchronousFlag)
                     xll = xl + temp - omgasm;

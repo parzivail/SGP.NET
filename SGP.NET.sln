@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP4_Sharp", "SGP4_Sharp\SGP4_Sharp.csproj", "{A8C667B9-1875-4083-829D-72566A69C0F6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP4Test", "Sandbox\SGP4Test.csproj", "{5C2CEB96-AA3D-4315-B5AC-2C3B282C5B74}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFX", "PFX\PFX.csproj", "{4ECCD5A4-2F81-4693-BCAB-2306BB96A1DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP.NET", "SGP.NET\SGP.NET.csproj", "{A8C667B9-1875-4083-829D-72566A69C0F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A8C667B9-1875-4083-829D-72566A69C0F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8C667B9-1875-4083-829D-72566A69C0F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8C667B9-1875-4083-829D-72566A69C0F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8C667B9-1875-4083-829D-72566A69C0F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5C2CEB96-AA3D-4315-B5AC-2C3B282C5B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5C2CEB96-AA3D-4315-B5AC-2C3B282C5B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C2CEB96-AA3D-4315-B5AC-2C3B282C5B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{4ECCD5A4-2F81-4693-BCAB-2306BB96A1DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ECCD5A4-2F81-4693-BCAB-2306BB96A1DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ECCD5A4-2F81-4693-BCAB-2306BB96A1DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8C667B9-1875-4083-829D-72566A69C0F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8C667B9-1875-4083-829D-72566A69C0F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8C667B9-1875-4083-829D-72566A69C0F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8C667B9-1875-4083-829D-72566A69C0F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

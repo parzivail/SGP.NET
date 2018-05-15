@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A8C667B9-1875-4083-829D-72566A69C0F6}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SGP4_Sharp</RootNamespace>
-    <AssemblyName>SGP4_Sharp</AssemblyName>
+    <RootNamespace>SGPdotNET</RootNamespace>
+    <AssemblyName>SGP.NET</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -45,7 +45,7 @@
     <Compile Include="Tle.cs" />
     <Compile Include="TleException.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="Vector.cs" />
+    <Compile Include="Vector3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

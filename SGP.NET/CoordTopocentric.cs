@@ -1,11 +1,13 @@
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     /// <summary>
     ///     Stores a topocentric location (azimuth, elevation, range and range rate).
-    ///     Azimuth and elevation are stored in radians. Range in kilometers. Range rate in kilometers/second.
     /// </summary>
     public class CoordTopocentric
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
         public CoordTopocentric()
         {
         }
@@ -13,22 +15,22 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="az">azimuth in radians</param>
-        /// <param name="el">elevation in radians</param>
-        /// <param name="rnge">range in kilometers</param>
-        /// <param name="rngeRate">range rate in kilometers per second</param>
-        public CoordTopocentric(double az, double el, double rnge, double rngeRate)
+        /// <param name="azimuth">Azimuth in radians</param>
+        /// <param name="elevation">Elevation in radians</param>
+        /// <param name="range">Range in kilometers</param>
+        /// <param name="rangeRate">Range rate in kilometers/second</param>
+        public CoordTopocentric(double azimuth, double elevation, double range, double rangeRate)
         {
-            Azimuth = az;
-            Elevation = el;
-            Range = rnge;
-            RangeRate = rngeRate;
+            Azimuth = azimuth;
+            Elevation = elevation;
+            Range = range;
+            RangeRate = rangeRate;
         }
 
         /// <summary>
-        ///     Copy constructor
+        ///     Constructor
         /// </summary>
-        /// <param name="topo">object to copy from</param>
+        /// <param name="topo">Object to copy from</param>
         public CoordTopocentric(CoordTopocentric topo)
         {
             Azimuth = topo.Azimuth;

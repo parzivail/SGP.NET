@@ -2,11 +2,10 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     /// <summary>
-    ///     Processes a two-line element set used to convey OrbitalElements. Used to extract the various raw fields from a
-    ///     two-line element set.
+    ///     Extracts OrbitalElements from a two-line or three-line element set
     /// </summary>
     public class Tle
     {
@@ -60,8 +59,8 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Initialise TLE with two lines
         /// </summary>
-        /// <param name="lineOne"></param>
-        /// <param name="lineTwo"></param>
+        /// <param name="lineOne">The first line of the set</param>
+        /// <param name="lineTwo">The second line of the set</param>
         public Tle(string lineOne, string lineTwo)
         {
             Line1 = lineOne;
@@ -70,11 +69,11 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        ///     Initialise TLE with two lines and a name
+        ///     Initialise 3LE with a name and two lines
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="lineOne"></param>
-        /// <param name="lineTwo"></param>
+        /// <param name="name">The 0th line (name) of the set</param>
+        /// <param name="lineOne">The first line of the set</param>
+        /// <param name="lineTwo">The second line of the set</param>
         public Tle(string name, string lineOne, string lineTwo)
         {
             Name = name;
@@ -84,9 +83,9 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        ///     Initialise TLE with another TLE
+        ///     Constructor
         /// </summary>
-        /// <param name="tle">the TLE to copy</param>
+        /// <param name="tle">Object to copy from</param>
         public Tle(Tle tle)
         {
             Name = tle.Name;

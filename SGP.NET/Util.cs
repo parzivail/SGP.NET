@@ -1,8 +1,8 @@
 using System;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
-    public class Util
+    internal class Util
     {
         /*
          * always positive result
@@ -19,12 +19,12 @@ namespace SGP4_Sharp
 
         public static double WrapNegPosPi(double a)
         {
-            return Mod(a + Global.KPi, Global.KTwopi) - Global.KPi;
+            return Mod(a + Math.PI, SgpConstants.TwoPi) - Math.PI;
         }
 
         public static double WrapTwoPi(double a)
         {
-            return Mod(a, Global.KTwopi);
+            return Mod(a, SgpConstants.TwoPi);
         }
 
         public static double WrapNegPos180(double a)
@@ -39,12 +39,12 @@ namespace SGP4_Sharp
 
         public static double DegreesToRadians(double degrees)
         {
-            return degrees * Global.KPi / 180.0;
+            return degrees * Math.PI / 180.0;
         }
 
         public static double RadiansToDegrees(double radians)
         {
-            return radians * 180.0 / Global.KPi;
+            return radians * 180.0 / Math.PI;
         }
 
         public static double AcTan(double sinx, double cosx)
@@ -52,15 +52,15 @@ namespace SGP4_Sharp
             if (cosx == 0.0)
             {
                 if (sinx > 0.0)
-                    return Global.KPi / 2.0;
+                    return Math.PI / 2.0;
 
-                return 3.0 * Global.KPi / 2.0;
+                return 3.0 * Math.PI / 2.0;
             }
 
             if (cosx > 0.0)
                 return Math.Atan(sinx / cosx);
 
-            return Global.KPi + Math.Atan(sinx / cosx);
+            return Math.PI + Math.Atan(sinx / cosx);
         }
     }
 }

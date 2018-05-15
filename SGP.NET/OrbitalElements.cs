@@ -1,6 +1,6 @@
 using System;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     /// <summary>
     ///     Container for the extracted orbital elements used by the SGP4 propagator.
@@ -15,19 +15,19 @@ namespace SGP4_Sharp
             ArgumentPerigee = tle.GetArgumentPerigee(false);
             Eccentricity = tle.Eccentricity;
             Inclination = tle.GetInclination(false);
-            MeanMotion = tle.MeanMotionRevPerDay * Global.KTwopi / Global.KMinutesPerDay;
+            MeanMotion = tle.MeanMotionRevPerDay * SgpConstants.TwoPi / SgpConstants.MinutesPerDay;
             BStar = tle.BStarDragTerm;
             Epoch = tle.Epoch;
 
             // recover original mean motion (xnodp) and semimajor axis (aodp) from input elements
-            var a1 = Math.Pow(Global.KXke / MeanMotion, Global.KTwothird);
+            var a1 = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / MeanMotion, SgpConstants.TwoThirds);
             var cosio = Math.Cos(Inclination);
             var theta2 = cosio * cosio;
             var x3Thm1 = 3.0 * theta2 - 1.0;
             var eosq = Eccentricity * Eccentricity;
             var betao2 = 1.0 - eosq;
             var betao = Math.Sqrt(betao2);
-            var temp = 1.5 * Global.KCk2 * x3Thm1 / (betao * betao2);
+            var temp = 1.5 * SgpConstants.Ck2 * x3Thm1 / (betao * betao2);
             var del1 = temp / (a1 * a1);
             var a0 = a1 * (1.0 - del1 * (1.0 / 3.0 + del1 * (1.0 + del1 * 134.0 / 81.0)));
             var del0 = temp / (a0 * a0);
@@ -36,8 +36,8 @@ namespace SGP4_Sharp
             RecoveredSemiMajorAxis = a0 / (1.0 - del0);
 
             // find perigee and period
-            Perigee = (RecoveredSemiMajorAxis * (1.0 - Eccentricity) - Global.KAe) * Global.EarthRadiusKm;
-            Period = Global.KTwopi / RecoveredMeanMotion;
+            Perigee = (RecoveredSemiMajorAxis * (1.0 - Eccentricity) - SgpConstants.DistanceUnitsPerEarthRadii) * SgpConstants.EarthRadiusKm;
+            Period = SgpConstants.TwoPi / RecoveredMeanMotion;
         }
 
         /// <summary>

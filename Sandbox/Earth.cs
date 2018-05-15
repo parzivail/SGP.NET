@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using PFX.Shader;
 using PFX.Util;
-using SGP4_Sharp;
+using SGPdotNET;
+using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox
 {
     class Earth
     {
-        private static readonly float EarthRadiusScaled = (float) (Global.EarthRadiusKm / 100);
+        private static readonly float EarthRadiusScaled = (float) (SgpConstants.EarthRadiusKm / 100);
         private readonly Sphere _sphere = new Sphere(EarthRadiusScaled, EarthRadiusScaled, 60, 30);
         private readonly Sphere _sphereAtmosphere = new Sphere(EarthRadiusScaled * 1.07f, EarthRadiusScaled * 1.07f, 60, 30);
         //private readonly Sphere _sphereSpace = new Sphere(257, 257, 60, 30);
@@ -124,7 +121,7 @@ namespace Sandbox
             NMatrixUniform.Value = normalMatrix;
 
             // Percent through a day (1440m/day)
-            var t = System.DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
+            var t = DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
             const float sunDistance = 20000;
 
             PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), 8696, sunDistance * (float)Math.Sin(t)), modelViewMatrix);

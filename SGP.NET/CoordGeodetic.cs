@@ -1,12 +1,15 @@
 using System;
 
-namespace SGP4_Sharp
+namespace SGPdotNET
 {
     /// <summary>
-    ///     Stores a geodetic location (latitude, longitude, altitude).
+    ///     Stores a geodetic location
     /// </summary>
     public class CoordGeodetic
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
         public CoordGeodetic()
         {
         }
@@ -14,10 +17,10 @@ namespace SGP4_Sharp
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="lat">the latitude (degrees by default)</param>
-        /// <param name="lon">the longitude (degrees by default)</param>
-        /// <param name="alt">the altitude in kilometers</param>
-        /// <param name="isRadians">whether the latitude and longitude are in radians</param>
+        /// <param name="lat">The latitude (degrees by default)</param>
+        /// <param name="lon">The longitude (degrees by default)</param>
+        /// <param name="alt">The altitude in kilometers</param>
+        /// <param name="isRadians">True if the provided latitude and longitude are in radians</param>
         public CoordGeodetic(double lat, double lon, double alt, bool isRadians = false)
         {
             if (isRadians)
@@ -34,9 +37,9 @@ namespace SGP4_Sharp
         }
 
         /// <summary>
-        ///     Copy constructor
+        ///     Constructor
         /// </summary>
-        /// <param name="geo">object to copy from</param>
+        /// <param name="geo">Object to copy from</param>
         public CoordGeodetic(CoordGeodetic geo)
         {
             Latitude = geo.Latitude;
@@ -60,30 +63,31 @@ namespace SGP4_Sharp
         public double Altitude { get; set; }
 
         /// <summary>
-        ///     Converts this geodedic position to a ECI one
+        ///     Converts this geodetic position to a ECI one
         /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
+        /// <param name="dt">The time for the ECI frame</param>
+        /// <returns>The position in an ECI reference frame with the supplied time</returns>
         public Eci ToEci(DateTime dt)
         {
             var time = dt;
 
-            const double mfactor = Global.KTwopi * (Global.EarthRotationPerSiderealDay / Global.KSecondsPerDay);
+            const double mfactor =
+                SgpConstants.TwoPi * (SgpConstants.EarthRotationPerSiderealDay / SgpConstants.SecondsPerDay);
 
             var theta = time.ToLocalMeanSiderealTime(Longitude);
 
             var c = 1.0
                     /
                     Math.Sqrt(1.0 +
-                              Global.EarthFlatteningConstant * (Global.EarthFlatteningConstant - 2.0) *
+                              SgpConstants.EarthFlatteningConstant * (SgpConstants.EarthFlatteningConstant - 2.0) *
                               Math.Pow(Math.Sin(Latitude), 2.0));
-            var s = Math.Pow(1.0 - Global.EarthFlatteningConstant, 2.0) * c;
-            var achcp = (Global.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude);
+            var s = Math.Pow(1.0 - SgpConstants.EarthFlatteningConstant, 2.0) * c;
+            var achcp = (SgpConstants.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude);
 
-            var position = new Vector(achcp * Math.Cos(theta), achcp * Math.Sin(theta),
-                (Global.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
+            var position = new Vector3(achcp * Math.Cos(theta), achcp * Math.Sin(theta),
+                (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
 
-            var velocity = new Vector(-mfactor * position.Y, mfactor * position.X, 0);
+            var velocity = new Vector3(-mfactor * position.Y, mfactor * position.X, 0);
 
             return new Eci(time, position, velocity);
         }

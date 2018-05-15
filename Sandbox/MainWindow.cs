@@ -3,25 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using PFX;
 using PFX.BmFont;
-using PFX.Shader;
 using PFX.Util;
-using SGP4_Sharp;
+using SGPdotNET;
 using DateTime = System.DateTime;
 using KeyPressEventArgs = OpenTK.KeyPressEventArgs;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using TimeSpan = System.TimeSpan;
+using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox
 {
