@@ -7,10 +7,6 @@ namespace SGPdotNET
     /// </summary>
     public class DecayedException : Exception
     {
-        public DateTime Time { get; }
-        public Vector3 Position { get; }
-        public Vector3 Velocity { get; }
-
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -23,5 +19,9 @@ namespace SGPdotNET
             Position = position;
             Velocity = velocity;
         }
+
+        public DateTime Time { get; }
+        public Vector3 Position { get; }
+        public Vector3 Velocity { get; }
     }
 }

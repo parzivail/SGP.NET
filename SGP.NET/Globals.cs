@@ -2,6 +2,9 @@ using System;
 
 namespace SGPdotNET
 {
+    /// <summary>
+    ///     Stores various numerical constants used in propogation
+    /// </summary>
     public class SgpConstants
     {
         public const double TwoPi = 2.0 * Math.PI;
@@ -20,8 +23,6 @@ namespace SGPdotNET
         public const double Q0 = 120.0;
         public const double S0 = 78.0;
         public const double S = DistanceUnitsPerEarthRadii * (1.0 + S0 / EarthRadiusKm);
-
-        public static double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4.0);
 
         /// <summary>
         ///     Also called Ae
@@ -87,6 +88,8 @@ namespace SGPdotNET
         ///     Jan 1.5 2000 = Jan 1 2000 12h UTC
         /// </summary>
         public const double EpochJan112H2000 = 2451545.0;
+
+        public static double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4.0);
 
         /// <summary>
         ///     Also called XKE

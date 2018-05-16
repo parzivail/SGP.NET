@@ -3,7 +3,7 @@ using System;
 namespace SGPdotNET
 {
     /// <summary>
-    /// Exception thrown by the propagator during initialization when a satellite has erroneous values
+    ///     Exception thrown by the propagator during initialization when a satellite has erroneous values
     /// </summary>
     public class SatelliteException : Exception
     {

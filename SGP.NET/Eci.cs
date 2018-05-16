@@ -106,7 +106,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="eci">The object to look at</param>
         /// <returns>The position in a topocentric reference frame to the supplied position</returns>
-        public CoordTopocentric GetLookAngle(Eci eci)
+        public CoordTopocentric LookAt(Eci eci)
         {
             var geo = ToGeodetic();
 

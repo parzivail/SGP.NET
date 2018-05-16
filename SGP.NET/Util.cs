@@ -2,7 +2,7 @@ using System;
 
 namespace SGPdotNET
 {
-    internal class Util
+    internal static class Util
     {
         /*
          * always positive result
@@ -61,6 +61,12 @@ namespace SGPdotNET
                 return Math.Atan(sinx / cosx);
 
             return Math.PI + Math.Atan(sinx / cosx);
+        }
+
+        public static DateTime Round(this DateTime date, TimeSpan span)
+        {
+            var ticks = (date.Ticks + span.Ticks / 2 + 1) / span.Ticks;
+            return new DateTime(ticks * span.Ticks);
         }
     }
 }

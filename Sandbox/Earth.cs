@@ -42,6 +42,8 @@ namespace Sandbox
         private int _vertexPositionAttribute;
         private int _vertexNormalAttribute;
         private int _textureCoordAttribute;
+        private int _vertexTangentAttribute;
+        private int _vertexBinormalAttribute;
 
         private int _earthSpheremap;
         private int _earthSpheremapNight;
@@ -53,7 +55,7 @@ namespace Sandbox
         {
             var pair = new Bitmap("earth_day.png").LoadGlTexture();
             _earthSpheremap = pair.Key;
-            pair = new Bitmap("earth_night.jpg").LoadGlTexture();
+            pair = new Bitmap("earth_night.png").LoadGlTexture();
             _earthSpheremapNight = pair.Key;
             pair = new Bitmap("earth_specmap.png").LoadGlTexture();
             _earthSpheremapSpecular = pair.Key;
@@ -85,10 +87,14 @@ namespace Sandbox
             GL.BindAttribLocation(_earthShader.GetId(), _vertexPositionAttribute = 0, "aVertexPosition");
             GL.BindAttribLocation(_earthShader.GetId(), _vertexNormalAttribute = 1, "aVertexNormal");
             GL.BindAttribLocation(_earthShader.GetId(), _textureCoordAttribute = 2, "aTextureCoord");
+            GL.BindAttribLocation(_earthShader.GetId(), _vertexTangentAttribute = 3, "aVertexTangent");
+            GL.BindAttribLocation(_earthShader.GetId(), _vertexBinormalAttribute = 4, "aVertexBinormal");
 
             GL.EnableVertexAttribArray(_vertexPositionAttribute);
             GL.EnableVertexAttribArray(_vertexNormalAttribute);
             GL.EnableVertexAttribArray(_textureCoordAttribute);
+            GL.EnableVertexAttribArray(_vertexTangentAttribute);
+            GL.EnableVertexAttribArray(_vertexBinormalAttribute);
 
             GL.UseProgram(0);
 
@@ -124,7 +130,9 @@ namespace Sandbox
             var t = DateTime.UtcNow.TimeOfDay.TotalMinutes / 1440f * Math.PI * 2;
             const float sunDistance = 20000;
 
-            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), 8696, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
+            var sunHeight = 8696 * Math.Cos((DateTime.UtcNow.DayOfYear + 10) / 365.0 * 2 * Math.PI + Math.PI);
+
+            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), (float)sunHeight, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
 
             var scale = projectionMatrix.ExtractScale();
             InnerRadius.Value = (EarthRadiusScaled * 1.1f * scale).Length;
@@ -167,11 +175,11 @@ namespace Sandbox
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapNormal);
 
             _earthShader.Use(uniforms);
-            _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute);
+            _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
             _earthVbo.Render(PrimitiveType.Triangles);
 
             _earthAtmosShader.Use(uniforms);
-            _earthAtmosVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute);
+            _earthAtmosVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
 
             GL.PushAttrib(AttribMask.EnableBit);
             GL.Enable(EnableCap.Blend);

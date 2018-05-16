@@ -31,15 +31,17 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GroundStation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoordGeodetic.cs" />
     <Compile Include="CoordTopocentric.cs" />
     <Compile Include="DecayedException.cs" />
     <Compile Include="Eci.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="Observer.cs" />
     <Compile Include="OrbitalElements.cs" />
+    <Compile Include="Satellite.cs" />
     <Compile Include="SatelliteException.cs" />
+    <Compile Include="SatelliteObservation.cs" />
     <Compile Include="SGP4.cs" />
     <Compile Include="TimeExtensions.cs" />
     <Compile Include="Tle.cs" />

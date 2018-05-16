@@ -101,14 +101,15 @@ namespace SGPdotNET
              * for perigee below 156km, the values of
              * s4 and qoms2t are altered
              */
-            var s4 = SgpConstants.DensityParameter;
+            var s4 = SgpConstants.S;
             var qoms24 = SgpConstants.Qoms2T;
             if (_elements.Perigee < 156.0)
             {
                 s4 = _elements.Perigee - 78.0;
                 if (_elements.Perigee < 98.0)
                     s4 = 20.0;
-                qoms24 = Math.Pow((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm, 4.0);
+                qoms24 = Math.Pow((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm,
+                    4.0);
                 s4 = s4 / SgpConstants.EarthRadiusKm + SgpConstants.DistanceUnitsPerEarthRadii;
             }
 
@@ -128,24 +129,25 @@ namespace SGPdotNET
             var coef = qoms24 * Math.Pow(tsi, 4.0);
             var coef1 = coef / Math.Pow(psisq, 3.5);
             var c2 = coef1 * _elements.RecoveredMeanMotion
-                     * (_elements.RecoveredSemiMajorAxis
-                        * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
-                        + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
-                        * (8.0 + 3.0 * etasq * (8.0 + etasq)));
+                           * (_elements.RecoveredSemiMajorAxis
+                              * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
+                              + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
+                                                                      * (8.0 + 3.0 * etasq * (8.0 + etasq)));
             _commonConsts.C1 = _elements.BStar * c2;
-            _commonConsts.A3Ovk2 = -SgpConstants.ZonalHarmonicJ3 / SgpConstants.Ck2 * SgpConstants.DistanceUnitsPerEarthRadii * SgpConstants.DistanceUnitsPerEarthRadii *
+            _commonConsts.A3Ovk2 = -SgpConstants.ZonalHarmonicJ3 / SgpConstants.Ck2 *
+                                   SgpConstants.DistanceUnitsPerEarthRadii * SgpConstants.DistanceUnitsPerEarthRadii *
                                    SgpConstants.DistanceUnitsPerEarthRadii;
             _commonConsts.X1Mth2 = 1.0 - theta2;
             _commonConsts.C4 = 2.0 * _elements.RecoveredMeanMotion
-                               * coef1 * _elements.RecoveredSemiMajorAxis * betao2
-                               * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.Eccentricity
-                                  * (0.5 + 2.0 * etasq)
-                                  - 2.0 * SgpConstants.Ck2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
-                                  * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
-                                                                    * (1.5 - 0.5 * eeta))
-                                     + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
-                                                                      (1.0 + etasq)) *
-                                     Math.Cos(2.0 * _elements.ArgumentPerigee)));
+                                   * coef1 * _elements.RecoveredSemiMajorAxis * betao2
+                                   * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.Eccentricity
+                                      * (0.5 + 2.0 * etasq)
+                                      - 2.0 * SgpConstants.Ck2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
+                                      * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
+                                                                        * (1.5 - 0.5 * eeta))
+                                         + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
+                                                                          (1.0 + etasq)) *
+                                         Math.Cos(2.0 * _elements.ArgumentPerigee)));
             var theta4 = theta2 * theta2;
             var temp1 = 3.0 * SgpConstants.Ck2 * pinvsq * _elements.RecoveredMeanMotion;
             var temp2 = temp1 * SgpConstants.Ck2 * pinvsq;
@@ -185,7 +187,8 @@ namespace SGPdotNET
             {
                 var c3 = 0.0;
                 if (_elements.Eccentricity > 1.0e-4)
-                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion * SgpConstants.DistanceUnitsPerEarthRadii *
+                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion *
+                         SgpConstants.DistanceUnitsPerEarthRadii *
                          _commonConsts.Sinio / _elements.Eccentricity;
 
                 _nearspaceConsts.C5 = 2.0 * coef1 * _elements.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
@@ -195,7 +198,8 @@ namespace SGPdotNET
 
                 _nearspaceConsts.Xmcof = 0.0;
                 if (_elements.Eccentricity > 1.0e-4)
-                    _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * _elements.BStar * SgpConstants.DistanceUnitsPerEarthRadii / eeta;
+                    _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * _elements.BStar *
+                                             SgpConstants.DistanceUnitsPerEarthRadii / eeta;
 
                 _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(_elements.MeanAnomoly), 3.0);
                 _nearspaceConsts.Sinmo = Math.Sin(_elements.MeanAnomoly);
@@ -297,7 +301,7 @@ namespace SGPdotNET
                                  * (3.0 + 5.0 * perturbedCosio) / 1.5e-12;
 
             var perturbedAycof = 0.25 * _commonConsts.A3Ovk2
-                                 * perturbedSinio;
+                                      * perturbedSinio;
 
             /*
              * using calculated values, find position and velocity
@@ -348,7 +352,7 @@ namespace SGPdotNET
                 tempa = tempa - _nearspaceConsts.D2 * tsq - _nearspaceConsts.D3
                         * tcube - _nearspaceConsts.D4 * tfour;
                 tempe += _elements.BStar * _nearspaceConsts.C5
-                         * (Math.Sin(xmp) - _nearspaceConsts.Sinmo);
+                                         * (Math.Sin(xmp) - _nearspaceConsts.Sinmo);
                 templ += _nearspaceConsts.T3Cof * tcube + tfour
                          * (_nearspaceConsts.T4Cof + tsince * _nearspaceConsts.T5Cof);
             }
@@ -476,6 +480,7 @@ namespace SGPdotNET
                     epw += deltaEpw;
                 }
             }
+
             /*
              * short period preliminary quantities
              */
@@ -781,12 +786,12 @@ namespace SGPdotNET
                 var f330 = 1.0 + cosio;
                 f330 = 1.875 * f330 * f330 * f330;
                 _deepspaceConsts.Del1 = 3.0 * _elements.RecoveredMeanMotion
-                                        * _elements.RecoveredMeanMotion
-                                        * aqnv * aqnv;
+                                            * _elements.RecoveredMeanMotion
+                                            * aqnv * aqnv;
                 _deepspaceConsts.Del2 = 2.0 * _deepspaceConsts.Del1
-                                        * f220 * g200 * q22;
+                                            * f220 * g200 * q22;
                 _deepspaceConsts.Del3 = 3.0 * _deepspaceConsts.Del1
-                                        * f330 * g300 * q33 * aqnv;
+                                            * f330 * g300 * q33 * aqnv;
                 _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                                         * f311 * g310 * q31 * aqnv;
 
@@ -888,8 +893,8 @@ namespace SGPdotNET
                 var f441 = 35.0 * sini2 * f220;
                 var f442 = 39.3750 * sini2 * sini2;
                 var f522 = 9.84375 * sinio
-                           * (sini2 * (1.0 - 2.0 * cosio - 5.0 * theta2)
-                              + 0.33333333 * (-2.0 + 4.0 * cosio + 6.0 * theta2));
+                                   * (sini2 * (1.0 - 2.0 * cosio - 5.0 * theta2)
+                                      + 0.33333333 * (-2.0 + 4.0 * cosio + 6.0 * theta2));
                 var f523 = sinio
                            * (4.92187512 * sini2 * (-2.0 - 4.0 * cosio + 10.0 * theta2)
                               + 6.56250012 * (1.0 + 2.0 * cosio - 3.0 * theta2));
@@ -931,8 +936,8 @@ namespace SGPdotNET
                         + xnodot + xnodot
                         - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad;
                 bfact = bfact + _deepspaceConsts.Ssl
-                        + _deepspaceConsts.Ssh
-                        + _deepspaceConsts.Ssh;
+                              + _deepspaceConsts.Ssh
+                              + _deepspaceConsts.Ssh;
             }
 
             if (initialiseIntegrator)
@@ -1214,9 +1219,9 @@ namespace SGPdotNET
                 values.Xnddt = _deepspaceConsts.Del1
                                * Math.Cos(_integratorParams.Xli - fasx2)
                                + 2.0 * _deepspaceConsts.Del2
-                               * Math.Cos(2.0 * (_integratorParams.Xli - fasx4))
+                                     * Math.Cos(2.0 * (_integratorParams.Xli - fasx4))
                                + 3.0 * _deepspaceConsts.Del3
-                               * Math.Cos(3.0 * (_integratorParams.Xli - fasx6));
+                                     * Math.Cos(3.0 * (_integratorParams.Xli - fasx6));
             }
             else
             {

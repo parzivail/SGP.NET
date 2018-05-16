@@ -302,7 +302,8 @@ namespace SGPdotNET
             }
             else
             {
-                correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" + str.Substring(str.IndexOf("-"));
+                correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" +
+                                   str.Substring(str.IndexOf("-"));
             }
 
             val = (double) decimal.Parse(correctedString, NumberStyles.Float);

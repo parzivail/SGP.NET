@@ -8,7 +8,7 @@ namespace SGPdotNET
     public class Vector3
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public Vector3() : this(0, 0, 0)
         {
@@ -41,22 +41,22 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        /// The X component of this vector
+        ///     The X component of this vector
         /// </summary>
         public double X { get; }
 
         /// <summary>
-        /// The Y component of this vector
+        ///     The Y component of this vector
         /// </summary>
         public double Y { get; }
 
         /// <summary>
-        /// The Z component of this vector
+        ///     The Z component of this vector
         /// </summary>
         public double Z { get; }
 
         /// <summary>
-        /// The length of this vector
+        ///     The length of this vector
         /// </summary>
         public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
 

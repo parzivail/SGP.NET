@@ -36,7 +36,8 @@ namespace SGPdotNET
             RecoveredSemiMajorAxis = a0 / (1.0 - del0);
 
             // find perigee and period
-            Perigee = (RecoveredSemiMajorAxis * (1.0 - Eccentricity) - SgpConstants.DistanceUnitsPerEarthRadii) * SgpConstants.EarthRadiusKm;
+            Perigee = (RecoveredSemiMajorAxis * (1.0 - Eccentricity) - SgpConstants.DistanceUnitsPerEarthRadii) *
+                      SgpConstants.EarthRadiusKm;
             Period = SgpConstants.TwoPi / RecoveredMeanMotion;
         }
 
