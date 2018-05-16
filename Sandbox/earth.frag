@@ -16,14 +16,20 @@ uniform sampler2D uNormalMapSampler;
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
+uniform bool bLq;
 
 out vec4 fragColor;
 
 void main(void) {
     vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
-    vec3 normal = texture(uNormalMapSampler, vTextureCoord).rgb;
-	normal = normalize(normal * 2.0 - 1.0);   
-	normal = normalize(vTBN * normal);
+    vec3 normal;
+	if (bLq) {
+		normal = vTransformedNormal;
+	} else {
+		normal = texture(uNormalMapSampler, vTextureCoord).rgb;
+		normal = normalize(normal * 2.0 - 1.0);
+		normal = normalize(vTBN * normal);
+	}
 
     float specularLightWeighting = 0.0;
     float shininess = texture2D(uSpecularMapSampler, vTextureCoord).r;
@@ -31,7 +37,7 @@ void main(void) {
     if (shininess < 1.0) {
         vec3 eyeDirection = normalize(-vPosition.xyz);
         vec3 reflectionDirection = reflect(-lightDirection, normal);
-        specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), shininess);
+        specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), shininess) * 0.75;
     }
 
 	vec3 normalMap = texture2D(uNormalMapSampler, vTextureCoord).rgb; 

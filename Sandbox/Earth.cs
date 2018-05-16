@@ -34,6 +34,7 @@ namespace Sandbox
         private static readonly Uniform InnerRadius = new Uniform("fInnerRadius");
         private static readonly Uniform OuterRadius = new Uniform("fOuterRadius");
         private static readonly Uniform Scatter = new Uniform("iScatter");
+        private static readonly Uniform LowQuality = new Uniform("bLq");
 
         private static SimpleVertexBuffer _earthVbo;
         private static SimpleVertexBuffer _earthAtmosVbo;
@@ -139,6 +140,7 @@ namespace Sandbox
             OuterRadius.Value = (EarthRadiusScaled * 1.15f * scale).Length;
 
             Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
+            LowQuality.Value = MainWindow.FastGraphics;
 
             var uniforms = new[]
             {
@@ -155,7 +157,8 @@ namespace Sandbox
                 PointLightingDiffuseColorUniform,
                 InnerRadius,
                 OuterRadius,
-                Scatter
+                Scatter,
+                LowQuality
             };
 
             //GL.ActiveTexture(TextureUnit.Texture0);

@@ -9,6 +9,7 @@ layout(location = 4) in vec3 aVertexBinormal;
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
+uniform bool bLq;
 
 out vec2 vTextureCoord;
 out vec3 vTransformedNormal;
@@ -20,8 +21,12 @@ void main(void) {
     gl_Position = uPMatrix * vPosition;
     vTextureCoord = aTextureCoord;
     vTransformedNormal = uNMatrix * aVertexNormal;
-	vec3 T = normalize(vec3(uMVMatrix * vec4(aVertexTangent,   0.0)));
-	vec3 B = normalize(vec3(uMVMatrix * vec4(aVertexBinormal, 0.0)));
-	vec3 N = normalize(vec3(uMVMatrix * vec4(aVertexNormal,    0.0)));
-	vTBN = mat3(T, B, N);
+	if (bLq) {
+		vTBN = mat3(0.0);
+	} else {
+		vec3 T = normalize(vec3(uMVMatrix * vec4(aVertexTangent,   0.0)));
+		vec3 B = normalize(vec3(uMVMatrix * vec4(aVertexBinormal, 0.0)));
+		vec3 N = normalize(vec3(uMVMatrix * vec4(aVertexNormal,    0.0)));
+		vTBN = mat3(T, B, N);
+	}
 }
