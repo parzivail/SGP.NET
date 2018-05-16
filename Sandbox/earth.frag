@@ -28,7 +28,7 @@ void main(void) {
 	} else {
 		normal = texture(uNormalMapSampler, vTextureCoord).rgb;
 		normal = normalize(normal * 2.0 - 1.0);
-		normal = normalize(vTBN * normal);
+		normal = vTBN * normal;
 	}
 
     float specularLightWeighting = 0.0;
@@ -37,7 +37,7 @@ void main(void) {
     if (shininess < 1.0) {
         vec3 eyeDirection = normalize(-vPosition.xyz);
         vec3 reflectionDirection = reflect(-lightDirection, normal);
-        specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), shininess) * 0.75;
+        specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), shininess);
     }
 
 	vec3 normalMap = texture2D(uNormalMapSampler, vTextureCoord).rgb; 

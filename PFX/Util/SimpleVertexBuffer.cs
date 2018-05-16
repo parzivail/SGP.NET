@@ -97,19 +97,16 @@ namespace PFX.Util
                     var t1 = w2.Y - w1.Y;
                     var t2 = w3.Y - w1.Y;
 
-                    float coef = 1 / (s1 * t1 - s2 * t2);
+                    var coef = 1 / (s1 * t1 - s2 * t2);
                     var tangent = new Vector3(coef * ((x1 * t2) + (x2 * -t1)), coef * ((y1 * t2) + (y2 * -t1)), coef * ((z1 * t2) + (z2 * -t1)));
 
                     tangents[a + 0] = tangent;
                     tangents[a + 1] = tangent;
                     tangents[a + 2] = tangent;
 
-                    var normal = Vector3.Cross(new Vector3(x1, y1, z1), new Vector3(x2, y2, z2));
-                    var binormal = Vector3.Cross(normal, tangent);
-
-                    binormals[a + 0] = binormal;
-                    tangents[a + 1] = binormal;
-                    tangents[a + 2] = binormal;
+                    binormals[a + 0] = Vector3.Cross(vertexNormals[i1], tangent);
+                    binormals[a + 1] = Vector3.Cross(vertexNormals[i2], tangent);
+                    binormals[a + 2] = Vector3.Cross(vertexNormals[i3], tangent);
                 }
             }
 
@@ -169,12 +166,12 @@ namespace PFX.Util
                     GL.BindBuffer(BufferTarget.ArrayBuffer, TangentBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexNormals.Length * Vector3.SizeInBytes),
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes),
                         tangents, BufferUsageHint.StaticDraw);
 
                     // Validate that the buffer is the correct size
                     GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out bufferSize);
-                    if (vertexNormals.Length * Vector3.SizeInBytes != bufferSize)
+                    if (tangents.Length * Vector3.SizeInBytes != bufferSize)
                         throw new ApplicationException("Tangent array not uploaded correctly");
 
                     // Clear the buffer Binding
@@ -191,13 +188,13 @@ namespace PFX.Util
                     GL.BindBuffer(BufferTarget.ArrayBuffer, BinormalBufferId);
 
                     // Send data to buffer
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexNormals.Length * Vector3.SizeInBytes),
-                        tangents, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(binormals.Length * Vector3.SizeInBytes),
+                        binormals, BufferUsageHint.StaticDraw);
 
                     // Validate that the buffer is the correct size
                     GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out bufferSize);
-                    if (vertexNormals.Length * Vector3.SizeInBytes != bufferSize)
-                        throw new ApplicationException("Tangent array not uploaded correctly");
+                    if (binormals.Length * Vector3.SizeInBytes != bufferSize)
+                        throw new ApplicationException("Binormal array not uploaded correctly");
 
                     // Clear the buffer Binding
                     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
