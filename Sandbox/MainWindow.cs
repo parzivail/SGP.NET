@@ -256,8 +256,8 @@ namespace Sandbox
 
                 var footprint = satellite.GetFootprint();
                 GL.PushMatrix();
-                GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
-                GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
+                //GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
+                //GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
                 GL.Begin(PrimitiveType.LineLoop);
                 foreach (var coord in footprint)
                     GL.Vertex3((coord.ToSphericalEcef() / 100f).ToGlVector3());

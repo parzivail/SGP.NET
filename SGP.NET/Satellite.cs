@@ -69,21 +69,26 @@ namespace SGPdotNET
         /// <summary>
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint at a specific time
         /// </summary>
+        /// <param name="time">The time to predict the footprint</param>
+        /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<CoordGeodetic> GetFootprint(DateTime time)
+        public List<CoordGeodetic> GetFootprint(DateTime time, int numPoints = 60)
         {
             var center = Predict(time).ToGeodetic();
             var coords = new List<CoordGeodetic>();
-            var size = center.GetFootprintRadians();
 
-            for (var i = 0; i < 60; i++)
+            var lat = center.Latitude;
+            var lon = center.Longitude;
+            var d = center.GetFootprintRadians();
+
+            for (var i = 0; i < numPoints; i++)
             {
-                var perc = i / 60f * 2 * Math.PI;
+                var perc = i / (float)numPoints * 2 * Math.PI;
 
-                var lat = Math.PI / 2f - size;
-                var lon = perc;
+                var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
+                var lngRadians = lon + Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat), Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
 
-                coords.Add(new CoordGeodetic(lat, lon, 10, true));
+                coords.Add(new CoordGeodetic(latRadians, lngRadians, 10, true));
             }
 
             return coords;
