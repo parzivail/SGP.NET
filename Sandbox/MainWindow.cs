@@ -216,7 +216,6 @@ namespace Sandbox
             {
                 var posVec = satellite
                                  .Predict()
-                                 .ToGeodetic()
                                  .ToSphericalEcef() / 100;
 
                 GL.Color3(Color.White);
@@ -234,7 +233,7 @@ namespace Sandbox
                 {
                     var predictEci = satellite
                         .Predict(time);
-                    var predictPos = predictEci.ToGeodetic().ToSphericalEcef() / 100;
+                    var predictPos = predictEci.ToSphericalEcef() / 100;
 
                     GL.Color3(GroundStation.IsVisible(predictEci) ? Color.DodgerBlue : Color.Yellow);
 
@@ -332,7 +331,6 @@ namespace Sandbox
             {
                 var posVec = (satellite
                                  .Predict()
-                                 .ToGeodetic()
                                  .ToSphericalEcef() / 100).ToGlVector3();
 
                 GL.PushMatrix();

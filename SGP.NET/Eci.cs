@@ -102,6 +102,15 @@ namespace SGPdotNET
         }
 
         /// <summary>
+        ///     Converts this ECI position to an ECEF one, assuming a spherical earth
+        /// </summary>
+        /// <returns>A spherical ECEF coordinate vector</returns>
+        public Vector3 ToSphericalEcef()
+        {
+            return ToGeodetic().ToSphericalEcef();
+        }
+
+        /// <summary>
         ///     Get the look angle between this position and the object
         /// </summary>
         /// <param name="eci">The object to look at</param>
