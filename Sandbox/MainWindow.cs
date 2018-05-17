@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -214,56 +215,64 @@ namespace Sandbox
             GL.Enable(EnableCap.Blend);
             foreach (var satellite in TrackedSatellites)
             {
-                var posVec = satellite
+                SGPdotNET.Vector3 posVec;
+                try
+                {
+                    posVec = satellite
                                  .Predict()
                                  .ToSphericalEcef() / 100;
+                }
+                catch (SatelliteException)
+                {
+                    continue;
+                }
 
                 GL.Color3(Color.White);
                 GL.Begin(PrimitiveType.Points);
                 GL.Vertex3(posVec.ToGlVector3());
                 GL.End();
 
-                GL.Enable(EnableCap.LineStipple);
-                GL.LineStipple(2, 0xAAAA);
-                GL.LineWidth(1);
+                //GL.Enable(EnableCap.LineStipple);
+                //GL.LineStipple(2, 0xAAAA);
+                //GL.LineWidth(1);
 
-                var time = DateTime.UtcNow.AddMinutes(-2);
-                GL.Begin(PrimitiveType.LineStrip);
-                for (var i = 0; i < 8; i++)
-                {
-                    var predictEci = satellite
-                        .Predict(time);
-                    var predictPos = predictEci.ToSphericalEcef() / 100;
+                //var time = DateTime.UtcNow.AddMinutes(-2);
+                //GL.Begin(PrimitiveType.LineStrip);
+                //for (var i = 0; i < 8; i++)
+                //{
+                //    var predictEci = satellite
+                //        .Predict(time);
+                //    var predictPos = predictEci.ToSphericalEcef() / 100;
 
-                    GL.Color3(GroundStation.IsVisible(predictEci) ? Color.DodgerBlue : Color.Yellow);
+                //    GL.Color3(GroundStation.IsVisible(predictEci) ? Color.DodgerBlue : Color.Yellow);
 
-                    GL.Vertex3(predictPos.ToGlVector3());
-                    time = time.AddMinutes(1);
-                }
-                GL.End();
+                //    GL.Vertex3(predictPos.ToGlVector3());
+                //    time = time.AddMinutes(1);
+                //}
+                //GL.End();
 
-                GL.Color3(Color.Yellow);
-                GL.LineStipple(4, 0xAAAA);
+                //GL.Color3(Color.Yellow);
+                //GL.LineStipple(4, 0xAAAA);
 
-                var center = satellite.Predict().ToGeodetic();
-                var centerOnSurface = new CoordGeodetic(center.Latitude, center.Longitude, 0, true);
+                //var center = satellite.Predict().ToGeodetic();
+                //var centerOnSurface = new CoordGeodetic(center.Latitude, center.Longitude, 0, true);
 
-                GL.Begin(PrimitiveType.LineStrip);
-                GL.Vertex3((center.ToSphericalEcef() / 100).ToGlVector3());
-                GL.Vertex3((centerOnSurface.ToSphericalEcef() / 100).ToGlVector3());
-                GL.End();
+                //GL.Begin(PrimitiveType.LineStrip);
+                //GL.Vertex3((center.ToSphericalEcef() / 100).ToGlVector3());
+                //GL.Vertex3((centerOnSurface.ToSphericalEcef() / 100).ToGlVector3());
+                //GL.End();
 
-                var footprint = satellite.GetFootprint();
-                GL.PushMatrix();
-                //GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
-                //GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
-                GL.Begin(PrimitiveType.LineLoop);
-                foreach (var coord in footprint)
-                    GL.Vertex3((coord.ToSphericalEcef() / 100f).ToGlVector3());
-                GL.End();
+                //var footprint = satellite.GetFootprint();
+                //GL.PushMatrix();
+                ////GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
+                ////GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
+                //GL.Begin(PrimitiveType.LineLoop);
+                //foreach (var coord in footprint)
+                //    GL.Vertex3((coord.ToSphericalEcef() / 100f).ToGlVector3());
+                //GL.End();
 
-                GL.PopMatrix();
-                GL.Disable(EnableCap.LineStipple);
+                //GL.PopMatrix();
+                //GL.Disable(EnableCap.LineStipple);
             }
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.Lighting);
@@ -329,9 +338,17 @@ namespace Sandbox
 
             foreach (var satellite in TrackedSatellites)
             {
-                var posVec = (satellite
+                Vector3 posVec;
+                try
+                {
+                    posVec = (satellite
                                  .Predict()
                                  .ToSphericalEcef() / 100).ToGlVector3();
+                }
+                catch (SatelliteException)
+                {
+                    continue;
+                }
 
                 GL.PushMatrix();
                 var mat = modelViewMatrix * projection;
@@ -400,29 +417,38 @@ namespace Sandbox
             Earth.Init();
             Lumberjack.Debug("Loaded Earth entity");
 
-            TrackedSatellites.Add(new Satellite(
-                "NOAA 19",
-                "1 33591U 09005A   18133.56712982  .00000090  00000-0  73994-4 0  9996",
-                "2 33591  99.1396 110.9116 0014982  65.8583 294.4152 14.12277340477026"
-            ));
+            //TrackedSatellites.Add(new Satellite(
+            //    "NOAA 19",
+            //    "1 33591U 09005A   18133.56712982  .00000090  00000-0  73994-4 0  9996",
+            //    "2 33591  99.1396 110.9116 0014982  65.8583 294.4152 14.12277340477026"
+            //));
 
-            TrackedSatellites.Add(new Satellite(
-                "NOAA 18",
-                "1 28654U 05018A   18133.96058456  .00000029  00000-0  40795-4 0  9998",
-                "2 28654  99.1481 168.7116 0013686 220.0166 139.9997 14.12375358668859"
-            ));
+            //TrackedSatellites.Add(new Satellite(
+            //    "NOAA 18",
+            //    "1 28654U 05018A   18133.96058456  .00000029  00000-0  40795-4 0  9998",
+            //    "2 28654  99.1481 168.7116 0013686 220.0166 139.9997 14.12375358668859"
+            //));
 
-            TrackedSatellites.Add(new Satellite(
-                "ISS (ZARYA)",
-                "1 25544U 98067A   18133.55965878  .00079487  00000-0  11977-2 0  9991",
-                "2 25544  51.6395 191.3285 0003974  83.9302  21.4973 15.54083292113132"
-            ));
+            //TrackedSatellites.Add(new Satellite(
+            //    "ISS (ZARYA)",
+            //    "1 25544U 98067A   18133.55965878  .00079487  00000-0  11977-2 0  9991",
+            //    "2 25544  51.6395 191.3285 0003974  83.9302  21.4973 15.54083292113132"
+            //));
 
-            TrackedSatellites.Add(new Satellite(
-                "ATLAS CENTAUR 2",
-                "1 00694U 63047A   18133.50403603  .00000393  00000-0  40022-4 0  9993",
-                "2 00694  30.3551 147.2516 0586973  17.7385 344.2819 14.02316828729119"
-            ));
+            //TrackedSatellites.Add(new Satellite(
+            //    "ATLAS CENTAUR 2",
+            //    "1 00694U 63047A   18133.50403603  .00000393  00000-0  40022-4 0  9993",
+            //    "2 00694  30.3551 147.2516 0586973  17.7385 344.2819 14.02316828729119"
+            //));
+
+            var satellites = File.ReadAllLines("3le.txt")
+                .Select((value, index) => new {PairNum = index / 3, value})
+                .GroupBy(pair => pair.PairNum)
+                .Select(grp => grp.Select(g => g.value).ToArray())
+                .Select(s => new Satellite(s[0].Substring(2), s[1], s[2]))
+                .Take(1000);
+
+            TrackedSatellites.AddRange(satellites);
 
             Lumberjack.Info("Window loaded");
         }

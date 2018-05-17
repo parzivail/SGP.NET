@@ -291,18 +291,26 @@ namespace SGPdotNET
             //  .00000-E0
             // "0.0000E-0" string
             var correctedString = "";
-
+            
             if (str[0] == '-')
             {
                 correctedString += "-";
 
                 // requires LastIndexOf to skip the first '-' in the string
-                correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" +
+                if (str.LastIndexOf("+") > 1)
+                    correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
+                                   str.Substring(str.LastIndexOf("+"));
+                else
+                    correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" +
                                    str.Substring(str.LastIndexOf("-"));
             }
             else
             {
-                correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" +
+                if (str.LastIndexOf("+") > 1)
+                    correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
+                                   str.Substring(str.LastIndexOf("+"));
+                else
+                    correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" +
                                    str.Substring(str.IndexOf("-"));
             }
 
