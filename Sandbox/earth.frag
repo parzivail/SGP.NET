@@ -23,12 +23,12 @@ out vec4 fragColor;
 void main(void) {
     vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
     vec3 normal;
-	if (bLq) {
+	if (true) {
 		normal = vTransformedNormal;
 	} else {
 		normal = texture(uNormalMapSampler, vTextureCoord).rgb;
 		normal = normalize(normal * 2.0 - 1.0);
-		normal = vTBN * normal;
+		normal = normal;
 	}
 
     float specularLightWeighting = 0.0;

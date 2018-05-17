@@ -21,7 +21,7 @@ void main(void) {
     gl_Position = uPMatrix * vPosition;
     vTextureCoord = aTextureCoord;
     vTransformedNormal = uNMatrix * aVertexNormal;
-	if (bLq) {
+	if (true) {
 		vTBN = mat3(0.0);
 	} else {
 		vec3 T = normalize(vec3(uMVMatrix * vec4(aVertexTangent,   0.0)));

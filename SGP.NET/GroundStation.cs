@@ -40,7 +40,7 @@ namespace SGPdotNET
             var t = start - deltaTime;
             var state = SatelliteObservationState.Init;
 
-            DateTime? startedObserving = null;
+            var startedObserving = start;
             var startAz = 0d;
             var maxEl = 0d;
 
@@ -74,7 +74,7 @@ namespace SGPdotNET
                     if (state == SatelliteObservationState.Observing)
                     {
                         var azEl = eciLocation.LookAt(posEci);
-                        obs.Add(new SatelliteObservation(satellite, startedObserving.GetValueOrDefault(), t, maxEl,
+                        obs.Add(new SatelliteObservation(satellite, startedObserving, t, maxEl,
                             startAz, azEl.Azimuth));
                     }
 

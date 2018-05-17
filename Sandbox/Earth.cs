@@ -136,8 +136,8 @@ namespace Sandbox
             PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), (float)sunHeight, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
 
             var scale = projectionMatrix.ExtractScale();
-            InnerRadius.Value = (EarthRadiusScaled * 1.1f * scale).Length;
-            OuterRadius.Value = (EarthRadiusScaled * 1.15f * scale).Length;
+            InnerRadius.Value = (EarthRadiusScaled * 1.14f * scale).Length;
+            OuterRadius.Value = (EarthRadiusScaled * 1.17f * scale).Length;
 
             Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
             LowQuality.Value = MainWindow.FastGraphics;
