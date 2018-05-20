@@ -134,10 +134,12 @@ namespace Sandbox
             var sunHeight = 8696 * Math.Cos((DateTime.UtcNow.DayOfYear + 10) / 365.0 * 2 * Math.PI + Math.PI);
 
             PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), (float)sunHeight, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
+            
+            var inner = 0.9f;
+            var outer = inner * 1.05f;
 
-            var scale = projectionMatrix.ExtractScale();
-            InnerRadius.Value = (EarthRadiusScaled * 1.14f * scale).Length;
-            OuterRadius.Value = (EarthRadiusScaled * 1.17f * scale).Length;
+            InnerRadius.Value = inner;
+            OuterRadius.Value = outer;
 
             Scatter.Value = MainWindow.FastGraphics ? 2 : 8;
             LowQuality.Value = MainWindow.FastGraphics;
@@ -181,14 +183,14 @@ namespace Sandbox
             _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
             _earthVbo.Render(PrimitiveType.Triangles);
 
-            _earthAtmosShader.Use(uniforms);
-            _earthAtmosVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
+            //_earthAtmosShader.Use(uniforms);
+            //_earthAtmosVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
 
-            GL.PushAttrib(AttribMask.EnableBit);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
-            _earthAtmosVbo.Render(PrimitiveType.Triangles);
-            GL.PopAttrib();
+            //GL.PushAttrib(AttribMask.EnableBit);
+            //GL.Enable(EnableCap.Blend);
+            //GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
+            //_earthAtmosVbo.Render(PrimitiveType.Triangles);
+            //GL.PopAttrib();
 
             GL.UseProgram(0);
 

@@ -107,7 +107,7 @@ namespace SGPdotNET
             return aer.Elevation / Math.PI * 180 >= minElevation;
         }
 
-        internal enum SatelliteObservationState
+        private enum SatelliteObservationState
         {
             Init,
             NotObserving,

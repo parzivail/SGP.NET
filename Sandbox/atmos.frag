@@ -142,7 +142,7 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
 }
 
 void main(void) {	
-	vec3 camPosition = vec3(0.0, 0.0, -256.0);
+	vec3 camPosition = vec3(0.0, 0.0, -1000.0);
 	vec3 dir = rayDirection(camPosition);
 	vec3 eye = camPosition;
 
