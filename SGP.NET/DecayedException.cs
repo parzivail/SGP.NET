@@ -20,8 +20,19 @@ namespace SGPdotNET
             Velocity = velocity;
         }
 
+        /// <summary>
+        /// Time of the event
+        /// </summary>
         public DateTime Time { get; }
+
+        /// <summary>
+        /// Position of the satellite at time
+        /// </summary>
         public Vector3 Position { get; }
+
+        /// <summary>
+        /// Velocity of the satellite at time
+        /// </summary>
         public Vector3 Velocity { get; }
     }
 }

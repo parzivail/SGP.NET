@@ -9,10 +9,10 @@ namespace SGPdotNET
     public class GroundStation
     {
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ground station at the specified location
         /// </summary>
         /// <param name="location">The location of the ground station</param>
-        public GroundStation(CoordGeodetic location)
+        public GroundStation(ICoordinate location)
         {
             Location = location;
         }
@@ -20,7 +20,7 @@ namespace SGPdotNET
         /// <summary>
         ///     The location of the ground station
         /// </summary>
-        public CoordGeodetic Location { get; }
+        public ICoordinate Location { get; }
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the

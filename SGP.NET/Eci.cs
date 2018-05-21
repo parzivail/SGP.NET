@@ -5,17 +5,17 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores an Earth-centered inertial position for a particular time
     /// </summary>
-    public class Eci
+    public class Eci : ICoordinate
     {
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ECI coordinate at the origin
         /// </summary>
         public Eci()
         {
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ECI coordinate with the specified values
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="latitude">The latitude in degrees</param>
@@ -27,20 +27,20 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ECI coordinate with the specified values
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
-        /// <param name="geo">The geodetic position</param>
-        public Eci(DateTime dt, CoordGeodetic geo)
+        /// <param name="coord">The position top copy</param>
+        public Eci(DateTime dt, ICoordinate coord)
         {
-            var eci = geo.ToEci(dt);
+            var eci = coord.ToEci(dt);
             Time = dt;
             Position = eci.Position;
             Velocity = eci.Velocity;
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ECI coordinate with the specified values
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="position">The ECI vector position</param>
@@ -52,7 +52,7 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new ECI coordinate with the specified values
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="position">The ECI position vector</param>
@@ -72,7 +72,7 @@ namespace SGPdotNET
         ///     Converts this ECI position to a geodetic one
         /// </summary>
         /// <returns>The position in a geodetic reference frame</returns>
-        public CoordGeodetic ToGeodetic()
+        public override CoordGeodetic ToGeodetic()
         {
             var theta = Util.AcTan(Position.Y, Position.X);
 
@@ -105,48 +105,14 @@ namespace SGPdotNET
         ///     Converts this ECI position to an ECEF one, assuming a spherical earth
         /// </summary>
         /// <returns>A spherical ECEF coordinate vector</returns>
-        public Vector3 ToSphericalEcef()
+        public override Vector3 ToSphericalEcef()
         {
             return ToGeodetic().ToSphericalEcef();
         }
 
-        /// <summary>
-        ///     Get the look angle between this position and the object
-        /// </summary>
-        /// <param name="eci">The object to look at</param>
-        /// <returns>The position in a topocentric reference frame to the supplied position</returns>
-        public CoordTopocentric LookAt(Eci eci)
+        public override Eci ToEci(DateTime dt)
         {
-            var geo = ToGeodetic();
-
-            var rangeRate = eci.Velocity - Velocity;
-            var range = eci.Position - Position;
-
-            var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude);
-
-            var sinLat = Math.Sin(geo.Latitude);
-            var cosLat = Math.Cos(geo.Latitude);
-            var sinTheta = Math.Sin(theta);
-            var cosTheta = Math.Cos(theta);
-
-            var topS = sinLat * cosTheta * range.X
-                       + sinLat * sinTheta * range.Y - cosLat * range.Z;
-            var topE = -sinTheta * range.X
-                       + cosTheta * range.Y;
-            var topZ = cosLat * cosTheta * range.X
-                       + cosLat * sinTheta * range.Y + sinLat * range.Z;
-            var az = Math.Atan(-topE / topS);
-
-            if (topS > 0.0)
-                az += Math.PI;
-
-            if (az < 0.0)
-                az += 2.0 * Math.PI;
-
-            var el = Math.Asin(topZ / range.Length);
-            var rate = range.Dot(rangeRate) / range.Length;
-
-            return new CoordTopocentric(az, el, range.Length, rate);
+            return this;
         }
 
         public override string ToString()

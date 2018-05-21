@@ -6,14 +6,14 @@ namespace SGPdotNET
     public class CoordTopocentric
     {
         /// <summary>
-        ///     Constructor
+        ///     Creates a new topocentirc coordinate at the origin
         /// </summary>
         public CoordTopocentric()
         {
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new topocentirc coordinate with the specified values
         /// </summary>
         /// <param name="azimuth">Azimuth in radians</param>
         /// <param name="elevation">Elevation in radians</param>
@@ -28,7 +28,7 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new topocentirc coordinate as a copy of the specified one
         /// </summary>
         /// <param name="topo">Object to copy from</param>
         public CoordTopocentric(CoordTopocentric topo)

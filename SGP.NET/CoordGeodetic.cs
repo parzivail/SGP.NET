@@ -5,17 +5,17 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores a geodetic location
     /// </summary>
-    public class CoordGeodetic
+    public class CoordGeodetic : ICoordinate
     {
         /// <summary>
-        ///     Constructor
+        ///     Creates a new geodetic coordinate at the origin
         /// </summary>
         public CoordGeodetic()
         {
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new geodetic coordinate with the specified values
         /// </summary>
         /// <param name="lat">The latitude (degrees by default)</param>
         /// <param name="lon">The longitude (degrees by default)</param>
@@ -38,11 +38,12 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Creates a new geodetic coordinate as a copy of the specified one
         /// </summary>
-        /// <param name="geo">Object to copy from</param>
-        public CoordGeodetic(CoordGeodetic geo)
+        /// <param name="coord">Object to copy from</param>
+        public CoordGeodetic(ICoordinate coord)
         {
+            var geo = coord.ToGeodetic();
             Latitude = geo.Latitude;
             Longitude = geo.Longitude;
             Altitude = geo.Altitude;
@@ -68,7 +69,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
-        public Eci ToEci(DateTime dt)
+        public override Eci ToEci(DateTime dt)
         {
             var time = dt;
 
@@ -91,7 +92,7 @@ namespace SGPdotNET
         ///     Converts this geodetic position to an ECEF one, assuming a spherical earth
         /// </summary>
         /// <returns>A spherical ECEF coordinate vector</returns>
-        public Vector3 ToSphericalEcef()
+        public override Vector3 ToSphericalEcef()
         {
             return new Vector3(
                 Math.Cos(Latitude) * Math.Cos(-Longitude + Math.PI) * (Altitude + SgpConstants.EarthRadiusKm),
@@ -100,61 +101,9 @@ namespace SGPdotNET
             );
         }
 
-        /// <summary>
-        ///     Calculates the visibility radius (km) of the satellite by which any distances from this position less than the
-        ///     radius are able to see this position
-        /// </summary>
-        /// <returns>The visibility radius, in kilometers</returns>
-        public double GetFootprint()
+        public override CoordGeodetic ToGeodetic()
         {
-            return GetFootprintRadians() * SgpConstants.EarthRadiusKm;
-        }
-
-        /// <summary>
-        ///     Calculates the visibility radius (radians) of the satellite by which any distances from this position less than the
-        ///     radius are able to see this position
-        /// </summary>
-        /// <returns>The visibility radius, in radians</returns>
-        public double GetFootprintRadians()
-        {
-            return Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + Altitude));
-        }
-
-        /// <summary>
-        ///     Calculates the Great Circle distance (km) to another geodetic coordinate
-        /// </summary>
-        /// <param name="to">The coordinate to measure against</param>
-        /// <returns>The distance between the coordinates, in kilometers</returns>
-        public double DistanceTo(CoordGeodetic to)
-        {
-            return DistanceToRadians(to) * SgpConstants.EarthRadiusKm;
-        }
-
-        /// <summary>
-        ///     Calculates the Great Circle distance (radians) to another geodetic coordinate
-        /// </summary>
-        /// <param name="to">The coordinate to measure against</param>
-        /// <returns>The distance between the coordinates, in radians</returns>
-        public double DistanceToRadians(CoordGeodetic to)
-        {
-            var dist = Math.Sin(Latitude) * Math.Sin(to.Latitude) + Math.Cos(Latitude) * Math.Cos(to.Latitude) * Math.Cos(Longitude - to.Longitude);
-            dist = Math.Acos(dist);
-
-            return dist;
-        }
-
-        /// <summary>
-        ///     Calculates the look angles between this coordinate and target
-        /// </summary>
-        /// <param name="time">The time of observation</param>
-        /// <param name="to">The coordinate to observe</param>
-        /// <returns>The topocentric angles between this coordinate and another</returns>
-        public CoordTopocentric LookAt(CoordGeodetic to, DateTime? time = null)
-        {
-            var t = DateTime.UtcNow;
-            if (time.HasValue)
-                t = time.Value;
-            return ToEci(t).LookAt(to.ToEci(t));
+            return this;
         }
 
         public override bool Equals(object obj)

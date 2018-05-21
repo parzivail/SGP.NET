@@ -61,7 +61,7 @@ namespace SGPdotNET
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
         /// </summary>
         /// <returns>A list of geodetic coordinates</returns>
-        public List<CoordGeodetic> GetFootprint()
+        public List<ICoordinate> GetFootprint()
         {
             return GetFootprint(DateTime.UtcNow);
         }
@@ -72,10 +72,10 @@ namespace SGPdotNET
         /// <param name="time">The time to predict the footprint</param>
         /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<CoordGeodetic> GetFootprint(DateTime time, int numPoints = 60)
+        public List<ICoordinate> GetFootprint(DateTime time, int numPoints = 60)
         {
             var center = Predict(time).ToGeodetic();
-            var coords = new List<CoordGeodetic>();
+            var coords = new List<ICoordinate>();
 
             var lat = center.Latitude;
             var lon = center.Longitude;
