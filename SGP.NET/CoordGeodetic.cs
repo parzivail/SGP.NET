@@ -5,7 +5,7 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores a geodetic location
     /// </summary>
-    public class CoordGeodetic : ICoordinate
+    public class CoordGeodetic : Coordinate
     {
         /// <summary>
         ///     Creates a new geodetic coordinate at the origin
@@ -41,7 +41,7 @@ namespace SGPdotNET
         ///     Creates a new geodetic coordinate as a copy of the specified one
         /// </summary>
         /// <param name="coord">Object to copy from</param>
-        public CoordGeodetic(ICoordinate coord)
+        public CoordGeodetic(Coordinate coord)
         {
             var geo = coord.ToGeodetic();
             Latitude = geo.Latitude;
@@ -78,11 +78,15 @@ namespace SGPdotNET
 
             var theta = time.ToLocalMeanSiderealTime(Longitude);
 
-            var c = 1.0 / Math.Sqrt(1.0 + SgpConstants.EarthFlatteningConstant * (SgpConstants.EarthFlatteningConstant - 2.0) * Math.Pow(Math.Sin(Latitude), 2.0));
+            var c = 1.0 /
+                    Math.Sqrt(1.0 +
+                              SgpConstants.EarthFlatteningConstant * (SgpConstants.EarthFlatteningConstant - 2.0) *
+                              Math.Pow(Math.Sin(Latitude), 2.0));
             var s = Math.Pow(1.0 - SgpConstants.EarthFlatteningConstant, 2.0) * c;
             var achcp = (SgpConstants.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude);
 
-            var position = new Vector3(achcp * Math.Cos(theta), achcp * Math.Sin(theta), (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
+            var position = new Vector3(achcp * Math.Cos(theta), achcp * Math.Sin(theta),
+                (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
             var velocity = new Vector3(-mfactor * position.Y, mfactor * position.X, 0);
 
             return new Eci(time, position, velocity);
@@ -114,7 +118,8 @@ namespace SGPdotNET
 
         protected bool Equals(CoordGeodetic other)
         {
-            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) && Altitude.Equals(other.Altitude);
+            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) &&
+                   Altitude.Equals(other.Altitude);
         }
 
         public override int GetHashCode()

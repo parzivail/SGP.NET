@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 
 namespace SGPdotNET
 {
     /// <summary>
-    /// Stores a generic location
+    ///     Stores a generic location
     /// </summary>
-    public abstract class ICoordinate
+    public abstract class Coordinate
     {
         /// <summary>
         ///     Converts this position to an ECI one
@@ -56,7 +52,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="to">The coordinate to measure against</param>
         /// <returns>The distance between the coordinates, in kilometers</returns>
-        public double DistanceTo(ICoordinate to)
+        public double DistanceTo(Coordinate to)
         {
             return DistanceToRadians(to) * SgpConstants.EarthRadiusKm;
         }
@@ -66,11 +62,12 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="to">The coordinate to measure against</param>
         /// <returns>The distance between the coordinates, in radians</returns>
-        public double DistanceToRadians(ICoordinate to)
+        public double DistanceToRadians(Coordinate to)
         {
             var geo = ToGeodetic();
             var toGeo = to.ToGeodetic();
-            var dist = Math.Sin(geo.Latitude) * Math.Sin(toGeo.Latitude) + Math.Cos(geo.Latitude) * Math.Cos(toGeo.Latitude) * Math.Cos(geo.Longitude - toGeo.Longitude);
+            var dist = Math.Sin(geo.Latitude) * Math.Sin(toGeo.Latitude) +
+                       Math.Cos(geo.Latitude) * Math.Cos(toGeo.Latitude) * Math.Cos(geo.Longitude - toGeo.Longitude);
             dist = Math.Acos(dist);
 
             return dist;
@@ -82,7 +79,7 @@ namespace SGPdotNET
         /// <param name="time">The time of observation</param>
         /// <param name="to">The coordinate to observe</param>
         /// <returns>The topocentric angles between this coordinate and another</returns>
-        public CoordTopocentric LookAt(ICoordinate to, DateTime? time = null)
+        public CoordTopocentric LookAt(Coordinate to, DateTime? time = null)
         {
             var t = DateTime.UtcNow;
             if (time.HasValue)

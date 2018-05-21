@@ -21,17 +21,17 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        /// Time of the event
+        ///     Time of the event
         /// </summary>
         public DateTime Time { get; }
 
         /// <summary>
-        /// Position of the satellite at time
+        ///     Position of the satellite at time
         /// </summary>
         public Vector3 Position { get; }
 
         /// <summary>
-        /// Velocity of the satellite at time
+        ///     Velocity of the satellite at time
         /// </summary>
         public Vector3 Velocity { get; }
     }

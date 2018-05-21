@@ -8,14 +8,14 @@ namespace SGPdotNET
     public class Vector3
     {
         /// <summary>
-        ///     Constructor
+        ///     Create a new Vector3 at the origin
         /// </summary>
         public Vector3() : this(0, 0, 0)
         {
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Create a new Vector3 at the specified position
         /// </summary>
         /// <param name="x">The X component of the new vector</param>
         /// <param name="y">The Y component of the new vector</param>
@@ -30,7 +30,7 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Create a new Vector3 as a copy of the specified one
         /// </summary>
         /// <param name="v">Object to copy from</param>
         public Vector3(Vector3 v)

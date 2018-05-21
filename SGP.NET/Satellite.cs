@@ -61,7 +61,7 @@ namespace SGPdotNET
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
         /// </summary>
         /// <returns>A list of geodetic coordinates</returns>
-        public List<ICoordinate> GetFootprint()
+        public List<Coordinate> GetFootprint()
         {
             return GetFootprint(DateTime.UtcNow);
         }
@@ -72,10 +72,10 @@ namespace SGPdotNET
         /// <param name="time">The time to predict the footprint</param>
         /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<ICoordinate> GetFootprint(DateTime time, int numPoints = 60)
+        public List<Coordinate> GetFootprint(DateTime time, int numPoints = 60)
         {
             var center = Predict(time).ToGeodetic();
-            var coords = new List<ICoordinate>();
+            var coords = new List<Coordinate>();
 
             var lat = center.Latitude;
             var lon = center.Longitude;
@@ -83,10 +83,12 @@ namespace SGPdotNET
 
             for (var i = 0; i < numPoints; i++)
             {
-                var perc = i / (float)numPoints * 2 * Math.PI;
+                var perc = i / (float) numPoints * 2 * Math.PI;
 
                 var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
-                var lngRadians = lon + Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat), Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
+                var lngRadians = lon +
+                                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat),
+                                     Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
 
                 coords.Add(new CoordGeodetic(latRadians, lngRadians, 10, true));
             }

@@ -83,7 +83,7 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Constructor
+        ///     Create a new Tle as a copy of the specified one
         /// </summary>
         /// <param name="tle">Object to copy from</param>
         public Tle(Tle tle)
@@ -291,7 +291,7 @@ namespace SGPdotNET
             //  .00000-E0
             // "0.0000E-0" string
             var correctedString = "";
-            
+
             if (str[0] == '-')
             {
                 correctedString += "-";
@@ -299,19 +299,19 @@ namespace SGPdotNET
                 // requires LastIndexOf to skip the first '-' in the string
                 if (str.LastIndexOf("+") > 1)
                     correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("+"));
+                                       str.Substring(str.LastIndexOf("+"));
                 else
                     correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("-"));
+                                       str.Substring(str.LastIndexOf("-"));
             }
             else
             {
                 if (str.LastIndexOf("+") > 1)
                     correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("+"));
+                                       str.Substring(str.LastIndexOf("+"));
                 else
                     correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" +
-                                   str.Substring(str.IndexOf("-"));
+                                       str.Substring(str.IndexOf("-"));
             }
 
             val = (double) decimal.Parse(correctedString, NumberStyles.Float);

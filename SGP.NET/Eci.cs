@@ -5,7 +5,7 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores an Earth-centered inertial position for a particular time
     /// </summary>
-    public class Eci : ICoordinate
+    public class Eci : Coordinate
     {
         /// <summary>
         ///     Creates a new ECI coordinate at the origin
@@ -31,7 +31,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="coord">The position top copy</param>
-        public Eci(DateTime dt, ICoordinate coord)
+        public Eci(DateTime dt, Coordinate coord)
         {
             var eci = coord.ToEci(dt);
             Time = dt;

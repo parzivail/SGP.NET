@@ -67,7 +67,8 @@ namespace SGPdotNET
 
         protected bool Equals(CoordTopocentric other)
         {
-            return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) && RangeRate.Equals(other.RangeRate);
+            return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
+                   RangeRate.Equals(other.RangeRate);
         }
 
         public override int GetHashCode()

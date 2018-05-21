@@ -12,7 +12,7 @@ namespace SGPdotNET
         ///     Creates a new ground station at the specified location
         /// </summary>
         /// <param name="location">The location of the ground station</param>
-        public GroundStation(ICoordinate location)
+        public GroundStation(Coordinate location)
         {
             Location = location;
         }
@@ -20,7 +20,7 @@ namespace SGPdotNET
         /// <summary>
         ///     The location of the ground station
         /// </summary>
-        public ICoordinate Location { get; }
+        public Coordinate Location { get; }
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
