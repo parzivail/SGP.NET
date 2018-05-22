@@ -41,7 +41,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="tsince">Time since the satellite's epoch</param>
         /// <returns>The predicted position of the satellite at a time relative to the satellite's epoch</returns>
-        public Eci FindPosition(double tsince)
+        public CoordEci FindPosition(double tsince)
         {
             return _useDeepSpace ? FindPositionSdp4(tsince) : FindPositionSgp4(tsince);
         }
@@ -51,7 +51,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="date">the date and time to predict</param>
         /// <returns>The predicted position of the satellite at a specific date and time</returns>
-        public Eci FindPosition(DateTime date)
+        public CoordEci FindPosition(DateTime date)
         {
             return FindPosition((date - _elements.Epoch).TotalMinutes);
         }
@@ -222,7 +222,7 @@ namespace SGPdotNET
             }
         }
 
-        private Eci FindPositionSdp4(double tsince)
+        private CoordEci FindPositionSdp4(double tsince)
         {
             /*
              * update for secular gravity and atmospheric drag
@@ -313,7 +313,7 @@ namespace SGPdotNET
                 perturbedCosio, perturbedSinio);
         }
 
-        private Eci FindPositionSgp4(double tsince)
+        private CoordEci FindPositionSgp4(double tsince)
         {
             /*
              * update for secular gravity and atmospheric drag
@@ -382,7 +382,7 @@ namespace SGPdotNET
                 _commonConsts.Cosio, _commonConsts.Sinio);
         }
 
-        private Eci CalculateFinalPositionVelocity(
+        private CoordEci CalculateFinalPositionVelocity(
             double tsince,
             double e,
             double a,
@@ -553,7 +553,7 @@ namespace SGPdotNET
                     position,
                     velocity);
 
-            return new Eci(_elements.Epoch.AddMinutes(tsince), position, velocity);
+            return new CoordEci(_elements.Epoch.AddMinutes(tsince), position, velocity);
         }
 
         private void DeepSpaceInitialise(

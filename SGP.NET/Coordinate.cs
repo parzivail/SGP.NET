@@ -12,19 +12,27 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
-        public abstract Eci ToEci(DateTime dt);
-
-        /// <summary>
-        ///     Converts this position to an ECEF one, assuming a spherical earth
-        /// </summary>
-        /// <returns>A spherical ECEF coordinate vector</returns>
-        public abstract Vector3 ToSphericalEcef();
+        public abstract CoordEci ToEci(DateTime dt);
 
         /// <summary>
         ///     Converts this ECI position to a geodetic one
         /// </summary>
         /// <returns>The position in a geodetic reference frame</returns>
         public abstract CoordGeodetic ToGeodetic();
+
+        /// <summary>
+        ///     Converts this position to an ECEF one, assuming a spherical earth
+        /// </summary>
+        /// <returns>A spherical ECEF coordinate vector</returns>
+        public Vector3 ToSphericalEcef()
+        {
+            var geo = ToGeodetic();
+            return new Vector3(
+                Math.Cos(geo.Latitude) * Math.Cos(-geo.Longitude + Math.PI) * (geo.Altitude + SgpConstants.EarthRadiusKm),
+                Math.Sin(geo.Latitude) * (geo.Altitude + SgpConstants.EarthRadiusKm),
+                Math.Cos(geo.Latitude) * Math.Sin(-geo.Longitude + Math.PI) * (geo.Altitude + SgpConstants.EarthRadiusKm)
+            );
+        }
 
         /// <summary>
         ///     Calculates the visibility radius (km) of the satellite by which any distances from this position less than the

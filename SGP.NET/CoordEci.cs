@@ -5,12 +5,12 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores an Earth-centered inertial position for a particular time
     /// </summary>
-    public class Eci : Coordinate
+    public class CoordEci : Coordinate
     {
         /// <summary>
         ///     Creates a new ECI coordinate at the origin
         /// </summary>
-        public Eci()
+        public CoordEci()
         {
         }
 
@@ -21,7 +21,7 @@ namespace SGPdotNET
         /// <param name="latitude">The latitude in degrees</param>
         /// <param name="longitude">The longitude in degrees</param>
         /// <param name="altitude">The altitude in kilometers</param>
-        public Eci(DateTime dt, double latitude, double longitude, double altitude)
+        public CoordEci(DateTime dt, double latitude, double longitude, double altitude)
             : this(dt, new CoordGeodetic(latitude, longitude, altitude))
         {
         }
@@ -31,7 +31,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="coord">The position top copy</param>
-        public Eci(DateTime dt, Coordinate coord)
+        public CoordEci(DateTime dt, Coordinate coord)
         {
             var eci = coord.ToEci(dt);
             Time = dt;
@@ -44,7 +44,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="position">The ECI vector position</param>
-        public Eci(DateTime dt, Vector3 position)
+        public CoordEci(DateTime dt, Vector3 position)
         {
             Time = dt;
             Position = position;
@@ -57,7 +57,7 @@ namespace SGPdotNET
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="position">The ECI position vector</param>
         /// <param name="velocity">The ECI velocity vector</param>
-        public Eci(DateTime dt, Vector3 position, Vector3 velocity)
+        public CoordEci(DateTime dt, Vector3 position, Vector3 velocity)
         {
             Time = dt;
             Position = position;
@@ -101,23 +101,14 @@ namespace SGPdotNET
             return new CoordGeodetic(lat, lon, alt, true);
         }
 
-        /// <summary>
-        ///     Converts this ECI position to an ECEF one, assuming a spherical earth
-        /// </summary>
-        /// <returns>A spherical ECEF coordinate vector</returns>
-        public override Vector3 ToSphericalEcef()
-        {
-            return ToGeodetic().ToSphericalEcef();
-        }
-
-        public override Eci ToEci(DateTime dt)
+        public override CoordEci ToEci(DateTime dt)
         {
             return this;
         }
 
         public override string ToString()
         {
-            return $"Eci[Position={Position}, Velocity={Velocity}]";
+            return $"CoordEci[Position={Position}, Velocity={Velocity}]";
         }
 
         public override int GetHashCode()
@@ -131,7 +122,7 @@ namespace SGPdotNET
 
         public override bool Equals(object obj)
         {
-            return obj is Eci eci &&
+            return obj is CoordEci eci &&
                    Time == eci.Time &&
                    Position.Equals(eci.Position) &&
                    Velocity.Equals(eci.Velocity);

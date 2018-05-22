@@ -69,7 +69,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
-        public override Eci ToEci(DateTime dt)
+        public override CoordEci ToEci(DateTime dt)
         {
             var time = dt;
 
@@ -89,20 +89,7 @@ namespace SGPdotNET
                 (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
             var velocity = new Vector3(-mfactor * position.Y, mfactor * position.X, 0);
 
-            return new Eci(time, position, velocity);
-        }
-
-        /// <summary>
-        ///     Converts this geodetic position to an ECEF one, assuming a spherical earth
-        /// </summary>
-        /// <returns>A spherical ECEF coordinate vector</returns>
-        public override Vector3 ToSphericalEcef()
-        {
-            return new Vector3(
-                Math.Cos(Latitude) * Math.Cos(-Longitude + Math.PI) * (Altitude + SgpConstants.EarthRadiusKm),
-                Math.Sin(Latitude) * (Altitude + SgpConstants.EarthRadiusKm),
-                Math.Cos(Latitude) * Math.Sin(-Longitude + Math.PI) * (Altitude + SgpConstants.EarthRadiusKm)
-            );
+            return new CoordEci(time, position, velocity);
         }
 
         public override CoordGeodetic ToGeodetic()

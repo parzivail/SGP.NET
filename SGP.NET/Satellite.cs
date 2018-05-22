@@ -42,7 +42,7 @@ namespace SGPdotNET
         ///     Predicts the satellite's real-time location
         /// </summary>
         /// <returns>An ECI coordinate set representing the satellite</returns>
-        public Eci Predict()
+        public CoordEci Predict()
         {
             return Predict(DateTime.UtcNow);
         }
@@ -52,7 +52,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="time">The time of observation</param>
         /// <returns>An ECI coordinate set representing the satellite at the given time</returns>
-        public Eci Predict(DateTime time)
+        public CoordEci Predict(DateTime time)
         {
             return _sgp4.FindPosition(time);
         }

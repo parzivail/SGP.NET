@@ -92,7 +92,7 @@ namespace SGPdotNET
         /// <param name="pos">The position to check</param>
         /// <param name="minElevation">The minimum elevation required to be "visible"</param>
         /// <returns>True if the satellite is above the specified elevation, false otherwise</returns>
-        public bool IsVisible(Eci pos, double minElevation = 0)
+        public bool IsVisible(CoordEci pos, double minElevation = 0)
         {
             var pGeo = pos.ToGeodetic();
             var footprint = pGeo.GetFootprintRadians();

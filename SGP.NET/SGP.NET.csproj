@@ -37,7 +37,7 @@
     <Compile Include="CoordGeodetic.cs" />
     <Compile Include="CoordTopocentric.cs" />
     <Compile Include="DecayedException.cs" />
-    <Compile Include="Eci.cs" />
+    <Compile Include="CoordEci.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="OrbitalElements.cs" />
     <Compile Include="Satellite.cs" />
