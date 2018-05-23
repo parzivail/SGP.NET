@@ -6,6 +6,7 @@ using System.Security.Policy;
 
 namespace SGPdotNET
 {
+    /// <inheritdoc cref="ITleProvider" />
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
     /// </summary>
