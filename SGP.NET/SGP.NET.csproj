@@ -40,6 +40,8 @@
     <Compile Include="CoordEci.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="OrbitalElements.cs" />
+    <Compile Include="ITleProvider.cs" />
+    <Compile Include="RemoteTleProvider.cs" />
     <Compile Include="Satellite.cs" />
     <Compile Include="SatelliteException.cs" />
     <Compile Include="SatelliteObservation.cs" />

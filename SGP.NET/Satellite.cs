@@ -26,11 +26,19 @@ namespace SGPdotNET
         /// <param name="name">The name of the satellite</param>
         /// <param name="tle1">The first line of the set</param>
         /// <param name="tle2">The second line of the set</param>
-        public Satellite(string name, string tle1, string tle2)
+        public Satellite(string name, string tle1, string tle2) : this(new Tle(name, tle1, tle2))
         {
-            _sgp4 = new Sgp4(new Tle(name, tle1, tle2));
+        }
 
-            Name = name;
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="tle">The two-line representation of the satellite</param>
+        public Satellite(Tle tle)
+        {
+            _sgp4 = new Sgp4(tle);
+
+            Name = tle.Name;
         }
 
         /// <summary>

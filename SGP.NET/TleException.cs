@@ -3,7 +3,7 @@ using System;
 namespace SGPdotNET
 {
     /// <summary>
-    ///     Exception thrown by the TLE parser when a TLE has erroneous values
+    ///     Exception thrown by the TLE parser when a TLE has invalid values
     /// </summary>
     public class TleException : Exception
     {

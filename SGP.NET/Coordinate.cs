@@ -28,9 +28,11 @@ namespace SGPdotNET
         {
             var geo = ToGeodetic();
             return new Vector3(
-                Math.Cos(geo.Latitude) * Math.Cos(-geo.Longitude + Math.PI) * (geo.Altitude + SgpConstants.EarthRadiusKm),
+                Math.Cos(geo.Latitude) * Math.Cos(-geo.Longitude + Math.PI) *
+                (geo.Altitude + SgpConstants.EarthRadiusKm),
                 Math.Sin(geo.Latitude) * (geo.Altitude + SgpConstants.EarthRadiusKm),
-                Math.Cos(geo.Latitude) * Math.Sin(-geo.Longitude + Math.PI) * (geo.Altitude + SgpConstants.EarthRadiusKm)
+                Math.Cos(geo.Latitude) * Math.Sin(-geo.Longitude + Math.PI) *
+                (geo.Altitude + SgpConstants.EarthRadiusKm)
             );
         }
 

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -417,38 +418,19 @@ namespace Sandbox
             Earth.Init();
             Lumberjack.Debug("Loaded Earth entity");
 
-            TrackedSatellites.Add(new Satellite(
-                "NOAA 19",
-                "1 33591U 09005A   18133.56712982  .00000090  00000-0  73994-4 0  9996",
-                "2 33591  99.1396 110.9116 0014982  65.8583 294.4152 14.12277340477026"
-            ));
+            var sources = new[]
+            {
+                new Url("http://www.celestrak.com/NORAD/elements/stations.txt"),
+                new Url("http://www.celestrak.com/NORAD/elements/weather.txt")
+            };
 
-            TrackedSatellites.Add(new Satellite(
-                "NOAA 18",
-                "1 28654U 05018A   18133.96058456  .00000029  00000-0  40795-4 0  9998",
-                "2 28654  99.1481 168.7116 0013686 220.0166 139.9997 14.12375358668859"
-            ));
-
-            TrackedSatellites.Add(new Satellite(
-                "ISS (ZARYA)",
-                "1 25544U 98067A   18139.54528407  .00001608  00000-0  31606-4 0  9992",
-                "2 25544  51.6394 161.4891 0004030 101.1644  33.7693 15.54074115114060"
-            ));
-
-            TrackedSatellites.Add(new Satellite(
-                "ATLAS CENTAUR 2",
-                "1 00694U 63047A   18133.50403603  .00000393  00000-0  40022-4 0  9993",
-                "2 00694  30.3551 147.2516 0586973  17.7385 344.2819 14.02316828729119"
-            ));
-
-            //var satellites = File.ReadAllLines("3le.txt")
-            //    .Select((value, index) => new {PairNum = index / 3, value})
-            //    .GroupBy(pair => pair.PairNum)
-            //    .Select(grp => grp.Select(g => g.value).ToArray())
-            //    .Select(s => new Satellite(s[0].Substring(2), s[1], s[2]))
-            //    .Take(1000);
-
-            //TrackedSatellites.AddRange(satellites);
+            using (var remote = new RemoteTleProvider(sources, true))
+            {
+                TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
+                TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
+                TrackedSatellites.Add(new Satellite(remote.GetTle(33591))); // NOAA 19
+            }
+            Lumberjack.Info("Loaded TLEs");
 
             Lumberjack.Info("Window loaded");
         }
