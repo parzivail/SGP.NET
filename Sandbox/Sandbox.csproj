@@ -36,6 +36,10 @@
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="PFX, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\PFX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -82,10 +86,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PFX\PFX.csproj">
-      <Project>{4eccd5a4-2f81-4693-bcab-2306bb96a1da}</Project>
-      <Name>PFX</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SGP.NET\SGP.NET.csproj">
       <Project>{a8c667b9-1875-4083-829d-72566a69c0f6}</Project>
       <Name>SGP.NET</Name>
