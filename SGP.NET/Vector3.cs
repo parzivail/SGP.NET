@@ -70,41 +70,79 @@ namespace SGPdotNET
             return X * vec.X + Y * vec.Y + Z * vec.Z;
         }
 
+        /// <summary>
+        ///     Subtracts one vector from another
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand vector</param>
+        /// <returns>The first vector minus the second</returns>
         public static Vector3 operator -(Vector3 v, Vector3 v2)
         {
             return new Vector3(v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z);
         }
 
+        /// <summary>
+        ///     Adds one vector to another
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand vector</param>
+        /// <returns>The first vector plus the second</returns>
         public static Vector3 operator +(Vector3 v, Vector3 v2)
         {
             return new Vector3(v.X + v2.X, v.Y + v2.Y, v.Z + v2.Z);
         }
 
+        /// <summary>
+        ///     Scales one vector by another
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand vector</param>
+        /// <returns>The first vector multiplied by the second</returns>
         public static Vector3 operator *(Vector3 v, Vector3 v2)
         {
             return new Vector3(v.X * v2.X, v.Y * v2.Y, v.Z * v2.Z);
         }
 
+        /// <summary>
+        ///     Scales one vector by another
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand vector</param>
+        /// <returns>The first vector divided by the second</returns>
         public static Vector3 operator /(Vector3 v, Vector3 v2)
         {
             return new Vector3(v.X / v2.X, v.Y / v2.Y, v.Z / v2.Z);
         }
 
+        /// <summary>
+        ///     Scales one vector by a scalar
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand scalar</param>
+        /// <returns>The first vector multiplied by the scalar</returns>
         public static Vector3 operator *(Vector3 v, double v2)
         {
             return new Vector3(v.X * v2, v.Y * v2, v.Z * v2);
         }
 
+        /// <summary>
+        ///     Scales one vector by a scalar
+        /// </summary>
+        /// <param name="v">The left-hand vector</param>
+        /// <param name="v2">The right-hand scalar</param>
+        /// <returns>The first vector divided by the scalar</returns>
         public static Vector3 operator /(Vector3 v, double v2)
         {
             return new Vector3(v.X / v2, v.Y / v2, v.Z / v2);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"Vector3[X={X}, Y={Y}, Z={Z}, Length={Length}]";
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is Vector3 vector &&
@@ -113,6 +151,7 @@ namespace SGPdotNET
                    Equals(Z, vector.Z);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 707706286;

@@ -28,6 +28,7 @@ namespace SGPdotNET
             _webClient = new WebClient();
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _webClient?.Dispose();

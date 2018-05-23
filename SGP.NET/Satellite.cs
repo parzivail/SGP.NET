@@ -75,7 +75,8 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Gets the surface distance (km) from the satellite's location which defines the bounds of the visibility footprint at a specific time
+        ///     Gets the surface distance (km) from the satellite's location which defines the bounds of the visibility footprint
+        ///     at a specific time
         /// </summary>
         /// <param name="time">The time to predict the footprint</param>
         /// <returns>The foorptint circle radius, in kilometers</returns>
@@ -85,7 +86,8 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility footprint
+        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility
+        ///     footprint
         /// </summary>
         /// <returns>The foorptint circle radius, in kilometers</returns>
         public double GetFootprintSizeRadians()
@@ -94,7 +96,8 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility footprint at a specific time
+        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility
+        ///     footprint at a specific time
         /// </summary>
         /// <param name="time">The time to predict the footprint</param>
         /// <returns>The foorptint circle radius, in kilometers</returns>

@@ -92,23 +92,31 @@ namespace SGPdotNET
             return new EciCoordinate(time, position, velocity);
         }
 
+        /// <inheritdoc />
         public override GeodeticCoordinate ToGeodetic()
         {
             return this;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is GeodeticCoordinate geodetic &&
                    Equals(geodetic);
         }
 
+        /// <summary>
+        ///     Checks equality between this object and another
+        /// </summary>
+        /// <param name="other">The other object of comparison</param>
+        /// <returns>True if the two objects are equal</returns>
         protected bool Equals(GeodeticCoordinate other)
         {
             return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) &&
                    Altitude.Equals(other.Altitude);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked
@@ -120,6 +128,7 @@ namespace SGPdotNET
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"GeodeticCoordinate[Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}]";

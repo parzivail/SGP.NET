@@ -7,6 +7,10 @@ namespace SGPdotNET
     /// </summary>
     public class OrbitalElements
     {
+        /// <summary>
+        ///     Creates a new numerical orbital element descriptor set for the provided two-line element set
+        /// </summary>
+        /// <param name="tle">The set to extract numerical values from</param>
         public OrbitalElements(Tle tle)
         {
             // extract and format tle data
@@ -42,42 +46,66 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     XMO
+        ///     The XMO mean anomoly, in dgerees
         /// </summary>
         public double MeanAnomoly { get; }
 
         /// <summary>
-        ///     XNODEO
+        ///     The XNODEO right ascension of the ascending node, in degrees
         /// </summary>
         public double AscendingNode { get; }
 
         /// <summary>
-        ///     OMEGAO
+        ///     The OMEGAO argument of perigree, in degrees
         /// </summary>
         public double ArgumentPerigee { get; }
 
         /// <summary>
-        ///     XNO
+        ///     The XNO mean motion, in revolutions per day
         /// </summary>
         public double MeanMotion { get; }
 
         /// <summary>
-        ///     AODP
+        ///     The AODP recovered semi-major axis
         /// </summary>
         public double RecoveredSemiMajorAxis { get; }
 
         /// <summary>
-        ///     XNODP
+        ///     The XNODP recovered mean motion
         /// </summary>
         public double RecoveredMeanMotion { get; }
 
+        /// <summary>
+        ///     The perigree, in kilometers
+        /// </summary>
         public double Perigee { get; }
+
+        /// <summary>
+        ///     Time, in days, of revolution (recovered from 1 / MeanMotion)
+        /// </summary>
         public double Period { get; }
+
+        /// <summary>
+        ///     The epoch of the element
+        /// </summary>
         public DateTime Epoch { get; }
+
+        /// <summary>
+        ///     BSTAR drag term
+        /// </summary>
         public double BStar { get; }
+
+        /// <summary>
+        ///     Eccentricity
+        /// </summary>
         public double Eccentricity { get; }
+
+        /// <summary>
+        ///     Inclination, in degrees
+        /// </summary>
         public double Inclination { get; }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is OrbitalElements elements &&
@@ -95,6 +123,7 @@ namespace SGPdotNET
                    Equals(Inclination, elements.Inclination);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 410639991;

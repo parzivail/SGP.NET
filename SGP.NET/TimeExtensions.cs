@@ -2,6 +2,9 @@
 
 namespace SGPdotNET
 {
+    /// <summary>
+    ///     Adds extension methods to the <see cref="System.DateTime" /> class that are useful for astronomical calculations
+    /// </summary>
     public static class TimeExtensions
     {
         /// <summary>

@@ -18,6 +18,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <DocumentationFile>bin\Debug\SGP.NET.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -38,7 +39,7 @@
     <Compile Include="TopocentricCoordinate.cs" />
     <Compile Include="DecayedException.cs" />
     <Compile Include="EciCoordinate.cs" />
-    <Compile Include="Globals.cs" />
+    <Compile Include="SgpConstants.cs" />
     <Compile Include="OrbitalElements.cs" />
     <Compile Include="ITleProvider.cs" />
     <Compile Include="RemoteTleProvider.cs" />

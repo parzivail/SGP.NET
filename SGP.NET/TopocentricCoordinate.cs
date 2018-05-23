@@ -59,18 +59,25 @@ namespace SGPdotNET
         /// </summary>
         public double RangeRate { get; }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is GeodeticCoordinate geodetic &&
                    Equals(geodetic);
         }
 
+        /// <summary>
+        ///     Checks equality between this object and another
+        /// </summary>
+        /// <param name="other">The other object of comparison</param>
+        /// <returns>True if the two objects are equal</returns>
         protected bool Equals(TopocentricCoordinate other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
                    RangeRate.Equals(other.RangeRate);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked
@@ -83,6 +90,7 @@ namespace SGPdotNET
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"TopocentricCoordinate[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";

@@ -107,17 +107,64 @@ namespace SGPdotNET
             _orbitNumber = tle._orbitNumber;
         }
 
+        /// <summary>
+        ///     The name of the satellite
+        /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        ///     The first line of the TLE set
+        /// </summary>
         public string Line1 { get; }
+
+        /// <summary>
+        ///     The second line of the TLE set
+        /// </summary>
         public string Line2 { get; }
+
+        /// <summary>
+        ///     The identification number assigned to the satellite by NORAD
+        /// </summary>
         public uint NoradNumber { get; private set; }
+
+        /// <summary>
+        ///     The international designator of the satellite
+        /// </summary>
         public string IntDesignator { get; private set; }
+
+        /// <summary>
+        ///     The epoch of the satellite
+        /// </summary>
         public DateTime Epoch { get; private set; }
+
+        /// <summary>
+        ///     The first time derivative of mean motion
+        /// </summary>
         public double MeanMotionDtOver2 => _meanMotionDt2;
+
+        /// <summary>
+        ///     The second time derivative of mean motion
+        /// </summary>
         public double MeanMotionDdtOver6 => _meanMotionDdt6;
+
+        /// <summary>
+        ///     The BSTAR drag term of the satellite
+        /// </summary>
         public double BStarDragTerm => _bstar;
+
+        /// <summary>
+        ///     The mean motion, in revolutions per day
+        /// </summary>
         public double MeanMotionRevPerDay => _meanMotion;
+
+        /// <summary>
+        ///     The number of orbits at the epoch
+        /// </summary>
         public uint OrbitNumber => _orbitNumber;
+
+        /// <summary>
+        ///     The eccentricity of the satellite
+        /// </summary>
         public double Eccentricity => _eccentricity;
 
         /// <summary>
@@ -160,6 +207,7 @@ namespace SGPdotNET
             return inDegrees ? _meanAnomaly : Util.DegreesToRadians(_meanAnomaly);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var builder = new StringBuilder();

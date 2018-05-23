@@ -64,8 +64,19 @@ namespace SGPdotNET
             Velocity = velocity;
         }
 
+        /// <summary>
+        ///     The time component of the coordinate
+        /// </summary>
         public DateTime Time { get; }
+
+        /// <summary>
+        ///     The position component of the coordinate
+        /// </summary>
         public Vector3 Position { get; }
+
+        /// <summary>
+        ///     THe velocity component of the coordinate
+        /// </summary>
         public Vector3 Velocity { get; }
 
         /// <summary>
@@ -101,16 +112,19 @@ namespace SGPdotNET
             return new GeodeticCoordinate(lat, lon, alt, true);
         }
 
+        /// <inheritdoc />
         public override EciCoordinate ToEci(DateTime dt)
         {
             return this;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"EciCoordinate[Position={Position}, Velocity={Velocity}]";
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 818017616;
@@ -120,6 +134,7 @@ namespace SGPdotNET
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is EciCoordinate eci &&
