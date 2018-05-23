@@ -3,12 +3,12 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores a topocentric location (azimuth, elevation, range and range rate).
     /// </summary>
-    public class CoordTopocentric
+    public class TopocentricCoordinate
     {
         /// <summary>
         ///     Creates a new topocentirc coordinate at the origin
         /// </summary>
-        public CoordTopocentric()
+        public TopocentricCoordinate()
         {
         }
 
@@ -19,7 +19,7 @@ namespace SGPdotNET
         /// <param name="elevation">Elevation in radians</param>
         /// <param name="range">Range in kilometers</param>
         /// <param name="rangeRate">Range rate in kilometers/second</param>
-        public CoordTopocentric(double azimuth, double elevation, double range, double rangeRate)
+        public TopocentricCoordinate(double azimuth, double elevation, double range, double rangeRate)
         {
             Azimuth = azimuth;
             Elevation = elevation;
@@ -31,7 +31,7 @@ namespace SGPdotNET
         ///     Creates a new topocentirc coordinate as a copy of the specified one
         /// </summary>
         /// <param name="topo">Object to copy from</param>
-        public CoordTopocentric(CoordTopocentric topo)
+        public TopocentricCoordinate(TopocentricCoordinate topo)
         {
             Azimuth = topo.Azimuth;
             Elevation = topo.Elevation;
@@ -61,11 +61,11 @@ namespace SGPdotNET
 
         public override bool Equals(object obj)
         {
-            return obj is CoordGeodetic geodetic &&
+            return obj is GeodeticCoordinate geodetic &&
                    Equals(geodetic);
         }
 
-        protected bool Equals(CoordTopocentric other)
+        protected bool Equals(TopocentricCoordinate other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
                    RangeRate.Equals(other.RangeRate);
@@ -85,7 +85,7 @@ namespace SGPdotNET
 
         public override string ToString()
         {
-            return $"CoordTopocentric[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
+            return $"TopocentricCoordinate[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
         }
     }
 }

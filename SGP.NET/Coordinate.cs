@@ -12,13 +12,13 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
-        public abstract CoordEci ToEci(DateTime dt);
+        public abstract EciCoordinate ToEci(DateTime dt);
 
         /// <summary>
         ///     Converts this ECI position to a geodetic one
         /// </summary>
         /// <returns>The position in a geodetic reference frame</returns>
-        public abstract CoordGeodetic ToGeodetic();
+        public abstract GeodeticCoordinate ToGeodetic();
 
         /// <summary>
         ///     Converts this position to an ECEF one, assuming a spherical earth
@@ -89,7 +89,7 @@ namespace SGPdotNET
         /// <param name="time">The time of observation</param>
         /// <param name="to">The coordinate to observe</param>
         /// <returns>The topocentric angles between this coordinate and another</returns>
-        public CoordTopocentric LookAt(Coordinate to, DateTime? time = null)
+        public TopocentricCoordinate LookAt(Coordinate to, DateTime? time = null)
         {
             var t = DateTime.UtcNow;
             if (time.HasValue)
@@ -126,7 +126,7 @@ namespace SGPdotNET
             var el = Math.Asin(topZ / range.Length);
             var rate = range.Dot(rangeRate) / range.Length;
 
-            return new CoordTopocentric(az, el, range.Length, rate);
+            return new TopocentricCoordinate(az, el, range.Length, rate);
         }
     }
 }

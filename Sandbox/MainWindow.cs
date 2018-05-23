@@ -42,7 +42,7 @@ namespace Sandbox
         private Vector3 _rotation = new Vector3(0, 180, 0);
 
         private static readonly Earth Earth = new Earth();
-        private static readonly GroundStation GroundStation = new GroundStation(new CoordGeodetic(30.2333, -81.6744, 0));
+        private static readonly GroundStation GroundStation = new GroundStation(new GeodeticCoordinate(30.2333, -81.6744, 0));
         private static readonly List<Satellite> TrackedSatellites = new List<Satellite>();
 
         private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
@@ -256,14 +256,14 @@ namespace Sandbox
                 GL.LineStipple(4, 0xAAAA);
 
                 var center = satellite.Predict().ToGeodetic();
-                var centerOnSurface = new CoordGeodetic(center.Latitude, center.Longitude, 0, true);
+                var centerOnSurface = new GeodeticCoordinate(center.Latitude, center.Longitude, 0, true);
 
                 GL.Begin(PrimitiveType.LineStrip);
                 GL.Vertex3((center.ToSphericalEcef() / 100).ToGlVector3());
                 GL.Vertex3((centerOnSurface.ToSphericalEcef() / 100).ToGlVector3());
                 GL.End();
 
-                var footprint = satellite.GetFootprint();
+                var footprint = satellite.GetFootprintBoundary();
                 GL.PushMatrix();
                 //GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
                 //GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);

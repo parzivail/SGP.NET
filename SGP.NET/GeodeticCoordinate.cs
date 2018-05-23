@@ -5,12 +5,12 @@ namespace SGPdotNET
     /// <summary>
     ///     Stores a geodetic location
     /// </summary>
-    public class CoordGeodetic : Coordinate
+    public class GeodeticCoordinate : Coordinate
     {
         /// <summary>
         ///     Creates a new geodetic coordinate at the origin
         /// </summary>
-        public CoordGeodetic()
+        public GeodeticCoordinate()
         {
         }
 
@@ -21,7 +21,7 @@ namespace SGPdotNET
         /// <param name="lon">The longitude (degrees by default)</param>
         /// <param name="alt">The altitude in kilometers</param>
         /// <param name="isRadians">True if the provided latitude and longitude are in radians</param>
-        public CoordGeodetic(double lat, double lon, double alt, bool isRadians = false)
+        public GeodeticCoordinate(double lat, double lon, double alt, bool isRadians = false)
         {
             if (isRadians)
             {
@@ -41,7 +41,7 @@ namespace SGPdotNET
         ///     Creates a new geodetic coordinate as a copy of the specified one
         /// </summary>
         /// <param name="coord">Object to copy from</param>
-        public CoordGeodetic(Coordinate coord)
+        public GeodeticCoordinate(Coordinate coord)
         {
             var geo = coord.ToGeodetic();
             Latitude = geo.Latitude;
@@ -69,7 +69,7 @@ namespace SGPdotNET
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
-        public override CoordEci ToEci(DateTime dt)
+        public override EciCoordinate ToEci(DateTime dt)
         {
             var time = dt;
 
@@ -89,21 +89,21 @@ namespace SGPdotNET
                 (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
             var velocity = new Vector3(-mfactor * position.Y, mfactor * position.X, 0);
 
-            return new CoordEci(time, position, velocity);
+            return new EciCoordinate(time, position, velocity);
         }
 
-        public override CoordGeodetic ToGeodetic()
+        public override GeodeticCoordinate ToGeodetic()
         {
             return this;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is CoordGeodetic geodetic &&
+            return obj is GeodeticCoordinate geodetic &&
                    Equals(geodetic);
         }
 
-        protected bool Equals(CoordGeodetic other)
+        protected bool Equals(GeodeticCoordinate other)
         {
             return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) &&
                    Altitude.Equals(other.Altitude);
@@ -122,7 +122,7 @@ namespace SGPdotNET
 
         public override string ToString()
         {
-            return $"CoordGeodetic[Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}]";
+            return $"GeodeticCoordinate[Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}]";
         }
     }
 }

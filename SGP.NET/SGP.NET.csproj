@@ -34,10 +34,10 @@
     <Compile Include="GroundStation.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CoordGeodetic.cs" />
-    <Compile Include="CoordTopocentric.cs" />
+    <Compile Include="GeodeticCoordinate.cs" />
+    <Compile Include="TopocentricCoordinate.cs" />
     <Compile Include="DecayedException.cs" />
-    <Compile Include="CoordEci.cs" />
+    <Compile Include="EciCoordinate.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="OrbitalElements.cs" />
     <Compile Include="ITleProvider.cs" />
