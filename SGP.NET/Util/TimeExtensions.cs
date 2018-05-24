@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SGPdotNET
+namespace SGPdotNET.Util
 {
     /// <summary>
     ///     Adds extension methods to the <see cref="System.DateTime" /> class that are useful for astronomical calculations

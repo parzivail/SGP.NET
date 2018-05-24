@@ -1,8 +1,9 @@
 using System;
 using System.Globalization;
 using System.Text;
+using SGPdotNET.Exception;
 
-namespace SGPdotNET
+namespace SGPdotNET.TLE
 {
     /// <summary>
     ///     Extracts OrbitalElements from a two-line or three-line element set
@@ -174,7 +175,7 @@ namespace SGPdotNET
         /// <returns></returns>
         public double GetInclination(bool inDegrees)
         {
-            return inDegrees ? _inclination : Util.DegreesToRadians(_inclination);
+            return inDegrees ? _inclination : Util.Util.DegreesToRadians(_inclination);
         }
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace SGPdotNET
         /// <returns></returns>
         public double GetRightAscendingNode(bool inDegrees)
         {
-            return inDegrees ? _rightAscendingNode : Util.DegreesToRadians(_rightAscendingNode);
+            return inDegrees ? _rightAscendingNode : Util.Util.DegreesToRadians(_rightAscendingNode);
         }
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace SGPdotNET
         /// <returns></returns>
         public double GetArgumentPerigee(bool inDegrees)
         {
-            return inDegrees ? _argumentPerigee : Util.DegreesToRadians(_argumentPerigee);
+            return inDegrees ? _argumentPerigee : Util.Util.DegreesToRadians(_argumentPerigee);
         }
 
         /// <summary>
@@ -204,7 +205,7 @@ namespace SGPdotNET
         /// <returns></returns>
         public double GetMeanAnomaly(bool inDegrees)
         {
-            return inDegrees ? _meanAnomaly : Util.DegreesToRadians(_meanAnomaly);
+            return inDegrees ? _meanAnomaly : Util.Util.DegreesToRadians(_meanAnomaly);
         }
 
         /// <inheritdoc />

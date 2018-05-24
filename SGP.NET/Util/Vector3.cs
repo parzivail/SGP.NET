@@ -1,6 +1,6 @@
 using System;
 
-namespace SGPdotNET
+namespace SGPdotNET.Util
 {
     /// <summary>
     ///     Generic 3-dimensional vector

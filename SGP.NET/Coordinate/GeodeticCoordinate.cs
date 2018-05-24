@@ -1,6 +1,8 @@
 using System;
+using SGPdotNET.Propogation;
+using SGPdotNET.Util;
 
-namespace SGPdotNET
+namespace SGPdotNET.Coordinate
 {
     /// <summary>
     ///     Stores a geodetic location
@@ -30,8 +32,8 @@ namespace SGPdotNET
             }
             else
             {
-                Latitude = Util.DegreesToRadians(lat);
-                Longitude = Util.DegreesToRadians(lon);
+                Latitude = Util.Util.DegreesToRadians(lat);
+                Longitude = Util.Util.DegreesToRadians(lon);
             }
 
             Altitude = alt;

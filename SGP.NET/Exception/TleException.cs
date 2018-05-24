@@ -1,11 +1,9 @@
-using System;
-
-namespace SGPdotNET
+namespace SGPdotNET.Exception
 {
     /// <summary>
     ///     Exception thrown by the TLE parser when a TLE has invalid values
     /// </summary>
-    public class TleException : Exception
+    public class TleException : System.Exception
     {
         /// <summary>
         ///     Constructor

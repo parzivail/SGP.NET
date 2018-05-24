@@ -1,4 +1,4 @@
-﻿namespace SGPdotNET
+﻿namespace SGPdotNET.TLE
 {
     /// <summary>
     ///     Provides a class to retrieve TLEs from a resource

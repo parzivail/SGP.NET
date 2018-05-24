@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using SGPdotNET.Coordinate;
+using SGPdotNET.Propogation;
+using SGPdotNET.TLE;
 
 namespace SGPdotNET
 {
@@ -110,7 +113,7 @@ namespace SGPdotNET
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
         /// </summary>
         /// <returns>A list of geodetic coordinates</returns>
-        public List<Coordinate> GetFootprintBoundary()
+        public List<Coordinate.Coordinate> GetFootprintBoundary()
         {
             return GetFootprintBoundary(DateTime.UtcNow);
         }
@@ -121,10 +124,10 @@ namespace SGPdotNET
         /// <param name="time">The time to predict the footprint</param>
         /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<Coordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
+        public List<Coordinate.Coordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
         {
             var center = Predict(time).ToGeodetic();
-            var coords = new List<Coordinate>();
+            var coords = new List<Coordinate.Coordinate>();
 
             var lat = center.Latitude;
             var lon = center.Longitude;

@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using PFX.Shader;
 using PFX.Util;
 using SGPdotNET;
+using SGPdotNET.Propogation;
 using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox

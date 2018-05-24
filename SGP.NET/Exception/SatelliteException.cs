@@ -1,11 +1,9 @@
-using System;
-
-namespace SGPdotNET
+namespace SGPdotNET.Exception
 {
     /// <summary>
     ///     Exception thrown by the propagator during initialization when a satellite has erroneous values
     /// </summary>
-    public class SatelliteException : Exception
+    public class SatelliteException : System.Exception
     {
         /// <summary>
         ///     Constructor

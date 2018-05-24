@@ -1,11 +1,12 @@
 using System;
+using SGPdotNET.Util;
 
-namespace SGPdotNET
+namespace SGPdotNET.Exception
 {
     /// <summary>
     ///     Exception thrown by the propagator when a satellite decays
     /// </summary>
-    public class DecayedException : Exception
+    public class DecayedException : System.Exception
     {
         /// <summary>
         ///     Constructor

@@ -13,6 +13,9 @@ using PFX;
 using PFX.BmFont;
 using PFX.Util;
 using SGPdotNET;
+using SGPdotNET.Coordinate;
+using SGPdotNET.Exception;
+using SGPdotNET.TLE;
 using KeyPressEventArgs = OpenTK.KeyPressEventArgs;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using Vector3 = OpenTK.Vector3;
@@ -216,7 +219,7 @@ namespace Sandbox
             GL.Enable(EnableCap.Blend);
             foreach (var satellite in TrackedSatellites)
             {
-                SGPdotNET.Vector3 posVec;
+                SGPdotNET.Util.Vector3 posVec;
                 try
                 {
                     posVec = satellite
@@ -424,12 +427,12 @@ namespace Sandbox
                 new Url("http://www.celestrak.com/NORAD/elements/weather.txt")
             };
 
-            using (var remote = new RemoteTleProvider(sources, true))
-            {
-                TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
-                TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
-                TrackedSatellites.Add(new Satellite(remote.GetTle(33591))); // NOAA 19
-            }
+            var remote = new RemoteTleProvider(sources, true);
+
+            TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
+            TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
+            TrackedSatellites.Add(new Satellite(remote.GetTle(33591))); // NOAA 19
+
             Lumberjack.Info("Loaded TLEs");
 
             Lumberjack.Info("Window loaded");

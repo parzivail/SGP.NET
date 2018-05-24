@@ -1,6 +1,7 @@
 using System;
+using SGPdotNET.Propogation;
 
-namespace SGPdotNET
+namespace SGPdotNET.Util
 {
     internal static class Util
     {

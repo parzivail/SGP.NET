@@ -1,4 +1,4 @@
-namespace SGPdotNET
+namespace SGPdotNET.Coordinate
 {
     /// <summary>
     ///     Stores a topocentric location (azimuth, elevation, range and range rate).

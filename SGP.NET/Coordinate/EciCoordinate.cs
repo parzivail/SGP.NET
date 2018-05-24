@@ -1,6 +1,8 @@
 using System;
+using SGPdotNET.Propogation;
+using SGPdotNET.Util;
 
-namespace SGPdotNET
+namespace SGPdotNET.Coordinate
 {
     /// <summary>
     ///     Stores an Earth-centered inertial position for a particular time
@@ -85,15 +87,15 @@ namespace SGPdotNET
         /// <returns>The position in a geodetic reference frame</returns>
         public override GeodeticCoordinate ToGeodetic()
         {
-            var theta = Util.AcTan(Position.Y, Position.X);
+            var theta = Util.Util.AcTan(Position.Y, Position.X);
 
-            var lon = Util.WrapNegPosPi(theta - Time.ToGreenwichSiderealTime());
+            var lon = Util.Util.WrapNegPosPi(theta - Time.ToGreenwichSiderealTime());
 
             var r = Math.Sqrt(Position.X * Position.X + Position.Y * Position.Y);
 
             const double e2 = SgpConstants.EarthFlatteningConstant * (2.0 - SgpConstants.EarthFlatteningConstant);
 
-            var lat = Util.AcTan(Position.Z, r);
+            var lat = Util.Util.AcTan(Position.Z, r);
             double phi;
             double c;
             var cnt = 0;
@@ -103,7 +105,7 @@ namespace SGPdotNET
                 phi = lat;
                 var sinphi = Math.Sin(phi);
                 c = 1.0 / Math.Sqrt(1.0 - e2 * sinphi * sinphi);
-                lat = Util.AcTan(Position.Z + SgpConstants.EarthRadiusKm * c * e2 * sinphi, r);
+                lat = Util.Util.AcTan(Position.Z + SgpConstants.EarthRadiusKm * c * e2 * sinphi, r);
                 cnt++;
             } while (Math.Abs(lat - phi) >= 1e-10 && cnt < 10);
 
