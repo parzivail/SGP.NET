@@ -15,6 +15,7 @@ using PFX.Util;
 using SGPdotNET;
 using SGPdotNET.Coordinate;
 using SGPdotNET.Exception;
+using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
 using KeyPressEventArgs = OpenTK.KeyPressEventArgs;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;

@@ -39,10 +39,16 @@ namespace SGPdotNET
         /// <param name="tle">The two-line representation of the satellite</param>
         public Satellite(Tle tle)
         {
+            Tle = tle;
             _sgp4 = new Sgp4(tle);
 
             Name = tle.Name;
         }
+
+        /// <summary>
+        ///     The two-line element representation of the satellite
+        /// </summary>
+        public Tle Tle { get; }
 
         /// <summary>
         ///     The name of this satellite

@@ -43,6 +43,8 @@ namespace SGPdotNET.Propogation
             // find perigee and period
             Perigee = (RecoveredSemiMajorAxis * (1.0 - Eccentricity) - SgpConstants.DistanceUnitsPerEarthRadii) *
                       SgpConstants.EarthRadiusKm;
+            Apogee = (RecoveredSemiMajorAxis * (1.0 + Eccentricity) - SgpConstants.DistanceUnitsPerEarthRadii) *
+                     SgpConstants.EarthRadiusKm;
             Period = SgpConstants.TwoPi / RecoveredMeanMotion;
         }
 
@@ -72,6 +74,11 @@ namespace SGPdotNET.Propogation
         public double RecoveredSemiMajorAxis { get; }
 
         /// <summary>
+        ///     The semi-major axis, in kilometers
+        /// </summary>
+        public double SemiMajorAxis => RecoveredSemiMajorAxis * SgpConstants.EarthRadiusKm;
+
+        /// <summary>
         ///     The XNODP recovered mean motion
         /// </summary>
         public double RecoveredMeanMotion { get; }
@@ -82,7 +89,12 @@ namespace SGPdotNET.Propogation
         public double Perigee { get; }
 
         /// <summary>
-        ///     Time, in days, of revolution (recovered from 1 / MeanMotion)
+        ///     The apogee, in kilometers
+        /// </summary>
+        public double Apogee { get; }
+
+        /// <summary>
+        ///     Time, in minutes, of revolution (recovered from 2pi / RecoveredMeanMotion)
         /// </summary>
         public double Period { get; }
 
