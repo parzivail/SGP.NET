@@ -13,12 +13,15 @@ namespace SGPdotNET.TLE
     /// </summary>
     public class RemoteTleProvider : ITleProvider
     {
-        private readonly TimeSpan _maxAge;
+        private readonly object _lock = new object();
         private readonly IEnumerable<Url> _sources;
-        private readonly bool _threeLine;
 
-        private List<Tle> _cachedTles;
-        private DateTime _lastRefresh = DateTime.MinValue;
+        private Dictionary<int, Tle> _cachedTles;
+
+        internal readonly TimeSpan MaxAge;
+        internal readonly bool ThreeLine;
+
+        internal DateTime LastRefresh = DateTime.MinValue;
 
         /// <inheritdoc />
         /// <summary>
@@ -40,9 +43,8 @@ namespace SGPdotNET.TLE
         public RemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge)
         {
             _sources = sources;
-            _threeLine = threeLine;
-            _maxAge = maxAge;
-            CacheRemoteTles(false);
+            ThreeLine = threeLine;
+            MaxAge = maxAge;
         }
 
         /// <inheritdoc />
@@ -54,14 +56,14 @@ namespace SGPdotNET.TLE
         public Tle GetTle(int satelliteId)
         {
             CacheRemoteTles();
-            return _cachedTles.FirstOrDefault(tle => tle.NoradNumber == satelliteId);
+            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
         /// <summary>
         ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
         /// </summary>
-        /// <returns>The remote TLEs for the all remote satellites</returns>
-        public List<Tle> GetTles()
+        /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+        public Dictionary<int, Tle> GetTles()
         {
             CacheRemoteTles();
             return _cachedTles;
@@ -69,44 +71,43 @@ namespace SGPdotNET.TLE
 
         private void CacheRemoteTles(bool async = true)
         {
-            if (DateTime.Now < _lastRefresh + _maxAge)
+            if (DateTime.UtcNow < LastRefresh + MaxAge)
                 return;
 
-            _cachedTles = new List<Tle>();
-            if (async)
+            var hasCachedTles = !(_cachedTles is null) && _cachedTles.Count > 0;
+            if (async && hasCachedTles)
                 new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    GetTlesFromRemote();
+                    lock (_lock)
+                    {
+                        _cachedTles = FetchNewTles();
+                    }
                 }).Start();
             else
-                GetTlesFromRemote();
+                _cachedTles = FetchNewTles();
 
-            _lastRefresh = DateTime.Now;
+            LastRefresh = DateTime.UtcNow;
         }
 
-        private void GetTlesFromRemote()
+        internal virtual Dictionary<int, Tle> FetchNewTles()
         {
+            var tles = new Dictionary<int, Tle>();
             using (var wc = new WebClient())
             {
                 foreach (var source in _sources)
                 {
-                    var file = wc.DownloadString(source.Value);
-                    var elementSets = file // take the file
+                    var file = wc.DownloadString(source.Value)
                         .Replace("\r\n", "\n") // normalize line endings
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries) // split into lines
-                        .Select((value, index) =>
-                            new {PairNum = index / (_threeLine ? 3 : 2), value}) // pair TLEs by index
-                        .GroupBy(pair => pair.PairNum) // group TLEs by index
-                        .Select(grp => grp.Select(g => g.value).ToArray()) // select groups of TLEs
-                        .Select(s =>
-                            new Tle((s[0].StartsWith("0 ") ? s[0].Substring(2) : s[0]).Trim(), s[1],
-                                s[2])) // convert lines into TLEs
-                        .ToList();
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                    _cachedTles.AddRange(elementSets);
+                    var elementSets = Tle.ParseElements(file, true);
+                    
+                    foreach (var elementSet in elementSets)
+                        tles.Add((int)elementSet.NoradNumber, elementSet);
                 }
             }
+            return tles;
         }
     }
 }

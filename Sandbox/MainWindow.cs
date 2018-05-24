@@ -428,7 +428,7 @@ namespace Sandbox
                 new Url("http://www.celestrak.com/NORAD/elements/weather.txt")
             };
 
-            var remote = new RemoteTleProvider(sources, true);
+            var remote = new LocallyBackedRemoteTleProvider(sources, true, "cachedTles.txt");
 
             TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
             TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18

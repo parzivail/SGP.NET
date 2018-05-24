@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using SGPdotNET.Exception;
 
@@ -208,6 +210,25 @@ namespace SGPdotNET.TLE
             return inDegrees ? _meanAnomaly : Util.Util.DegreesToRadians(_meanAnomaly);
         }
 
+        /// <summary>
+        /// Parses a list of TLEs from a list of TLE lines
+        /// </summary>
+        /// <param name="lines">Each line of the each element set, sequentially</param>
+        /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+        /// <returns>A list of the TLEs parsed from the lines</returns>
+        public static List<Tle> ParseElements(string[] lines, bool threeLine)
+        {
+            return lines // take the file
+                .Select((value, index) =>
+                    new { PairNum = index / (threeLine ? 3 : 2), value }) // pair TLEs by index
+                .GroupBy(pair => pair.PairNum) // group TLEs by index
+                .Select(grp => grp.Select(g => g.value).ToArray()) // select groups of TLEs
+                .Select(s => s.Length == 2 ? new Tle(s[0], s[1]) : new Tle(ExtractSatName(s[0]), s[1], s[2])) // convert lines into TLEs
+                .ToList();
+        }
+
+        private static string ExtractSatName(string s) => (s.StartsWith("0 ") ? s.Substring(2) : s).Trim();
+
         /// <inheritdoc />
         public override string ToString()
         {
@@ -295,7 +316,7 @@ namespace SGPdotNET.TLE
                 year += 2000;
             else
                 year += 1900;
-            Epoch = new DateTime((int) year, 1, 1).AddDays(day - 1);
+            Epoch = new DateTime((int)year, 1, 1).AddDays(day - 1);
         }
 
         private static bool IsValidLineLength(string str)
@@ -312,7 +333,7 @@ namespace SGPdotNET.TLE
                 if (char.IsDigit(str[i]))
                 {
                     foundDigit = true;
-                    temp = temp * 10 + (uint) (str[i] - '0');
+                    temp = temp * 10 + (uint)(str[i] - '0');
                 }
                 else if (foundDigit)
                 {
@@ -363,7 +384,7 @@ namespace SGPdotNET.TLE
                                        str.Substring(str.IndexOf("-"));
             }
 
-            val = (double) decimal.Parse(correctedString, NumberStyles.Float);
+            val = (double)decimal.Parse(correctedString, NumberStyles.Float);
 
             var temp = "";
 

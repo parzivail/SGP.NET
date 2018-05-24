@@ -42,6 +42,7 @@
     <Compile Include="Propogation\SgpConstants.cs" />
     <Compile Include="Propogation\OrbitalElements.cs" />
     <Compile Include="TLE\ITleProvider.cs" />
+    <Compile Include="TLE\LocallyBackedRemoteTleProvider.cs" />
     <Compile Include="TLE\RemoteTleProvider.cs" />
     <Compile Include="Satellite.cs" />
     <Compile Include="Exception\SatelliteException.cs" />
