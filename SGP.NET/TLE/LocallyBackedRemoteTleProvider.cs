@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Security.Policy;
 using System.Text;
-using System.Threading;
 
 namespace SGPdotNET.TLE
 {
@@ -25,8 +23,9 @@ namespace SGPdotNET.TLE
         /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, string localFilename) : this(sources, threeLine,
-            TimeSpan.FromDays(1), localFilename)
+        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, string localFilename)
+            : this(sources, threeLine,
+                TimeSpan.FromDays(1), localFilename)
         {
         }
 
@@ -37,7 +36,8 @@ namespace SGPdotNET.TLE
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge, string localFilename) : base(sources, threeLine, maxAge)
+        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge,
+            string localFilename) : base(sources, threeLine, maxAge)
         {
             _localFilename = localFilename;
         }
@@ -49,16 +49,17 @@ namespace SGPdotNET.TLE
                 {
                     var dateLine = sr.ReadLine();
 
-                    if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var date) && DateTime.UtcNow - date < MaxAge)
+                    if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
+                            out var date) && DateTime.UtcNow - date < MaxAge)
                     {
                         LastRefresh = date;
                         var restOfFile = sr.ReadToEnd()
                             .Replace("\r\n", "\n") // normalize line endings
-                            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                            .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
                         var elementSets = Tle.ParseElements(restOfFile, true);
 
-                        return elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
+                        return elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
                     }
                 }
 

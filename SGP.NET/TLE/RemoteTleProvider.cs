@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Security.Policy;
 using System.Threading;
@@ -16,10 +15,10 @@ namespace SGPdotNET.TLE
         private readonly object _lock = new object();
         private readonly IEnumerable<Url> _sources;
 
-        private Dictionary<int, Tle> _cachedTles;
-
         internal readonly TimeSpan MaxAge;
         internal readonly bool ThreeLine;
+
+        private Dictionary<int, Tle> _cachedTles;
 
         internal DateTime LastRefresh = DateTime.MinValue;
 
@@ -102,9 +101,9 @@ namespace SGPdotNET.TLE
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
                     var elementSets = Tle.ParseElements(file, true);
-                    
+
                     foreach (var elementSet in elementSets)
-                        tles.Add((int)elementSet.NoradNumber, elementSet);
+                        tles.Add((int) elementSet.NoradNumber, elementSet);
                 }
             }
             return tles;
