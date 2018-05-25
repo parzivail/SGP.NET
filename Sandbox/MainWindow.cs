@@ -52,6 +52,7 @@ namespace Sandbox
         private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
         private DateTime _observationsDirtyTime = DateTime.Now;
 
+        private Satellite _n19;
 
         public MainWindow() : base(960, 540)
         {
@@ -325,13 +326,14 @@ namespace Sandbox
             {
                 Font.RenderString("Development Build");
 
-                GL.Translate(0, Height - Font.Common.LineHeight, 0);
+                GL.Translate(0, Height - Font.Common.LineHeight * 2, 0);
                 if (_todaysObservations.Count > 0)
                 {
                     var next = GetNextObservation();
                     var time = next.Start.ToLocalTime();
                     Font.RenderString(
-                        $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})");
+                        $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})\n" +
+                        $"Doppler shift of N19: {GroundStation.GetDopplerShift(_n19, 137.1e6)}");
                 }
                 else if (ObserverBackgroundWorker.IsBusy)
                     Font.RenderString("Recalculating observations...");
@@ -433,10 +435,8 @@ namespace Sandbox
             TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
             TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
 
-            var n19 = new Satellite(remote.GetTle(33591));
-            TrackedSatellites.Add(n19); // NOAA 19
-
-            Lumberjack.Debug($"doppler: {GroundStation.GetDopplerShift(n19, 137.1e6)}");
+            _n19 = new Satellite(remote.GetTle(33591));
+            TrackedSatellites.Add(_n19); // NOAA 19
 
             Lumberjack.Info("Loaded TLEs");
 

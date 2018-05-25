@@ -121,12 +121,7 @@ namespace SGPdotNET
             // *= 1000 => km/s to m/s
             var rr = Location.LookAt(satellite.Predict()).RangeRate * 1000;
 
-            return rr / SgpConstants.SpeedOfLight * inputFrequency;
-        }
-
-        private double GetRangeRate(Satellite satellite)
-        {
-            throw new NotImplementedException();
+            return -rr / SgpConstants.SpeedOfLight * inputFrequency;
         }
 
         private enum SatelliteObservationState
