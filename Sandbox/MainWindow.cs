@@ -13,7 +13,7 @@ using PFX;
 using PFX.BmFont;
 using PFX.Util;
 using SGPdotNET;
-using SGPdotNET.Coordinate;
+using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Exception;
 using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
@@ -432,7 +432,11 @@ namespace Sandbox
 
             TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
             TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
-            TrackedSatellites.Add(new Satellite(remote.GetTle(33591))); // NOAA 19
+
+            var n19 = new Satellite(remote.GetTle(33591));
+            TrackedSatellites.Add(n19); // NOAA 19
+
+            Lumberjack.Debug($"doppler: {GroundStation.GetDopplerShift(n19, 137.1e6)}");
 
             Lumberjack.Info("Loaded TLEs");
 

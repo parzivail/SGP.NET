@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SGPdotNET.Coordinate;
+using SGPdotNET.CoordinateSystem;
+using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
 namespace SGPdotNET
@@ -14,7 +15,7 @@ namespace SGPdotNET
         ///     Creates a new ground station at the specified location
         /// </summary>
         /// <param name="location">The location of the ground station</param>
-        public GroundStation(Coordinate.Coordinate location)
+        public GroundStation(Coordinate location)
         {
             Location = location;
         }
@@ -22,7 +23,7 @@ namespace SGPdotNET
         /// <summary>
         ///     The location of the ground station
         /// </summary>
-        public Coordinate.Coordinate Location { get; }
+        public Coordinate Location { get; }
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
@@ -107,6 +108,25 @@ namespace SGPdotNET
 
             var aer = eciLocation.LookAt(pos);
             return aer.Elevation / Math.PI * 180 >= minElevation;
+        }
+
+        /// <summary>
+        /// Predicts the doppler shift of the satellite relative to the ground station, in Hz
+        /// </summary>
+        /// <param name="satellite">The satellite to calculate the doppler shift for</param>
+        /// <param name="inputFrequency">The base RX/TX frequency, in Hz</param>
+        /// <returns>The doppler shift of the satellite</returns>
+        public double GetDopplerShift(Satellite satellite, double inputFrequency)
+        {
+            // *= 1000 => km/s to m/s
+            var rr = Location.LookAt(satellite.Predict()).RangeRate * 1000;
+
+            return rr / SgpConstants.SpeedOfLight * inputFrequency;
+        }
+
+        private double GetRangeRate(Satellite satellite)
+        {
+            throw new NotImplementedException();
         }
 
         private enum SatelliteObservationState

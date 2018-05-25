@@ -33,12 +33,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GroundStation.cs" />
-    <Compile Include="Coordinate\Coordinate.cs" />
+    <Compile Include="CoordinateSystem\Coordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Coordinate\GeodeticCoordinate.cs" />
-    <Compile Include="Coordinate\TopocentricCoordinate.cs" />
+    <Compile Include="CoordinateSystem\GeodeticCoordinate.cs" />
+    <Compile Include="CoordinateSystem\TopocentricCoordinate.cs" />
     <Compile Include="Exception\DecayedException.cs" />
-    <Compile Include="Coordinate\EciCoordinate.cs" />
+    <Compile Include="CoordinateSystem\EciCoordinate.cs" />
     <Compile Include="Propogation\SgpConstants.cs" />
     <Compile Include="Propogation\OrbitalElements.cs" />
     <Compile Include="TLE\ITleProvider.cs" />

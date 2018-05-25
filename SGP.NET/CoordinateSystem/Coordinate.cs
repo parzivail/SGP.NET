@@ -2,7 +2,7 @@ using System;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
-namespace SGPdotNET.Coordinate
+namespace SGPdotNET.CoordinateSystem
 {
     /// <summary>
     ///     Stores a generic location

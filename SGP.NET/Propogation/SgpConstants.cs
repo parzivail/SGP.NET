@@ -33,6 +33,11 @@ namespace SGPdotNET.Propogation
         public const double HoursPerDay = 24.0;
 
         /// <summary>
+        /// The speef of light, in meters/second
+        /// </summary>
+        public const double SpeedOfLight = 299792458;
+
+        /// <summary>
         ///     CK2 propogation constant
         /// </summary>
         public const double Ck2 = 0.5 * ZonalHarmonicJ2 * DistanceUnitsPerEarthRadii * DistanceUnitsPerEarthRadii;
