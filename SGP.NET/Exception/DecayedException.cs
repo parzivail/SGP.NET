@@ -3,11 +3,13 @@ using SGPdotNET.Util;
 
 namespace SGPdotNET.Exception
 {
+    /// <inheritdoc />
     /// <summary>
     ///     Exception thrown by the propagator when a satellite decays
     /// </summary>
     public class DecayedException : System.Exception
     {
+        /// <inheritdoc />
         /// <summary>
         ///     Constructor
         /// </summary>

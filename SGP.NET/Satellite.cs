@@ -23,6 +23,7 @@ namespace SGPdotNET
         {
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Constructor
         /// </summary>

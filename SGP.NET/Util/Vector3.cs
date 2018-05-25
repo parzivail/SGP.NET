@@ -7,6 +7,7 @@ namespace SGPdotNET.Util
     /// </summary>
     public class Vector3
     {
+        /// <inheritdoc />
         /// <summary>
         ///     Create a new Vector3 at the origin
         /// </summary>

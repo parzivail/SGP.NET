@@ -4,6 +4,7 @@ using SGPdotNET.Util;
 
 namespace SGPdotNET.CoordinateSystem
 {
+    /// <inheritdoc />
     /// <summary>
     ///     Stores a geodetic location
     /// </summary>
@@ -66,6 +67,7 @@ namespace SGPdotNET.CoordinateSystem
         /// </summary>
         public double Altitude { get; }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Converts this geodetic position to an ECI one
         /// </summary>

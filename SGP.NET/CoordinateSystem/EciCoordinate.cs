@@ -4,6 +4,7 @@ using SGPdotNET.Util;
 
 namespace SGPdotNET.CoordinateSystem
 {
+    /// <inheritdoc />
     /// <summary>
     ///     Stores an Earth-centered inertial position for a particular time
     /// </summary>
@@ -16,6 +17,7 @@ namespace SGPdotNET.CoordinateSystem
         {
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Creates a new ECI coordinate with the specified values
         /// </summary>
@@ -77,10 +79,11 @@ namespace SGPdotNET.CoordinateSystem
         public Vector3 Position { get; }
 
         /// <summary>
-        ///     THe velocity component of the coordinate
+        ///     The velocity component of the coordinate
         /// </summary>
         public Vector3 Velocity { get; }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Converts this ECI position to a geodetic one
         /// </summary>

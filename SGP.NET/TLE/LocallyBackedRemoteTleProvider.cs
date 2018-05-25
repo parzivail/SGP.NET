@@ -29,6 +29,7 @@ namespace SGPdotNET.TLE
         {
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Constructor
         /// </summary>
