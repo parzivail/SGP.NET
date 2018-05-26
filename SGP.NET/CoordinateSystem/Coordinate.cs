@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
@@ -9,6 +10,12 @@ namespace SGPdotNET.CoordinateSystem
     /// </summary>
     public abstract class Coordinate
     {
+        private static readonly int[] LocCharRangeAaXx = { 18, 10, 24, 10, 24, 10 };
+        private static readonly int[] LocCharRangeAaYy = { 18, 10, 24, 10, 25, 10 };
+
+        private const int MaxLocatorPairs = 6;
+        private const int MinLocatorPairs = 1;
+
         /// <summary>
         ///     Converts this position to an ECI one
         /// </summary>
@@ -17,10 +24,68 @@ namespace SGPdotNET.CoordinateSystem
         public abstract EciCoordinate ToEci(DateTime dt);
 
         /// <summary>
-        ///     Converts this ECI position to a geodetic one
+        ///     Converts this position to a geodetic one
         /// </summary>
         /// <returns>The position in a geodetic reference frame</returns>
         public abstract GeodeticCoordinate ToGeodetic();
+
+        /// <summary>
+        /// Converts this position to it's Maidenhead Locator System representation, disregarding altitude 
+        /// </summary>
+        /// <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
+        /// <param name="standard">The conversion standard to use for the 5th pair</param>
+        /// <returns>The Maidenhead representation string</returns>
+        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
+        {
+            return ToMaidenhead((int)precision + 1, standard);
+        }
+
+        /// <summary>
+        /// Converts this position to it's Maidenhead Locator System representation, disregarding altitude 
+        /// </summary>
+        /// <param name="pairCount">The number of pairs in the conversion, which defines the precision</param>
+        /// <param name="standard">The conversion standard to use for the 5th pair</param>
+        /// <returns>The Maidenhead representation string</returns>
+        public string ToMaidenhead(int pairCount, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
+        {
+            var geo = ToGeodetic();
+
+            var locator = new char[pairCount * 2];
+            int[] charRange;
+
+            switch (standard)
+            {
+                case MaidenheadStandard.AaToXx:
+                    charRange = LocCharRangeAaXx;
+                    break;
+                case MaidenheadStandard.AaToYy:
+                    charRange = LocCharRangeAaYy;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(standard), standard, null);
+            }
+
+            for (var xOrY = 0; xOrY < 2; ++xOrY)
+            {
+                var ordinate = xOrY == 0 ? MathUtil.RadiansToDegrees(geo.Longitude) / 2.0 : MathUtil.RadiansToDegrees(geo.Latitude);
+                var divisions = 1;
+
+                /* The 1e-6 here guards against floating point rounding errors */
+                ordinate = ordinate + 270.000001 % 180.0;
+                for (var pair = 0; pair < pairCount; ++pair)
+                {
+                    divisions *= charRange[pair];
+                    var squareSize = 180.0 / divisions;
+
+                    var locvalue = (char)(ordinate / squareSize);
+                    ordinate -= squareSize * locvalue;
+                    locvalue += charRange[pair] == 10 ? '0' : 'A';
+                    locator[pair * 2 + xOrY] = locvalue;
+                }
+            }
+
+            return new string(locator);
+        }
 
         /// <summary>
         ///     Converts this position to an ECEF one, assuming a spherical earth

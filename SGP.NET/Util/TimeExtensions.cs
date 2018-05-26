@@ -35,7 +35,7 @@ namespace SGPdotNET.Util
                         - 0.0000062 * t * t * t;
 
             // 360.0 / 86400.0 = 1.0 / 240.0
-            return Util.WrapTwoPi(Util.DegreesToRadians(theta / 240.0));
+            return MathUtil.WrapTwoPi(MathUtil.DegreesToRadians(theta / 240.0));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace SGPdotNET.Util
         /// <returns>The Local Mean Sidereal Time representation the DateTime</returns>
         public static double ToLocalMeanSiderealTime(this DateTime dt, double longitude)
         {
-            return Util.WrapTwoPi(dt.ToGreenwichSiderealTime() + longitude);
+            return MathUtil.WrapTwoPi(dt.ToGreenwichSiderealTime() + longitude);
         }
     }
 }

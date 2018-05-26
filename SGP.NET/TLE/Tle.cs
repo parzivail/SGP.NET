@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using SGPdotNET.Exception;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.TLE
 {
@@ -177,7 +178,7 @@ namespace SGPdotNET.TLE
         /// <returns></returns>
         public double GetInclination(bool inDegrees)
         {
-            return inDegrees ? _inclination : Util.Util.DegreesToRadians(_inclination);
+            return inDegrees ? _inclination : MathUtil.DegreesToRadians(_inclination);
         }
 
         /// <summary>
@@ -187,7 +188,7 @@ namespace SGPdotNET.TLE
         /// <returns></returns>
         public double GetRightAscendingNode(bool inDegrees)
         {
-            return inDegrees ? _rightAscendingNode : Util.Util.DegreesToRadians(_rightAscendingNode);
+            return inDegrees ? _rightAscendingNode : MathUtil.DegreesToRadians(_rightAscendingNode);
         }
 
         /// <summary>
@@ -197,7 +198,7 @@ namespace SGPdotNET.TLE
         /// <returns></returns>
         public double GetArgumentPerigee(bool inDegrees)
         {
-            return inDegrees ? _argumentPerigee : Util.Util.DegreesToRadians(_argumentPerigee);
+            return inDegrees ? _argumentPerigee : MathUtil.DegreesToRadians(_argumentPerigee);
         }
 
         /// <summary>
@@ -207,7 +208,7 @@ namespace SGPdotNET.TLE
         /// <returns></returns>
         public double GetMeanAnomaly(bool inDegrees)
         {
-            return inDegrees ? _meanAnomaly : Util.Util.DegreesToRadians(_meanAnomaly);
+            return inDegrees ? _meanAnomaly : MathUtil.DegreesToRadians(_meanAnomaly);
         }
 
         /// <summary>

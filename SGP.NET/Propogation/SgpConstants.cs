@@ -10,27 +10,27 @@ namespace SGPdotNET.Propogation
         /// <summary>
         ///     Twice the value of Pi
         /// </summary>
-        public const double TwoPi = 2.0 * Math.PI;
+        public const double TwoPi = 2 * Math.PI;
 
         /// <summary>
         ///     Two divided by three (2/3)
         /// </summary>
-        public const double TwoThirds = 2.0 / 3.0;
+        public const double TwoThirds = 2.0 / 3;
 
         /// <summary>
         ///     The number of seconds per day
         /// </summary>
-        public const double SecondsPerDay = 86400.0;
+        public const double SecondsPerDay = 86400;
 
         /// <summary>
         ///     The number of minutes per day
         /// </summary>
-        public const double MinutesPerDay = 1440.0;
+        public const double MinutesPerDay = 1440;
 
         /// <summary>
         ///     The number of hours per day
         /// </summary>
-        public const double HoursPerDay = 24.0;
+        public const double HoursPerDay = 24;
 
         /// <summary>
         /// The speef of light, in meters/second
@@ -52,22 +52,22 @@ namespace SGPdotNET.Propogation
         /// <summary>
         ///     Q-zero propogation constant
         /// </summary>
-        public const double Q0 = 120.0;
+        public const double Q0 = 120;
 
         /// <summary>
         ///     S-zero propogation constant
         /// </summary>
-        public const double S0 = 78.0;
+        public const double S0 = 78;
 
         /// <summary>
         ///     S propogation constant
         /// </summary>
-        public const double S = DistanceUnitsPerEarthRadii * (1.0 + S0 / EarthRadiusKm);
+        public const double S = DistanceUnitsPerEarthRadii * (1 + S0 / EarthRadiusKm);
 
         /// <summary>
         ///     Also called Ae
         /// </summary>
-        public const double DistanceUnitsPerEarthRadii = 1.0;
+        public const double DistanceUnitsPerEarthRadii = 1;
 
         /// <summary>
         ///     Also called mu
@@ -107,7 +107,7 @@ namespace SGPdotNET.Propogation
         /// <summary>
         ///     Also called kF
         /// </summary>
-        public const double EarthFlatteningConstant = 1.0 / 298.26;
+        public const double EarthFlatteningConstant = 1 / 298.26;
 
         /// <summary>
         ///     Also called OmegaE
@@ -122,22 +122,22 @@ namespace SGPdotNET.Propogation
         /// <summary>
         ///     Jan 1.5 1900 = Jan 1 1900 12h UTC
         /// </summary>
-        public const double EpochJan112H1900 = 2415020.0;
+        public const double EpochJan112H1900 = 2415020;
 
         /// <summary>
         ///     Jan 1.5 2000 = Jan 1 2000 12h UTC
         /// </summary>
-        public const double EpochJan112H2000 = 2451545.0;
+        public const double EpochJan112H2000 = 2451545;
 
         /// <summary>
         ///     QOMS2T propogation constant
         /// </summary>
-        public static double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4.0);
+        public static double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4);
 
         /// <summary>
         ///     Also called XKE
         /// </summary>
-        public static double ReciprocalOfMinutesPerTimeUnit = 60.0 /
+        public static double ReciprocalOfMinutesPerTimeUnit = 60 /
                                                               Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
                                                                         EarthGravitation);
     }

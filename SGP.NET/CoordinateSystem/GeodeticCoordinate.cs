@@ -33,8 +33,8 @@ namespace SGPdotNET.CoordinateSystem
             }
             else
             {
-                Latitude = Util.Util.DegreesToRadians(lat);
-                Longitude = Util.Util.DegreesToRadians(lon);
+                Latitude = MathUtil.DegreesToRadians(lat);
+                Longitude = MathUtil.DegreesToRadians(lon);
             }
 
             Altitude = alt;

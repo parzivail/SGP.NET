@@ -90,15 +90,15 @@ namespace SGPdotNET.CoordinateSystem
         /// <returns>The position in a geodetic reference frame</returns>
         public override GeodeticCoordinate ToGeodetic()
         {
-            var theta = Util.Util.AcTan(Position.Y, Position.X);
+            var theta = MathUtil.AcTan(Position.Y, Position.X);
 
-            var lon = Util.Util.WrapNegPosPi(theta - Time.ToGreenwichSiderealTime());
+            var lon = MathUtil.WrapNegPosPi(theta - Time.ToGreenwichSiderealTime());
 
             var r = Math.Sqrt(Position.X * Position.X + Position.Y * Position.Y);
 
             const double e2 = SgpConstants.EarthFlatteningConstant * (2.0 - SgpConstants.EarthFlatteningConstant);
 
-            var lat = Util.Util.AcTan(Position.Z, r);
+            var lat = MathUtil.AcTan(Position.Z, r);
             double phi;
             double c;
             var cnt = 0;
@@ -108,7 +108,7 @@ namespace SGPdotNET.CoordinateSystem
                 phi = lat;
                 var sinphi = Math.Sin(phi);
                 c = 1.0 / Math.Sqrt(1.0 - e2 * sinphi * sinphi);
-                lat = Util.Util.AcTan(Position.Z + SgpConstants.EarthRadiusKm * c * e2 * sinphi, r);
+                lat = MathUtil.AcTan(Position.Z + SgpConstants.EarthRadiusKm * c * e2 * sinphi, r);
                 cnt++;
             } while (Math.Abs(lat - phi) >= 1e-10 && cnt < 10);
 

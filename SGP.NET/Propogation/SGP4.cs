@@ -617,7 +617,7 @@ namespace SGPdotNET.Propogation
             var zcoshl = Math.Sqrt(1.0 - zsinhl * zsinhl);
             var c = 4.7199672 + 0.22997150 * jday;
             var gam = 5.8351514 + 0.0019443680 * jday;
-            _deepspaceConsts.Zmol = Util.Util.WrapTwoPi(c - gam);
+            _deepspaceConsts.Zmol = MathUtil.WrapTwoPi(c - gam);
             var zx = 0.39785416 * stem / zsinil;
             var zy = zcoshl * ctem + 0.91744867 * zsinhl * stem;
             zx = Math.Atan2(zx, zy);
@@ -625,7 +625,7 @@ namespace SGPdotNET.Propogation
 
             var zcosgl = Math.Cos(zx);
             var zsingl = Math.Sin(zx);
-            _deepspaceConsts.Zmos = Util.Util.WrapTwoPi(6.2565837 + 0.017201977 * jday);
+            _deepspaceConsts.Zmos = MathUtil.WrapTwoPi(6.2565837 + 0.017201977 * jday);
 
             /*
              * do solar terms
@@ -1078,7 +1078,7 @@ namespace SGPdotNET.Propogation
                 alfdp += dalf;
                 betdp += dbet;
 
-                xnodes = Util.Util.WrapTwoPi(xnodes);
+                xnodes = MathUtil.WrapTwoPi(xnodes);
 
                 var xls = xll + omgasm + cosis * xnodes;
                 var dls = pl + pgh - pinc * xnodes * sinis;

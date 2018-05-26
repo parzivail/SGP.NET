@@ -333,7 +333,7 @@ namespace Sandbox
                     var time = next.Start.ToLocalTime();
                     Font.RenderString(
                         $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})\n" +
-                        $"Doppler shift of N19: {GroundStation.GetDopplerShift(_n19, 137.1e6)}");
+                        $"Maidenhead of N19: {_n19.Predict().ToMaidenhead()}", false);
                 }
                 else if (ObserverBackgroundWorker.IsBusy)
                     Font.RenderString("Recalculating observations...");

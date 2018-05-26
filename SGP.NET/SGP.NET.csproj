@@ -32,6 +32,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoordinateSystem\MaidenheadPrecision.cs" />
+    <Compile Include="CoordinateSystem\MaidenheadStandard.cs" />
     <Compile Include="GroundStation.cs" />
     <Compile Include="CoordinateSystem\Coordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -51,7 +53,7 @@
     <Compile Include="Util\TimeExtensions.cs" />
     <Compile Include="TLE\Tle.cs" />
     <Compile Include="Exception\TleException.cs" />
-    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util\MathUtil.cs" />
     <Compile Include="Util\Vector3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
