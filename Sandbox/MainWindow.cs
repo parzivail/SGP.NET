@@ -260,7 +260,8 @@ namespace Sandbox
                 GL.Color3(Color.Yellow);
                 GL.LineStipple(4, 0xAAAA);
 
-                var center = satellite.Predict().ToGeodetic();
+                var prediction = satellite.Predict();
+                var center = prediction.ToGeodetic();
                 var centerOnSurface = new GeodeticCoordinate(center.Latitude, center.Longitude, 0, true);
 
                 GL.Begin(PrimitiveType.LineStrip);
@@ -268,7 +269,7 @@ namespace Sandbox
                 GL.Vertex3((centerOnSurface.ToSphericalEcef() / 100).ToGlVector3());
                 GL.End();
 
-                var footprint = satellite.GetFootprintBoundary();
+                var footprint = prediction.GetFootprintBoundary();
                 GL.PushMatrix();
                 //GL.Rotate((float)(center.Longitude / Math.PI * 180) - 90, 0, 1, 0);
                 //GL.Rotate(90 - (float)(center.Latitude / Math.PI * 180), 1, 0, 0);
@@ -333,7 +334,7 @@ namespace Sandbox
                     var time = next.Start.ToLocalTime();
                     Font.RenderString(
                         $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})\n" +
-                        $"Maidenhead of N19: {_n19.Predict().ToMaidenhead()}", false);
+                        $"Maidenhead of N19: {_n19.Predict().ToDegreesMinutesSeconds()}", false);
                 }
                 else if (ObserverBackgroundWorker.IsBusy)
                     Font.RenderString("Recalculating observations...");

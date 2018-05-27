@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SGPdotNET.CoordinateSystem;
+using SGPdotNET.Exception;
 using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
 
@@ -73,86 +74,6 @@ namespace SGPdotNET
         public EciCoordinate Predict(DateTime time)
         {
             return _sgp4.FindPosition(time);
-        }
-
-        /// <summary>
-        ///     Gets the surface distance (km) from the satellite's location which defines the bounds of the visibility footprint
-        /// </summary>
-        /// <returns>The foorptint circle radius, in kilometers</returns>
-        public double GetFootprintSize()
-        {
-            return Predict().GetFootprint();
-        }
-
-        /// <summary>
-        ///     Gets the surface distance (km) from the satellite's location which defines the bounds of the visibility footprint
-        ///     at a specific time
-        /// </summary>
-        /// <param name="time">The time to predict the footprint</param>
-        /// <returns>The foorptint circle radius, in kilometers</returns>
-        public double GetFootprintSize(DateTime time)
-        {
-            return Predict(time).GetFootprint();
-        }
-
-        /// <summary>
-        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility
-        ///     footprint
-        /// </summary>
-        /// <returns>The foorptint circle radius, in kilometers</returns>
-        public double GetFootprintSizeRadians()
-        {
-            return Predict().GetFootprintRadians();
-        }
-
-        /// <summary>
-        ///     Gets the surface distance (radians) from the satellite's location which defines the bounds of the visibility
-        ///     footprint at a specific time
-        /// </summary>
-        /// <param name="time">The time to predict the footprint</param>
-        /// <returns>The foorptint circle radius, in kilometers</returns>
-        public double GetFootprintSizeRadians(DateTime time)
-        {
-            return Predict(time).GetFootprintRadians();
-        }
-
-        /// <summary>
-        ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
-        /// </summary>
-        /// <returns>A list of geodetic coordinates</returns>
-        public List<Coordinate> GetFootprintBoundary()
-        {
-            return GetFootprintBoundary(DateTime.UtcNow);
-        }
-
-        /// <summary>
-        ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint at a specific time
-        /// </summary>
-        /// <param name="time">The time to predict the footprint</param>
-        /// <param name="numPoints">The number of points in the resulting circle</param>
-        /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<Coordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
-        {
-            var center = Predict(time).ToGeodetic();
-            var coords = new List<Coordinate>();
-
-            var lat = center.Latitude;
-            var lon = center.Longitude;
-            var d = center.GetFootprintRadians();
-
-            for (var i = 0; i < numPoints; i++)
-            {
-                var perc = i / (float) numPoints * 2 * Math.PI;
-
-                var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
-                var lngRadians = lon +
-                                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat),
-                                     Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
-
-                coords.Add(new GeodeticCoordinate(latRadians, lngRadians, 10, true));
-            }
-
-            return coords;
         }
     }
 }

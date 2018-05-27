@@ -33,6 +33,16 @@ namespace SGPdotNET.Propogation
         public const double HoursPerDay = 24;
 
         /// <summary>
+        ///     The number of minutes per degree
+        /// </summary>
+        public const double MinutesPerDegree = 60;
+
+        /// <summary>
+        ///     The number of seconds per minute
+        /// </summary>
+        public const double SecondsPerMinute = 60;
+
+        /// <summary>
         /// The speef of light, in meters/second
         /// </summary>
         public const double SpeedOfLight = 299792458;

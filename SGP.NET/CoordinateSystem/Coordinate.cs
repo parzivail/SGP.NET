@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
@@ -88,6 +89,30 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
+        /// Converts this position to it's Degrees-Minutes-Seconds (DMS) representation, disregarding altitude 
+        /// </summary>
+        /// <returns>The Degrees-Minutes-Seconds representation string</returns>
+        public string ToDegreesMinutesSeconds()
+        {
+            var geo = ToGeodetic();
+
+            var north = geo.Latitude > 0;
+            var east = geo.Longitude > 0;
+
+            var latDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Latitude));
+            var latD = Math.Floor(latDd);
+            var latM = Math.Floor(latDd % 1 * SgpConstants.MinutesPerDegree);
+            var latS = (latDd - latD - latM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree * SgpConstants.SecondsPerMinute;
+
+            var lonDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Longitude));
+            var lonD = Math.Floor(lonDd);
+            var lonM = Math.Floor(lonDd % 1 * SgpConstants.MinutesPerDegree);
+            var lonS = (lonDd - lonD - lonM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree * SgpConstants.SecondsPerMinute;
+
+            return $"{latD}°{latM}'{latS}\"{(north ? "N" : "S")} {lonD}°{lonM}'{lonS}\"{(east ? "E" : "W")}";
+        }
+
+        /// <summary>
         ///     Converts this position to an ECEF one, assuming a spherical earth
         /// </summary>
         /// <returns>A spherical ECEF coordinate vector</returns>
@@ -122,6 +147,45 @@ namespace SGPdotNET.CoordinateSystem
         {
             var geo = ToGeodetic();
             return Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude));
+        }
+
+        /// <summary>
+        ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
+        /// </summary>
+        /// <returns>A list of geodetic coordinates</returns>
+        public List<Coordinate> GetFootprintBoundary()
+        {
+            return GetFootprintBoundary(DateTime.UtcNow);
+        }
+
+        /// <summary>
+        ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint at a specific time
+        /// </summary>
+        /// <param name="time">The time to predict the footprint</param>
+        /// <param name="numPoints">The number of points in the resulting circle</param>
+        /// <returns>A list of geodetic coordinates for the specified time</returns>
+        public List<Coordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
+        {
+            var center = ToGeodetic();
+            var coords = new List<Coordinate>();
+
+            var lat = center.Latitude;
+            var lon = center.Longitude;
+            var d = center.GetFootprintRadians();
+
+            for (var i = 0; i < numPoints; i++)
+            {
+                var perc = i / (float)numPoints * 2 * Math.PI;
+
+                var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
+                var lngRadians = lon +
+                                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat),
+                                     Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
+
+                coords.Add(new GeodeticCoordinate(latRadians, lngRadians, 10, true));
+            }
+
+            return coords;
         }
 
         /// <summary>
