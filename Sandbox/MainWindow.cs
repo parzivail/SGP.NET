@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using OpenTK;
@@ -15,44 +14,33 @@ using PFX.Util;
 using SGPdotNET;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Exception;
-using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
-using KeyPressEventArgs = OpenTK.KeyPressEventArgs;
-using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-using Vector3 = OpenTK.Vector3;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Sandbox
 {
-    class MainWindow : GameWindow
+    internal class MainWindow : GameWindow
     {
         public static bool FastGraphics;
 
-        /// <summary>
-        /// Onscreen font
-        /// </summary>
-        public BitmapFont Font { get; set; }
-        /// <summary>
-        /// Keyboard State
-        /// </summary>
-        public KeyboardState KeyboardState { get; private set; }
+        private static readonly BackgroundWorker ObserverBackgroundWorker = new BackgroundWorker();
+
+        private static readonly Earth Earth = new Earth();
+
+        private static readonly GroundStation GroundStation =
+            new GroundStation(new GeodeticCoordinate(30.2333, -81.6744, 0));
+
+        private static readonly List<Satellite> TrackedSatellites = new List<Satellite>();
 
         private readonly Profiler _profiler = new Profiler();
-        private Dictionary<string, TimeSpan> _profile = new Dictionary<string, TimeSpan>();
         private Sparkline _fpsSparkline;
+        private DateTime _observationsDirtyTime = DateTime.Now;
+        private Dictionary<string, TimeSpan> _profile = new Dictionary<string, TimeSpan>();
         private Sparkline _renderTimeSparkline;
-
-        private static readonly BackgroundWorker ObserverBackgroundWorker = new BackgroundWorker();
 
         private Vector3 _rotation = new Vector3(0, 180, 0);
 
-        private static readonly Earth Earth = new Earth();
-        private static readonly GroundStation GroundStation = new GroundStation(new GeodeticCoordinate(30.2333, -81.6744, 0));
-        private static readonly List<Satellite> TrackedSatellites = new List<Satellite>();
-
         private List<SatelliteObservation> _todaysObservations = new List<SatelliteObservation>();
-        private DateTime _observationsDirtyTime = DateTime.Now;
-
-        private Satellite _n19;
 
         public MainWindow() : base(960, 540)
         {
@@ -72,6 +60,16 @@ namespace Sandbox
 
             Lumberjack.TraceLevel = OutputLevel.Debug;
         }
+
+        /// <summary>
+        ///     Onscreen font
+        /// </summary>
+        public BitmapFont Font { get; set; }
+
+        /// <summary>
+        ///     Keyboard State
+        /// </summary>
+        public KeyboardState KeyboardState { get; private set; }
 
         private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -118,7 +116,7 @@ namespace Sandbox
 
         private void CollectPredictedObservations(object sender, RunWorkerCompletedEventArgs args)
         {
-            _todaysObservations = (List<SatelliteObservation>)args.Result;
+            _todaysObservations = (List<SatelliteObservation>) args.Result;
         }
 
         private static void PredictFutureObservations(object sender, DoWorkEventArgs args)
@@ -148,7 +146,7 @@ namespace Sandbox
 
         private void MainWindow_UpdateFrame(object sender, FrameEventArgs e)
         {
-            var t = (float)(50 * e.Time);
+            var t = (float) (50 * e.Time);
 
             if (KeyboardState[Key.Left])
                 _rotation.Y -= t;
@@ -188,9 +186,9 @@ namespace Sandbox
 
             // FromGeodetic sparklines
             if (_profile.ContainsKey("render"))
-                _renderTimeSparkline.Enqueue((float)_profile["render"].TotalMilliseconds);
+                _renderTimeSparkline.Enqueue((float) _profile["render"].TotalMilliseconds);
 
-            _fpsSparkline.Enqueue((float)RenderFrequency);
+            _fpsSparkline.Enqueue((float) RenderFrequency);
 
             // Reset the view
             GL.Clear(ClearBufferMask.ColorBufferBit |
@@ -198,7 +196,7 @@ namespace Sandbox
                      ClearBufferMask.StencilBufferBit);
 
             // Reload the projection matrix
-            var aspectRatio = Width / (float)Height;
+            var aspectRatio = Width / (float) Height;
             var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1, 1024);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref projection);
@@ -255,6 +253,7 @@ namespace Sandbox
                     GL.Vertex3(predictPos.ToGlVector3());
                     time = time.AddMinutes(1);
                 }
+
                 GL.End();
 
                 GL.Color3(Color.Yellow);
@@ -281,6 +280,7 @@ namespace Sandbox
                 GL.PopMatrix();
                 GL.Disable(EnableCap.LineStipple);
             }
+
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.Lighting);
 
@@ -313,33 +313,37 @@ namespace Sandbox
             {
                 // Static diagnostic header
                 GL.PushMatrix();
-                Font.RenderString($"FPS: {(int)Math.Ceiling(RenderFrequency)}\n" +
+                Font.RenderString($"FPS: {(int) Math.Ceiling(RenderFrequency)}\n" +
                                   $"Fast Graphics: {FastGraphics}");
                 GL.PopMatrix();
 
                 // Sparklines
-                GL.Translate(0, Height - (int)(Font.Common.LineHeight * 1.4f * 2), 0);
+                GL.Translate(0, Height - (int) (Font.Common.LineHeight * 1.4f * 2), 0);
                 _fpsSparkline.Render(Color.White, Color.Blue);
-                GL.Translate(0, (int)(Font.Common.LineHeight * 1.4f), 0);
+                GL.Translate(0, (int) (Font.Common.LineHeight * 1.4f), 0);
                 _renderTimeSparkline.Render(Color.White, Color.Red);
             }
             else
             {
                 Font.RenderString("Development Build");
 
-                GL.Translate(0, Height - Font.Common.LineHeight * 2, 0);
+                GL.Translate(0, Height - Font.Common.LineHeight, 0);
                 if (_todaysObservations.Count > 0)
                 {
                     var next = GetNextObservation();
                     var time = next.Start.ToLocalTime();
                     Font.RenderString(
-                        $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})\n" +
-                        $"Maidenhead of N19: {_n19.Predict().ToDegreesMinutesSeconds()}", false);
+                        $"Next: {next.Satellite.Name} at {time:h\\:mm\\:ss} (T-{time - DateTime.Now:h\\:mm\\:ss})",
+                        false);
                 }
                 else if (ObserverBackgroundWorker.IsBusy)
+                {
                     Font.RenderString("Recalculating observations...");
+                }
                 else
+                {
                     Font.RenderString("No observations <1d");
+                }
             }
 
             GL.PopMatrix();
@@ -350,8 +354,8 @@ namespace Sandbox
                 try
                 {
                     posVec = (satellite
-                                 .Predict()
-                                 .ToSphericalEcef() / 100).ToGlVector3();
+                                  .Predict()
+                                  .ToSphericalEcef() / 100).ToGlVector3();
                 }
                 catch (SatelliteException)
                 {
@@ -361,7 +365,7 @@ namespace Sandbox
                 GL.PushMatrix();
                 var mat = modelViewMatrix * projection;
                 posVec = Vector3.Project(posVec, 0, Height, Width, -Height, -1, 1, mat);
-                GL.Translate((int)posVec.X + 3, (int)(posVec.Y - Font.Common.LineHeight / 2f), posVec.Z);
+                GL.Translate((int) posVec.X + 3, (int) (posVec.Y - Font.Common.LineHeight / 2f), posVec.Z);
                 Font.RenderString(satellite.Name);
                 GL.PopMatrix();
             }
@@ -397,10 +401,10 @@ namespace Sandbox
             GL.LineWidth(2);
 
             const float diffuse = 1.5f;
-            float[] matDiffuse = { diffuse, diffuse, diffuse };
+            float[] matDiffuse = {diffuse, diffuse, diffuse};
             GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, matDiffuse);
-            GL.Light(LightName.Light0, LightParameter.Position, new[] { 0.0f, 0.0f, 0.0f, 256.0f });
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new[] { diffuse, diffuse, diffuse, diffuse });
+            GL.Light(LightName.Light0, LightParameter.Position, new[] {0.0f, 0.0f, 0.0f, 256.0f});
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new[] {diffuse, diffuse, diffuse, diffuse});
             Lumberjack.Debug("Created lights");
 
             // Set up lighting
@@ -418,8 +422,8 @@ namespace Sandbox
             Lumberjack.Debug("Loaded fonts");
 
             // Load sparklines
-            _fpsSparkline = new Sparkline(Font, $"0-{(int)TargetRenderFrequency}fps", 50,
-                (float)TargetRenderFrequency, Sparkline.SparklineStyle.Area);
+            _fpsSparkline = new Sparkline(Font, $"0-{(int) TargetRenderFrequency}fps", 50,
+                (float) TargetRenderFrequency, Sparkline.SparklineStyle.Area);
             _renderTimeSparkline = new Sparkline(Font, "0-50ms", 50, 50, Sparkline.SparklineStyle.Area);
 
             Earth.Init();
@@ -435,9 +439,7 @@ namespace Sandbox
 
             TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
             TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
-
-            _n19 = new Satellite(remote.GetTle(33591));
-            TrackedSatellites.Add(_n19); // NOAA 19
+            TrackedSatellites.Add(new Satellite(remote.GetTle(33591))); // NOAA 19
 
             Lumberjack.Info("Loaded TLEs");
 
@@ -445,7 +447,7 @@ namespace Sandbox
         }
 
         /// <summary>
-        /// Saves the current screen frame to a PNG
+        ///     Saves the current screen frame to a PNG
         /// </summary>
         /// <param name="filename">The PNG filename to save</param>
         public void SaveScreen(string filename)
@@ -453,8 +455,9 @@ namespace Sandbox
             using (var bmp = new Bitmap(ClientRectangle.Width, ClientRectangle.Height))
             {
                 var data = bmp.LockBits(ClientRectangle, ImageLockMode.WriteOnly,
-                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                GL.ReadPixels(0, 0, ClientRectangle.Width, ClientRectangle.Height, PixelFormat.Bgr,
+                    PixelFormat.Format24bppRgb);
+                GL.ReadPixels(0, 0, ClientRectangle.Width, ClientRectangle.Height,
+                    OpenTK.Graphics.OpenGL.PixelFormat.Bgr,
                     PixelType.UnsignedByte, data.Scan0);
                 bmp.UnlockBits(data);
                 bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);

@@ -5,19 +5,17 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using PFX.Shader;
 using PFX.Util;
-using SGPdotNET;
 using SGPdotNET.Propogation;
-using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox
 {
-    class Earth
+    internal class Earth
     {
         private static readonly float EarthRadiusScaled = (float) (SgpConstants.EarthRadiusKm / 100);
-        private readonly Sphere _sphere = new Sphere(EarthRadiusScaled, EarthRadiusScaled, 60, 30);
-        private readonly Sphere _sphereAtmosphere = new Sphere(EarthRadiusScaled * 1.07f, EarthRadiusScaled * 1.07f, 60, 30);
+
         //private readonly Sphere _sphereSpace = new Sphere(257, 257, 60, 30);
         private static ShaderProgram _earthShader;
+
         private static ShaderProgram _earthAtmosShader;
         //private static ShaderProgram _spaceShader;
 
@@ -39,18 +37,24 @@ namespace Sandbox
 
         private static SimpleVertexBuffer _earthVbo;
         private static SimpleVertexBuffer _earthAtmosVbo;
-        //private static SimpleVertexBuffer _spaceVbo;
+        private readonly Sphere _sphere = new Sphere(EarthRadiusScaled, EarthRadiusScaled, 60, 30);
 
-        private int _vertexPositionAttribute;
-        private int _vertexNormalAttribute;
-        private int _textureCoordAttribute;
-        private int _vertexTangentAttribute;
-        private int _vertexBinormalAttribute;
+        private readonly Sphere _sphereAtmosphere =
+            new Sphere(EarthRadiusScaled * 1.07f, EarthRadiusScaled * 1.07f, 60, 30);
 
         private int _earthSpheremap;
         private int _earthSpheremapNight;
-        private int _earthSpheremapSpecular;
         private int _earthSpheremapNormal;
+        private int _earthSpheremapSpecular;
+        private int _textureCoordAttribute;
+        private int _vertexBinormalAttribute;
+
+        private int _vertexNormalAttribute;
+        //private static SimpleVertexBuffer _spaceVbo;
+
+        private int _vertexPositionAttribute;
+
+        private int _vertexTangentAttribute;
         //private int _spaceSpheremap;
 
         public void Init()
@@ -67,15 +71,15 @@ namespace Sandbox
             //_spaceSpheremap = pair.Key;
 
             _earthShader = new FragVertShaderProgram(
-                    File.ReadAllText("earth.frag"),
-                    File.ReadAllText("earth.vert")
-                );
+                File.ReadAllText("earth.frag"),
+                File.ReadAllText("earth.vert")
+            );
             _earthShader.InitProgram();
 
             _earthAtmosShader = new FragVertShaderProgram(
-                    File.ReadAllText("atmos.frag"),
-                    File.ReadAllText("earth.vert")
-                );
+                File.ReadAllText("atmos.frag"),
+                File.ReadAllText("earth.vert")
+            );
             _earthAtmosShader.InitProgram();
 
             //_spaceShader = new FragVertShaderProgram(
@@ -134,8 +138,10 @@ namespace Sandbox
 
             var sunHeight = 8696 * Math.Cos((DateTime.UtcNow.DayOfYear + 10) / 365.0 * 2 * Math.PI + Math.PI);
 
-            PointLightingLocationUniform.Value = Vector3.TransformPosition(new Vector3(sunDistance * (float)Math.Cos(t), (float)sunHeight, sunDistance * (float)Math.Sin(t)), modelViewMatrix);
-            
+            PointLightingLocationUniform.Value = Vector3.TransformPosition(
+                new Vector3(sunDistance * (float) Math.Cos(t), (float) sunHeight, sunDistance * (float) Math.Sin(t)),
+                modelViewMatrix);
+
             var inner = 0.9f;
             var outer = inner * 1.05f;
 
@@ -181,7 +187,8 @@ namespace Sandbox
             GL.BindTexture(TextureTarget.Texture2D, _earthSpheremapNormal);
 
             _earthShader.Use(uniforms);
-            _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute, _vertexTangentAttribute, _vertexBinormalAttribute);
+            _earthVbo.BindAttribs(_vertexPositionAttribute, _textureCoordAttribute, _vertexNormalAttribute,
+                _vertexTangentAttribute, _vertexBinormalAttribute);
             _earthVbo.Render(PrimitiveType.Triangles);
 
             //_earthAtmosShader.Use(uniforms);

@@ -3,7 +3,7 @@ using PFX.Shader;
 
 namespace Sandbox
 {
-    class FragVertShaderProgram : ShaderProgram
+    internal class FragVertShaderProgram : ShaderProgram
     {
         private readonly string _program;
         private readonly string _vertprogram;

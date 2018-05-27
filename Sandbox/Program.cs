@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 namespace Sandbox
 {
-    class Program
+    internal class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //var tle = new Tle(
             //    "1 33591U 09005A   18126.90753522  .00000083  00000-0  70028-4 0  9998",
@@ -14,7 +14,7 @@ namespace Sandbox
             //    );
 
             //var sgp4 = new SGP4(tle);
-            
+
             //var end = DateTime.Now + TimeSpan.FromSeconds(10);
             //long count = 0;
             //while (DateTime.Now <= end)
