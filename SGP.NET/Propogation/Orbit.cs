@@ -6,13 +6,13 @@ namespace SGPdotNET.Propogation
     /// <summary>
     ///     Container for the extracted orbital elements used by the SGP4 propagator.
     /// </summary>
-    public class OrbitalElements
+    public class Orbit
     {
         /// <summary>
         ///     Creates a new numerical orbital element descriptor set for the provided two-line element set
         /// </summary>
         /// <param name="tle">The set to extract numerical values from</param>
-        public OrbitalElements(Tle tle)
+        public Orbit(Tle tle)
         {
             // extract and format tle data
             MeanAnomoly = tle.GetMeanAnomaly(false);
@@ -121,7 +121,7 @@ namespace SGPdotNET.Propogation
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is OrbitalElements elements &&
+            return obj is Orbit elements &&
                    Equals(MeanAnomoly, elements.MeanAnomoly) &&
                    Equals(AscendingNode, elements.AscendingNode) &&
                    Equals(ArgumentPerigee, elements.ArgumentPerigee) &&

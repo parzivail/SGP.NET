@@ -43,7 +43,7 @@ namespace SGPdotNET.Propogation
         public const double SecondsPerMinute = 60;
 
         /// <summary>
-        /// The speef of light, in meters/second
+        ///     The speef of light, in meters/second
         /// </summary>
         public const double SpeedOfLight = 299792458;
 

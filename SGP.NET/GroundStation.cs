@@ -111,7 +111,7 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        /// Predicts the doppler shift of the satellite relative to the ground station, in Hz
+        ///     Predicts the doppler shift of the satellite relative to the ground station, in Hz
         /// </summary>
         /// <param name="satellite">The satellite to calculate the doppler shift for</param>
         /// <param name="inputFrequency">The base RX/TX frequency, in Hz</param>

@@ -1,3 +1,5 @@
+using System;
+
 namespace SGPdotNET.Util
 {
     /// <summary>
@@ -57,7 +59,7 @@ namespace SGPdotNET.Util
         /// <summary>
         ///     The length of this vector
         /// </summary>
-        public double Length => System.Math.Sqrt(X * X + Y * Y + Z * Z);
+        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
 
         /// <summary>
         ///     Calculates the dot product of this vector and another

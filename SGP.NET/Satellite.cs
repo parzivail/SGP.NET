@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using SGPdotNET.CoordinateSystem;
-using SGPdotNET.Exception;
 using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
 
@@ -56,6 +54,11 @@ namespace SGPdotNET
         ///     The name of this satellite
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        ///     The orbit information of the satellite
+        /// </summary>
+        public Orbit Orbit => _sgp4.Orbit;
 
         /// <summary>
         ///     Predicts the satellite's real-time location

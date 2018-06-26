@@ -17,7 +17,10 @@ namespace SGPdotNET.Propogation
         private static readonly IntegratorConstants EmptyIntegratorConstants = new IntegratorConstants();
         private static readonly IntegratorParams EmptyIntegratorParams = new IntegratorParams();
 
-        private readonly OrbitalElements _elements;
+        /// <summary>
+        ///     The orbit information of the satellite
+        /// </summary>
+        public readonly Orbit Orbit;
 
         private CommonConstants _commonConsts;
         private DeepSpaceConstants _deepspaceConsts;
@@ -33,7 +36,7 @@ namespace SGPdotNET.Propogation
         /// <param name="tle">The two-line element set to propogate</param>
         public Sgp4(Tle tle)
         {
-            _elements = new OrbitalElements(tle);
+            Orbit = new Orbit(tle);
             Initialize();
         }
 
@@ -54,7 +57,7 @@ namespace SGPdotNET.Propogation
         /// <returns>The predicted position of the satellite at a specific date and time</returns>
         public EciCoordinate FindPosition(DateTime date)
         {
-            return FindPosition((date - _elements.Epoch).TotalMinutes);
+            return FindPosition((date - Orbit.Epoch).TotalMinutes);
         }
 
         private static double EvaluateCubicPolynomial(double x, double constant, double linear, double squared,
@@ -67,21 +70,21 @@ namespace SGPdotNET.Propogation
         {
             Reset();
 
-            if (_elements.Eccentricity < 0.0 || _elements.Eccentricity > 0.999)
+            if (Orbit.Eccentricity < 0.0 || Orbit.Eccentricity > 0.999)
                 throw new SatelliteException("GetEccentricity out of range");
 
-            if (_elements.Inclination < 0.0 || _elements.Inclination > Math.PI)
+            if (Orbit.Inclination < 0.0 || Orbit.Inclination > Math.PI)
                 throw new SatelliteException("GetInclination out of range");
 
-            _commonConsts.Cosio = Math.Cos(_elements.Inclination);
-            _commonConsts.Sinio = Math.Sin(_elements.Inclination);
+            _commonConsts.Cosio = Math.Cos(Orbit.Inclination);
+            _commonConsts.Sinio = Math.Sin(Orbit.Inclination);
             var theta2 = _commonConsts.Cosio * _commonConsts.Cosio;
             _commonConsts.X3Thm1 = 3.0 * theta2 - 1.0;
-            var eosq = _elements.Eccentricity * _elements.Eccentricity;
+            var eosq = Orbit.Eccentricity * Orbit.Eccentricity;
             var betao2 = 1.0 - eosq;
             var betao = Math.Sqrt(betao2);
 
-            if (_elements.Period >= 225.0)
+            if (Orbit.Period >= 225.0)
             {
                 _useDeepSpace = true;
             }
@@ -95,7 +98,7 @@ namespace SGPdotNET.Propogation
                  * quadratic variation in mean anomly. also, the c3 term, the
                  * delta omega term and the delta m term are dropped
                  */
-                _useSimpleModel = _elements.Perigee < 220.0;
+                _useSimpleModel = Orbit.Perigee < 220.0;
             }
 
             /*
@@ -104,10 +107,10 @@ namespace SGPdotNET.Propogation
              */
             var s4 = SgpConstants.S;
             var qoms24 = SgpConstants.Qoms2T;
-            if (_elements.Perigee < 156.0)
+            if (Orbit.Perigee < 156.0)
             {
-                s4 = _elements.Perigee - 78.0;
-                if (_elements.Perigee < 98.0)
+                s4 = Orbit.Perigee - 78.0;
+                if (Orbit.Perigee < 98.0)
                     s4 = 20.0;
                 qoms24 = Math.Pow((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm,
                     4.0);
@@ -118,42 +121,42 @@ namespace SGPdotNET.Propogation
              * generate constants
              */
             var pinvsq = 1.0
-                         / (_elements.RecoveredSemiMajorAxis
-                            * _elements.RecoveredSemiMajorAxis
+                         / (Orbit.RecoveredSemiMajorAxis
+                            * Orbit.RecoveredSemiMajorAxis
                             * betao2 * betao2);
-            var tsi = 1.0 / (_elements.RecoveredSemiMajorAxis - s4);
-            _commonConsts.Eta = _elements.RecoveredSemiMajorAxis
-                                * _elements.Eccentricity * tsi;
+            var tsi = 1.0 / (Orbit.RecoveredSemiMajorAxis - s4);
+            _commonConsts.Eta = Orbit.RecoveredSemiMajorAxis
+                                * Orbit.Eccentricity * tsi;
             var etasq = _commonConsts.Eta * _commonConsts.Eta;
-            var eeta = _elements.Eccentricity * _commonConsts.Eta;
+            var eeta = Orbit.Eccentricity * _commonConsts.Eta;
             var psisq = Math.Abs(1.0 - etasq);
             var coef = qoms24 * Math.Pow(tsi, 4.0);
             var coef1 = coef / Math.Pow(psisq, 3.5);
-            var c2 = coef1 * _elements.RecoveredMeanMotion
-                     * (_elements.RecoveredSemiMajorAxis
-                        * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
-                        + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
-                        * (8.0 + 3.0 * etasq * (8.0 + etasq)));
-            _commonConsts.C1 = _elements.BStar * c2;
+            var c2 = coef1 * Orbit.RecoveredMeanMotion
+                           * (Orbit.RecoveredSemiMajorAxis
+                              * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
+                              + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
+                                                                      * (8.0 + 3.0 * etasq * (8.0 + etasq)));
+            _commonConsts.C1 = Orbit.BStar * c2;
             _commonConsts.A3Ovk2 = -SgpConstants.ZonalHarmonicJ3 / SgpConstants.Ck2 *
                                    SgpConstants.DistanceUnitsPerEarthRadii * SgpConstants.DistanceUnitsPerEarthRadii *
                                    SgpConstants.DistanceUnitsPerEarthRadii;
             _commonConsts.X1Mth2 = 1.0 - theta2;
-            _commonConsts.C4 = 2.0 * _elements.RecoveredMeanMotion
-                               * coef1 * _elements.RecoveredSemiMajorAxis * betao2
-                               * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + _elements.Eccentricity
-                                  * (0.5 + 2.0 * etasq)
-                                  - 2.0 * SgpConstants.Ck2 * tsi / (_elements.RecoveredSemiMajorAxis * psisq)
-                                  * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
-                                                                    * (1.5 - 0.5 * eeta))
-                                     + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
-                                                                      (1.0 + etasq)) *
-                                     Math.Cos(2.0 * _elements.ArgumentPerigee)));
+            _commonConsts.C4 = 2.0 * Orbit.RecoveredMeanMotion
+                                   * coef1 * Orbit.RecoveredSemiMajorAxis * betao2
+                                   * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + Orbit.Eccentricity
+                                      * (0.5 + 2.0 * etasq)
+                                      - 2.0 * SgpConstants.Ck2 * tsi / (Orbit.RecoveredSemiMajorAxis * psisq)
+                                      * (-3.0 * _commonConsts.X3Thm1 * (1.0 - 2.0 * eeta + etasq
+                                                                        * (1.5 - 0.5 * eeta))
+                                         + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
+                                                                          (1.0 + etasq)) *
+                                         Math.Cos(2.0 * Orbit.ArgumentPerigee)));
             var theta4 = theta2 * theta2;
-            var temp1 = 3.0 * SgpConstants.Ck2 * pinvsq * _elements.RecoveredMeanMotion;
+            var temp1 = 3.0 * SgpConstants.Ck2 * pinvsq * Orbit.RecoveredMeanMotion;
             var temp2 = temp1 * SgpConstants.Ck2 * pinvsq;
-            var temp3 = 1.25 * SgpConstants.Ck4 * pinvsq * pinvsq * _elements.RecoveredMeanMotion;
-            _commonConsts.Xmdot = _elements.RecoveredMeanMotion + 0.5 * temp1 * betao *
+            var temp3 = 1.25 * SgpConstants.Ck4 * pinvsq * pinvsq * Orbit.RecoveredMeanMotion;
+            _commonConsts.Xmdot = Orbit.RecoveredMeanMotion + 0.5 * temp1 * betao *
                                   _commonConsts.X3Thm1 + 0.0625 * temp2 * betao *
                                   (13.0 - 78.0 * theta2 + 137.0 * theta4);
             var x1M5Th = 1.0 - 5.0 * theta2;
@@ -178,7 +181,7 @@ namespace SGPdotNET.Propogation
 
             if (_useDeepSpace)
             {
-                _deepspaceConsts.Gsto = _elements.Epoch.ToGreenwichSiderealTime();
+                _deepspaceConsts.Gsto = Orbit.Epoch.ToGreenwichSiderealTime();
 
                 DeepSpaceInitialise(eosq, _commonConsts.Sinio, _commonConsts.Cosio, betao,
                     theta2, betao2,
@@ -187,32 +190,32 @@ namespace SGPdotNET.Propogation
             else
             {
                 var c3 = 0.0;
-                if (_elements.Eccentricity > 1.0e-4)
-                    c3 = coef * tsi * _commonConsts.A3Ovk2 * _elements.RecoveredMeanMotion *
+                if (Orbit.Eccentricity > 1.0e-4)
+                    c3 = coef * tsi * _commonConsts.A3Ovk2 * Orbit.RecoveredMeanMotion *
                          SgpConstants.DistanceUnitsPerEarthRadii *
-                         _commonConsts.Sinio / _elements.Eccentricity;
+                         _commonConsts.Sinio / Orbit.Eccentricity;
 
-                _nearspaceConsts.C5 = 2.0 * coef1 * _elements.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
-                                                                                                 (etasq + eeta) +
-                                                                                                 eeta * etasq);
-                _nearspaceConsts.Omgcof = _elements.BStar * c3 * Math.Cos(_elements.ArgumentPerigee);
+                _nearspaceConsts.C5 = 2.0 * coef1 * Orbit.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
+                                                                                             (etasq + eeta) +
+                                                                                             eeta * etasq);
+                _nearspaceConsts.Omgcof = Orbit.BStar * c3 * Math.Cos(Orbit.ArgumentPerigee);
 
                 _nearspaceConsts.Xmcof = 0.0;
-                if (_elements.Eccentricity > 1.0e-4)
-                    _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * _elements.BStar *
+                if (Orbit.Eccentricity > 1.0e-4)
+                    _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * Orbit.BStar *
                                              SgpConstants.DistanceUnitsPerEarthRadii / eeta;
 
-                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(_elements.MeanAnomoly), 3.0);
-                _nearspaceConsts.Sinmo = Math.Sin(_elements.MeanAnomoly);
+                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(Orbit.MeanAnomoly), 3.0);
+                _nearspaceConsts.Sinmo = Math.Sin(Orbit.MeanAnomoly);
 
                 if (_useSimpleModel) return;
 
                 var c1Sq = _commonConsts.C1 * _commonConsts.C1;
-                _nearspaceConsts.D2 = 4.0 * _elements.RecoveredSemiMajorAxis * tsi * c1Sq;
+                _nearspaceConsts.D2 = 4.0 * Orbit.RecoveredSemiMajorAxis * tsi * c1Sq;
                 var temp = _nearspaceConsts.D2 * tsi * _commonConsts.C1 / 3.0;
-                _nearspaceConsts.D3 = (17.0 * _elements.RecoveredSemiMajorAxis + s4) * temp;
-                _nearspaceConsts.D4 = 0.5 * temp * _elements.RecoveredSemiMajorAxis *
-                                      tsi * (221.0 * _elements.RecoveredSemiMajorAxis + 31.0 * s4) * _commonConsts.C1;
+                _nearspaceConsts.D3 = (17.0 * Orbit.RecoveredSemiMajorAxis + s4) * temp;
+                _nearspaceConsts.D4 = 0.5 * temp * Orbit.RecoveredSemiMajorAxis *
+                                      tsi * (221.0 * Orbit.RecoveredSemiMajorAxis + 31.0 * s4) * _commonConsts.C1;
                 _nearspaceConsts.T3Cof = _nearspaceConsts.D2 + 2.0 * c1Sq;
                 _nearspaceConsts.T4Cof = 0.25 * (3.0 * _nearspaceConsts.D3 + _commonConsts.C1 *
                                                  (12.0 * _nearspaceConsts.D2 + 10.0 * c1Sq));
@@ -228,22 +231,22 @@ namespace SGPdotNET.Propogation
             /*
              * update for secular gravity and atmospheric drag
              */
-            var xmdf = _elements.MeanAnomoly
+            var xmdf = Orbit.MeanAnomoly
                        + _commonConsts.Xmdot * tsince;
-            var omgadf = _elements.ArgumentPerigee
+            var omgadf = Orbit.ArgumentPerigee
                          + _commonConsts.Omgdot * tsince;
-            var xnoddf = _elements.AscendingNode
+            var xnoddf = Orbit.AscendingNode
                          + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
             var xnode = xnoddf + _commonConsts.Xnodcf * tsq;
             var tempa = 1.0 - _commonConsts.C1 * tsince;
-            var tempe = _elements.BStar * _commonConsts.C4 * tsince;
+            var tempe = Orbit.BStar * _commonConsts.C4 * tsince;
             var templ = _commonConsts.T2Cof * tsq;
 
-            var xn = _elements.RecoveredMeanMotion;
-            var e = _elements.Eccentricity;
-            var xincl = _elements.Inclination;
+            var xn = Orbit.RecoveredMeanMotion;
+            var e = Orbit.Eccentricity;
+            var xincl = Orbit.Inclination;
 
             DeepSpaceSecular(tsince, ref xmdf, omgadf, xnode, ref e, ref xincl, ref xn);
 
@@ -252,7 +255,7 @@ namespace SGPdotNET.Propogation
 
             var a = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / xn, SgpConstants.TwoThirds) * tempa * tempa;
             e -= tempe;
-            var xmam = xmdf + _elements.RecoveredMeanMotion * templ;
+            var xmam = xmdf + Orbit.RecoveredMeanMotion * templ;
 
             DeepSpacePeriodics(tsince, ref e, ref xincl, ref omgadf, ref xnode, ref xmam);
 
@@ -302,7 +305,7 @@ namespace SGPdotNET.Propogation
                                  * (3.0 + 5.0 * perturbedCosio) / 1.5e-12;
 
             var perturbedAycof = 0.25 * _commonConsts.A3Ovk2
-                                 * perturbedSinio;
+                                      * perturbedSinio;
 
             /*
              * using calculated values, find position and velocity
@@ -319,20 +322,20 @@ namespace SGPdotNET.Propogation
             /*
              * update for secular gravity and atmospheric drag
              */
-            var xmdf = _elements.MeanAnomoly
+            var xmdf = Orbit.MeanAnomoly
                        + _commonConsts.Xmdot * tsince;
-            var omgadf = _elements.ArgumentPerigee
+            var omgadf = Orbit.ArgumentPerigee
                          + _commonConsts.Omgdot * tsince;
-            var xnoddf = _elements.AscendingNode
+            var xnoddf = Orbit.AscendingNode
                          + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
             var xnode = xnoddf + _commonConsts.Xnodcf * tsq;
             var tempa = 1.0 - _commonConsts.C1 * tsince;
-            var tempe = _elements.BStar * _commonConsts.C4 * tsince;
+            var tempe = Orbit.BStar * _commonConsts.C4 * tsince;
             var templ = _commonConsts.T2Cof * tsq;
 
-            var xincl = _elements.Inclination;
+            var xincl = Orbit.Inclination;
             var omega = omgadf;
             var xmp = xmdf;
 
@@ -352,15 +355,15 @@ namespace SGPdotNET.Propogation
 
                 tempa = tempa - _nearspaceConsts.D2 * tsq - _nearspaceConsts.D3
                         * tcube - _nearspaceConsts.D4 * tfour;
-                tempe += _elements.BStar * _nearspaceConsts.C5
-                         * (Math.Sin(xmp) - _nearspaceConsts.Sinmo);
+                tempe += Orbit.BStar * _nearspaceConsts.C5
+                                     * (Math.Sin(xmp) - _nearspaceConsts.Sinmo);
                 templ += _nearspaceConsts.T3Cof * tcube + tfour
                          * (_nearspaceConsts.T4Cof + tsince * _nearspaceConsts.T5Cof);
             }
 
-            var a = _elements.RecoveredSemiMajorAxis * tempa * tempa;
-            var e = _elements.Eccentricity - tempe;
-            var xl = xmp + omega + xnode + _elements.RecoveredMeanMotion * templ;
+            var a = Orbit.RecoveredSemiMajorAxis * tempa * tempa;
+            var e = Orbit.Eccentricity - tempe;
+            var xl = xmp + omega + xnode + Orbit.RecoveredMeanMotion * templ;
 
             /*
              * fix tolerance for error recognition
@@ -550,11 +553,11 @@ namespace SGPdotNET.Propogation
 
             if (rk < 1.0)
                 throw new DecayedException(
-                    _elements.Epoch.AddMinutes(tsince),
+                    Orbit.Epoch.AddMinutes(tsince),
                     position,
                     velocity);
 
-            return new EciCoordinate(_elements.Epoch.AddMinutes(tsince), position, velocity);
+            return new EciCoordinate(Orbit.Epoch.AddMinutes(tsince), position, velocity);
         }
 
         private void DeepSpaceInitialise(
@@ -595,17 +598,17 @@ namespace SGPdotNET.Propogation
             const double root52 = 1.1428639E-7;
             const double root54 = 2.1765803E-9;
 
-            var aqnv = 1.0 / _elements.RecoveredSemiMajorAxis;
+            var aqnv = 1.0 / Orbit.RecoveredSemiMajorAxis;
             var xpidot = omgdot + xnodot;
-            var sinq = Math.Sin(_elements.AscendingNode);
-            var cosq = Math.Cos(_elements.AscendingNode);
-            var sing = Math.Sin(_elements.ArgumentPerigee);
-            var cosg = Math.Cos(_elements.ArgumentPerigee);
+            var sinq = Math.Sin(Orbit.AscendingNode);
+            var cosq = Math.Cos(Orbit.AscendingNode);
+            var sing = Math.Sin(Orbit.ArgumentPerigee);
+            var cosg = Math.Cos(Orbit.ArgumentPerigee);
 
             /*
              * initialize lunar / solar terms
              */
-            var jday = _elements.Epoch.ToJulian() - SgpConstants.EpochJan112H2000;
+            var jday = Orbit.Epoch.ToJulian() - SgpConstants.EpochJan112H2000;
 
             var xnodce = 4.5236020 - 9.2422029e-4 * jday;
             var xnodceTemp = xnodce % SgpConstants.TwoPi;
@@ -639,7 +642,7 @@ namespace SGPdotNET.Propogation
             var cc = c1Ss;
             var zn = zns;
             var ze = zes;
-            var xnoi = 1.0 / _elements.RecoveredMeanMotion;
+            var xnoi = 1.0 / Orbit.RecoveredMeanMotion;
 
             for (var cnt = 0; cnt < 2; cnt++)
             {
@@ -691,7 +694,7 @@ namespace SGPdotNET.Propogation
                 var s3 = cc * xnoi;
                 var s2 = -0.5 * s3 / betao;
                 var s4 = s3 * betao;
-                var s1 = -15.0 * _elements.Eccentricity * s4;
+                var s1 = -15.0 * Orbit.Eccentricity * s4;
                 var s5 = x1 * x3 + x2 * x4;
                 var s6 = x2 * x3 + x1 * x4;
                 var s7 = x2 * x4 - x1 * x3;
@@ -707,8 +710,8 @@ namespace SGPdotNET.Propogation
                  * with
                  * shdq = (-zn * s2 * (z21 + z23)) / sinio
                  */
-                if (_elements.Inclination < 5.2359877e-2
-                    || _elements.Inclination > Math.PI - 5.2359877e-2)
+                if (Orbit.Inclination < 5.2359877e-2
+                    || Orbit.Inclination > Math.PI - 5.2359877e-2)
                     shdq = 0.0;
                 else
                     shdq = -zn * s2 * (z21 + z23) / sinio;
@@ -769,8 +772,8 @@ namespace SGPdotNET.Propogation
             _deepspaceConsts.SynchronousFlag = false;
             var initialiseIntegrator = true;
 
-            if (_elements.RecoveredMeanMotion < 0.0052359877
-                && _elements.RecoveredMeanMotion > 0.0034906585)
+            if (Orbit.RecoveredMeanMotion < 0.0052359877
+                && Orbit.RecoveredMeanMotion > 0.0034906585)
             {
                 /*
                  * 24h synchronous resonance terms initialisation
@@ -786,28 +789,28 @@ namespace SGPdotNET.Propogation
                            - 0.75 * (1.0 + cosio);
                 var f330 = 1.0 + cosio;
                 f330 = 1.875 * f330 * f330 * f330;
-                _deepspaceConsts.Del1 = 3.0 * _elements.RecoveredMeanMotion
-                                        * _elements.RecoveredMeanMotion
-                                        * aqnv * aqnv;
+                _deepspaceConsts.Del1 = 3.0 * Orbit.RecoveredMeanMotion
+                                            * Orbit.RecoveredMeanMotion
+                                            * aqnv * aqnv;
                 _deepspaceConsts.Del2 = 2.0 * _deepspaceConsts.Del1
-                                        * f220 * g200 * q22;
+                                            * f220 * g200 * q22;
                 _deepspaceConsts.Del3 = 3.0 * _deepspaceConsts.Del1
-                                        * f330 * g300 * q33 * aqnv;
+                                            * f330 * g300 * q33 * aqnv;
                 _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                                         * f311 * g310 * q31 * aqnv;
 
-                _integratorConsts.Xlamo = _elements.MeanAnomoly
-                                          + _elements.AscendingNode
-                                          + _elements.ArgumentPerigee
+                _integratorConsts.Xlamo = Orbit.MeanAnomoly
+                                          + Orbit.AscendingNode
+                                          + Orbit.ArgumentPerigee
                                           - _deepspaceConsts.Gsto;
                 bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad;
                 bfact += _deepspaceConsts.Ssl
                          + _deepspaceConsts.Ssg
                          + _deepspaceConsts.Ssh;
             }
-            else if (_elements.RecoveredMeanMotion < 8.26e-3
-                     || _elements.RecoveredMeanMotion > 9.24e-3
-                     || _elements.Eccentricity < 0.5)
+            else if (Orbit.RecoveredMeanMotion < 8.26e-3
+                     || Orbit.RecoveredMeanMotion > 9.24e-3
+                     || Orbit.Eccentricity < 0.5)
             {
                 initialiseIntegrator = false;
             }
@@ -825,41 +828,41 @@ namespace SGPdotNET.Propogation
                 double g422;
                 double g520;
 
-                var g201 = -0.306 - (_elements.Eccentricity - 0.64) * 0.440;
+                var g201 = -0.306 - (Orbit.Eccentricity - 0.64) * 0.440;
 
-                if (_elements.Eccentricity <= 0.65)
+                if (Orbit.Eccentricity <= 0.65)
                 {
-                    g211 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g211 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         3.616, -13.247, +16.290, 0.0);
-                    g310 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g310 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -19.302, 117.390, -228.419, 156.591);
-                    g322 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g322 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -18.9068, 109.7927, -214.6334, 146.5816);
-                    g410 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g410 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -41.122, 242.694, -471.094, 313.953);
-                    g422 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g422 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -146.407, 841.880, -1629.014, 1083.435);
-                    g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g520 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -532.114, 3017.977, -5740.032, 3708.276);
                 }
                 else
                 {
-                    g211 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g211 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -72.099, 331.819, -508.738, 266.724);
-                    g310 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g310 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -346.844, 1582.851, -2415.925, 1246.113);
-                    g322 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g322 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -342.585, 1554.908, -2366.899, 1215.972);
-                    g410 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g410 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -1052.797, 4758.686, -7193.992, 3651.957);
-                    g422 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g422 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -3581.69, 16178.11, -24462.77, 12422.52);
 
-                    if (_elements.Eccentricity <= 0.715)
-                        g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    if (Orbit.Eccentricity <= 0.715)
+                        g520 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                             1464.74, -4664.75, 3763.64, 0.0);
                     else
-                        g520 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                        g520 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                             -5149.66, 29936.92, -54087.36, 31324.56);
                 }
 
@@ -867,22 +870,22 @@ namespace SGPdotNET.Propogation
                 double g521;
                 double g532;
 
-                if (_elements.Eccentricity < 0.7)
+                if (Orbit.Eccentricity < 0.7)
                 {
-                    g533 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g533 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -919.2277, 4988.61, -9064.77, 5542.21);
-                    g521 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g521 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -822.71072, 4568.6173, -8491.4146, 5337.524);
-                    g532 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g532 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -853.666, 4690.25, -8624.77, 5341.4);
                 }
                 else
                 {
-                    g533 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g533 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -37995.78, 161616.52, -229838.2, 109377.94);
-                    g521 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g521 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -51752.104, 218913.95, -309468.16, 146349.42);
-                    g532 = EvaluateCubicPolynomial(_elements.Eccentricity,
+                    g532 = EvaluateCubicPolynomial(Orbit.Eccentricity,
                         -40023.88, 170470.89, -242699.48, 115605.82);
                 }
 
@@ -894,8 +897,8 @@ namespace SGPdotNET.Propogation
                 var f441 = 35.0 * sini2 * f220;
                 var f442 = 39.3750 * sini2 * sini2;
                 var f522 = 9.84375 * sinio
-                           * (sini2 * (1.0 - 2.0 * cosio - 5.0 * theta2)
-                              + 0.33333333 * (-2.0 + 4.0 * cosio + 6.0 * theta2));
+                                   * (sini2 * (1.0 - 2.0 * cosio - 5.0 * theta2)
+                                      + 0.33333333 * (-2.0 + 4.0 * cosio + 6.0 * theta2));
                 var f523 = sinio
                            * (4.92187512 * sini2 * (-2.0 - 4.0 * cosio + 10.0 * theta2)
                               + 6.56250012 * (1.0 + 2.0 * cosio - 3.0 * theta2));
@@ -904,8 +907,8 @@ namespace SGPdotNET.Propogation
                 var f543 = 29.53125 * sinio * (-2.0 - 8.0 * cosio + theta2 *
                                                (12.0 + 8.0 * cosio - 10.0 * theta2));
 
-                var xno2 = _elements.RecoveredMeanMotion
-                           * _elements.RecoveredMeanMotion;
+                var xno2 = Orbit.RecoveredMeanMotion
+                           * Orbit.RecoveredMeanMotion;
                 var ainv2 = aqnv * aqnv;
 
                 var temp1 = 3.0 * xno2 * ainv2;
@@ -928,17 +931,17 @@ namespace SGPdotNET.Propogation
                 _deepspaceConsts.D5421 = temp * f542 * g521;
                 _deepspaceConsts.D5433 = temp * f543 * g533;
 
-                _integratorConsts.Xlamo = _elements.MeanAnomoly
-                                          + _elements.AscendingNode
-                                          + _elements.AscendingNode
+                _integratorConsts.Xlamo = Orbit.MeanAnomoly
+                                          + Orbit.AscendingNode
+                                          + Orbit.AscendingNode
                                           - _deepspaceConsts.Gsto
                                           - _deepspaceConsts.Gsto;
                 bfact = xmdot
                         + xnodot + xnodot
                         - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad;
                 bfact = bfact + _deepspaceConsts.Ssl
-                        + _deepspaceConsts.Ssh
-                        + _deepspaceConsts.Ssh;
+                              + _deepspaceConsts.Ssh
+                              + _deepspaceConsts.Ssh;
             }
 
             if (initialiseIntegrator)
@@ -946,9 +949,9 @@ namespace SGPdotNET.Propogation
                 /*
                  * initialise integrator
                  */
-                _integratorConsts.Xfact = bfact - _elements.RecoveredMeanMotion;
+                _integratorConsts.Xfact = bfact - Orbit.RecoveredMeanMotion;
                 _integratorParams.Atime = 0.0;
-                _integratorParams.Xni = _elements.RecoveredMeanMotion;
+                _integratorParams.Xni = Orbit.RecoveredMeanMotion;
                 _integratorParams.Xli = _integratorConsts.Xlamo;
                 /*
                  * precompute dot terms for epoch
@@ -1138,7 +1141,7 @@ namespace SGPdotNET.Propogation
                      * restart from epoch
                      */
                     _integratorParams.Atime = 0.0;
-                    _integratorParams.Xni = _elements.RecoveredMeanMotion;
+                    _integratorParams.Xni = Orbit.RecoveredMeanMotion;
                     _integratorParams.Xli = _integratorConsts.Xlamo;
 
                     /*
@@ -1220,13 +1223,13 @@ namespace SGPdotNET.Propogation
                 values.Xnddt = _deepspaceConsts.Del1
                                * Math.Cos(_integratorParams.Xli - fasx2)
                                + 2.0 * _deepspaceConsts.Del2
-                               * Math.Cos(2.0 * (_integratorParams.Xli - fasx4))
+                                     * Math.Cos(2.0 * (_integratorParams.Xli - fasx4))
                                + 3.0 * _deepspaceConsts.Del3
-                               * Math.Cos(3.0 * (_integratorParams.Xli - fasx6));
+                                     * Math.Cos(3.0 * (_integratorParams.Xli - fasx6));
             }
             else
             {
-                var xomi = _elements.ArgumentPerigee
+                var xomi = Orbit.ArgumentPerigee
                            + _commonConsts.Omgdot * _integratorParams.Atime;
                 var x2Omi = xomi + xomi;
                 var x2Li = _integratorParams.Xli + _integratorParams.Xli;

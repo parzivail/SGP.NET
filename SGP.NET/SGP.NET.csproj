@@ -42,7 +42,7 @@
     <Compile Include="Exception\DecayedException.cs" />
     <Compile Include="CoordinateSystem\EciCoordinate.cs" />
     <Compile Include="Propogation\SgpConstants.cs" />
-    <Compile Include="Propogation\OrbitalElements.cs" />
+    <Compile Include="Propogation\Orbit.cs" />
     <Compile Include="TLE\ITleProvider.cs" />
     <Compile Include="TLE\LocallyBackedRemoteTleProvider.cs" />
     <Compile Include="TLE\RemoteTleProvider.cs" />

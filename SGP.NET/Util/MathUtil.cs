@@ -15,12 +15,12 @@ namespace SGPdotNET.Util
             if (y == 0)
                 return x;
 
-            return x - y * System.Math.Floor(x / y);
+            return x - y * Math.Floor(x / y);
         }
 
         public static double WrapNegPosPi(double a)
         {
-            return Mod(a + System.Math.PI, SgpConstants.TwoPi) - System.Math.PI;
+            return Mod(a + Math.PI, SgpConstants.TwoPi) - Math.PI;
         }
 
         public static double WrapTwoPi(double a)
@@ -40,12 +40,12 @@ namespace SGPdotNET.Util
 
         public static double DegreesToRadians(double degrees)
         {
-            return degrees * System.Math.PI / 180.0;
+            return degrees * Math.PI / 180.0;
         }
 
         public static double RadiansToDegrees(double radians)
         {
-            return radians * 180.0 / System.Math.PI;
+            return radians * 180.0 / Math.PI;
         }
 
         public static double AcTan(double sinx, double cosx)
@@ -53,15 +53,15 @@ namespace SGPdotNET.Util
             if (cosx == 0.0)
             {
                 if (sinx > 0.0)
-                    return System.Math.PI / 2.0;
+                    return Math.PI / 2.0;
 
-                return 3.0 * System.Math.PI / 2.0;
+                return 3.0 * Math.PI / 2.0;
             }
 
             if (cosx > 0.0)
-                return System.Math.Atan(sinx / cosx);
+                return Math.Atan(sinx / cosx);
 
-            return System.Math.PI + System.Math.Atan(sinx / cosx);
+            return Math.PI + Math.Atan(sinx / cosx);
         }
 
         public static DateTime Round(this DateTime date, TimeSpan span)

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
@@ -11,11 +10,10 @@ namespace SGPdotNET.CoordinateSystem
     /// </summary>
     public abstract class Coordinate
     {
-        private static readonly int[] LocCharRangeAaXx = { 18, 10, 24, 10, 24, 10 };
-        private static readonly int[] LocCharRangeAaYy = { 18, 10, 24, 10, 25, 10 };
-
         private const int MaxLocatorPairs = 6;
         private const int MinLocatorPairs = 1;
+        private static readonly int[] LocCharRangeAaXx = {18, 10, 24, 10, 24, 10};
+        private static readonly int[] LocCharRangeAaYy = {18, 10, 24, 10, 25, 10};
 
         /// <summary>
         ///     Converts this position to an ECI one
@@ -31,18 +29,19 @@ namespace SGPdotNET.CoordinateSystem
         public abstract GeodeticCoordinate ToGeodetic();
 
         /// <summary>
-        /// Converts this position to it's Maidenhead Locator System representation, disregarding altitude 
+        ///     Converts this position to it's Maidenhead Locator System representation, disregarding altitude
         /// </summary>
         /// <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
         /// <returns>The Maidenhead representation string</returns>
-        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
+        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers,
+            MaidenheadStandard standard = MaidenheadStandard.AaToXx)
         {
-            return ToMaidenhead((int)precision + 1, standard);
+            return ToMaidenhead((int) precision + 1, standard);
         }
 
         /// <summary>
-        /// Converts this position to it's Maidenhead Locator System representation, disregarding altitude 
+        ///     Converts this position to it's Maidenhead Locator System representation, disregarding altitude
         /// </summary>
         /// <param name="pairCount">The number of pairs in the conversion, which defines the precision</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
@@ -68,7 +67,9 @@ namespace SGPdotNET.CoordinateSystem
 
             for (var xOrY = 0; xOrY < 2; ++xOrY)
             {
-                var ordinate = xOrY == 0 ? MathUtil.RadiansToDegrees(geo.Longitude) / 2.0 : MathUtil.RadiansToDegrees(geo.Latitude);
+                var ordinate = xOrY == 0
+                    ? MathUtil.RadiansToDegrees(geo.Longitude) / 2.0
+                    : MathUtil.RadiansToDegrees(geo.Latitude);
                 var divisions = 1;
 
                 /* The 1e-6 here guards against floating point rounding errors */
@@ -78,7 +79,7 @@ namespace SGPdotNET.CoordinateSystem
                     divisions *= charRange[pair];
                     var squareSize = 180.0 / divisions;
 
-                    var locvalue = (char)(ordinate / squareSize);
+                    var locvalue = (char) (ordinate / squareSize);
                     ordinate -= squareSize * locvalue;
                     locvalue += charRange[pair] == 10 ? '0' : 'A';
                     locator[pair * 2 + xOrY] = locvalue;
@@ -89,7 +90,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        /// Converts this position to it's Degrees-Minutes-Seconds (DMS) representation, disregarding altitude 
+        ///     Converts this position to it's Degrees-Minutes-Seconds (DMS) representation, disregarding altitude
         /// </summary>
         /// <returns>The Degrees-Minutes-Seconds representation string</returns>
         public string ToDegreesMinutesSeconds()
@@ -102,12 +103,14 @@ namespace SGPdotNET.CoordinateSystem
             var latDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Latitude));
             var latD = Math.Floor(latDd);
             var latM = Math.Floor(latDd % 1 * SgpConstants.MinutesPerDegree);
-            var latS = (latDd - latD - latM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree * SgpConstants.SecondsPerMinute;
+            var latS = (latDd - latD - latM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree *
+                       SgpConstants.SecondsPerMinute;
 
             var lonDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Longitude));
             var lonD = Math.Floor(lonDd);
             var lonM = Math.Floor(lonDd % 1 * SgpConstants.MinutesPerDegree);
-            var lonS = (lonDd - lonD - lonM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree * SgpConstants.SecondsPerMinute;
+            var lonS = (lonDd - lonD - lonM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree *
+                       SgpConstants.SecondsPerMinute;
 
             return $"{latD}°{latM}'{latS}\"{(north ? "N" : "S")} {lonD}°{lonM}'{lonS}\"{(east ? "E" : "W")}";
         }
@@ -175,7 +178,7 @@ namespace SGPdotNET.CoordinateSystem
 
             for (var i = 0; i < numPoints; i++)
             {
-                var perc = i / (float)numPoints * 2 * Math.PI;
+                var perc = i / (float) numPoints * 2 * Math.PI;
 
                 var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
                 var lngRadians = lon +

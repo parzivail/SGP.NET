@@ -229,7 +229,10 @@ namespace SGPdotNET.TLE
                 .ToList();
         }
 
-        private static string ExtractSatName(string s) => (s.StartsWith("0 ") ? s.Substring(2) : s).Trim();
+        private static string ExtractSatName(string s)
+        {
+            return (s.StartsWith("0 ") ? s.Substring(2) : s).Trim();
+        }
 
         /// <inheritdoc />
         public override string ToString()
