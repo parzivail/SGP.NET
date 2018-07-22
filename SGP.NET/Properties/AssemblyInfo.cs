@@ -3,12 +3,12 @@
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("SGP4_Sharp")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("SGP.NET")]
+[assembly: AssemblyDescription("C# SGP4 Satellite Prediction Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Space Dynamics Laboratory")]
-[assembly: AssemblyProduct("C# SGP4")]
-[assembly: AssemblyCopyright("Apache License, Version 2.0")]
+[assembly: AssemblyCompany("parzivail")]
+[assembly: AssemblyProduct("SGP.NET")]
+[assembly: AssemblyCopyright("GNU GPLv3")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
