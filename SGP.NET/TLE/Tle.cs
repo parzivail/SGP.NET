@@ -174,42 +174,26 @@ namespace SGPdotNET.TLE
         /// <summary>
         ///     Gets the inclination
         /// </summary>
-        /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
-        public double GetInclination(bool inDegrees)
-        {
-            return inDegrees ? _inclination : MathUtil.DegreesToRadians(_inclination);
-        }
+        public Angle Inclination => new Angle(_inclination, true);
 
         /// <summary>
         ///     Gets the right ascension of the ascending node
         /// </summary>
-        /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
-        public double GetRightAscendingNode(bool inDegrees)
-        {
-            return inDegrees ? _rightAscendingNode : MathUtil.DegreesToRadians(_rightAscendingNode);
-        }
+        public Angle RightAscendingNode => new Angle(_rightAscendingNode, true);
 
         /// <summary>
         ///     Gets the argument of perigee
         /// </summary>
-        /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
-        public double GetArgumentPerigee(bool inDegrees)
-        {
-            return inDegrees ? _argumentPerigee : MathUtil.DegreesToRadians(_argumentPerigee);
-        }
+        public Angle ArgumentPerigee => new Angle(_argumentPerigee, true);
 
         /// <summary>
         ///     Gets the mean anomaly
         /// </summary>
-        /// <param name="inDegrees">True to return value in degrees</param>
         /// <returns></returns>
-        public double GetMeanAnomaly(bool inDegrees)
-        {
-            return inDegrees ? _meanAnomaly : MathUtil.DegreesToRadians(_meanAnomaly);
-        }
+        public Angle MeanAnomaly => new Angle(_meanAnomaly, true);
 
         /// <summary>
         ///     Parses a list of TLEs from a list of TLE lines
@@ -246,10 +230,10 @@ namespace SGPdotNET.TLE
             builder.AppendLine($"Mean Motion Ddt6:     {MeanMotionDdtOver6}");
             builder.AppendLine($"GetEccentricity:         {Eccentricity}");
             builder.AppendLine($"GetBStar:                {BStarDragTerm}");
-            builder.AppendLine($"GetInclination:          {GetInclination(true)}");
-            builder.AppendLine($"Right Ascending Node: {GetRightAscendingNode(true)}");
-            builder.AppendLine($"Argument GetPerigee:     {GetArgumentPerigee(true)}");
-            builder.AppendLine($"Mean Anomaly:         {GetMeanAnomaly(true)}");
+            builder.AppendLine($"GetInclination:          {Inclination}");
+            builder.AppendLine($"Right Ascending Node: {RightAscendingNode}");
+            builder.AppendLine($"Argument GetPerigee:     {ArgumentPerigee}");
+            builder.AppendLine($"Mean Anomaly:         {MeanAnomaly}");
             builder.AppendLine($"Mean Motion:          {MeanMotionRevPerDay}");
 
             return builder.ToString();
@@ -269,13 +253,10 @@ namespace SGPdotNET.TLE
             if (Line2[0] != '2')
                 throw new TleException("Invalid line beginning for line two");
 
-            uint satNumber1 = 0;
-            uint satNumber2 = 0;
-
             ExtractInteger(Line1.Substring(Tle1ColNoradnum,
-                Tle1LenNoradnum), ref satNumber1);
+                Tle1LenNoradnum), out var satNumber1);
             ExtractInteger(Line2.Substring(Tle2ColNoradnum,
-                Tle2LenNoradnum), ref satNumber2);
+                Tle2LenNoradnum), out var satNumber2);
 
             if (satNumber1 != satNumber2)
                 throw new TleException("Satellite numbers do not match");
@@ -288,34 +269,31 @@ namespace SGPdotNET.TLE
             IntDesignator = Line1.Substring(Tle1ColIntldescA,
                 Tle1LenIntldescA + Tle1LenIntldescB + Tle1LenIntldescC);
 
-            uint year = 0;
-            var day = 0.0;
-
             ExtractInteger(Line1.Substring(Tle1ColEpochA,
-                Tle1LenEpochA), ref year);
+                Tle1LenEpochA), out var year);
             ExtractDouble(Line1.Substring(Tle1ColEpochB,
-                Tle1LenEpochB), 4, ref day);
+                Tle1LenEpochB), 4, out var day);
             ExtractDouble(Line1.Substring(Tle1ColMeanmotiondt2,
-                Tle1LenMeanmotiondt2), 2, ref _meanMotionDt2);
+                Tle1LenMeanmotiondt2), 2, out _meanMotionDt2);
             ExtractExponential(Line1.Substring(Tle1ColMeanmotionddt6,
-                Tle1LenMeanmotionddt6), ref _meanMotionDdt6);
+                Tle1LenMeanmotionddt6), out _meanMotionDdt6);
             ExtractExponential(Line1.Substring(Tle1ColBstar,
-                Tle1LenBstar), ref _bstar);
+                Tle1LenBstar), out _bstar);
 
             ExtractDouble(Line2.Substring(Tle2ColInclination,
-                Tle2LenInclination), 4, ref _inclination);
+                Tle2LenInclination), 4, out _inclination);
             ExtractDouble(Line2.Substring(Tle2ColRaascendnode,
-                Tle2LenRaascendnode), 4, ref _rightAscendingNode);
+                Tle2LenRaascendnode), 4, out _rightAscendingNode);
             ExtractDouble(Line2.Substring(Tle2ColEccentricity,
-                Tle2LenEccentricity), -1, ref _eccentricity);
+                Tle2LenEccentricity), -1, out _eccentricity);
             ExtractDouble(Line2.Substring(Tle2ColArgperigee,
-                Tle2LenArgperigee), 4, ref _argumentPerigee);
+                Tle2LenArgperigee), 4, out _argumentPerigee);
             ExtractDouble(Line2.Substring(Tle2ColMeananomaly,
-                Tle2LenMeananomaly), 4, ref _meanAnomaly);
+                Tle2LenMeananomaly), 4, out _meanAnomaly);
             ExtractDouble(Line2.Substring(Tle2ColMeanmotion,
-                Tle2LenMeanmotion), 3, ref _meanMotion);
+                Tle2LenMeanmotion), 3, out _meanMotion);
             ExtractInteger(Line2.Substring(Tle2ColRevatepoch,
-                Tle2LenRevatepoch), ref _orbitNumber);
+                Tle2LenRevatepoch), out _orbitNumber);
 
             if (year < 57)
                 year += 2000;
@@ -329,7 +307,7 @@ namespace SGPdotNET.TLE
             return str.Length == TleLenLineData;
         }
 
-        private static void ExtractInteger(string str, ref uint val)
+        private static void ExtractInteger(string str, out uint val)
         {
             var foundDigit = false;
             uint temp = 0;
@@ -352,14 +330,14 @@ namespace SGPdotNET.TLE
             val = !foundDigit ? 0 : temp;
         }
 
-        private static void ExtractDouble(string str, int pointPos, ref double val)
+        private static void ExtractDouble(string str, int pointPos, out double val)
         {
             if (pointPos == -1)
                 str = "0." + str;
             val = double.Parse(str);
         }
 
-        private static void ExtractExponential(string str, ref double val)
+        private static void ExtractExponential(string str, out double val)
         {
             //24909-3
             //2.4909e-3

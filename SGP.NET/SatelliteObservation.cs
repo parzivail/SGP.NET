@@ -1,4 +1,5 @@
 ﻿using System;
+using SGPdotNET.Util;
 
 namespace SGPdotNET
 {
@@ -16,8 +17,8 @@ namespace SGPdotNET
         /// <param name="maxElevation">The max elevation reached during observation</param>
         /// <param name="startAzimuth">The azimuth at the start of the observation</param>
         /// <param name="endAzimuth">The azimuth at the end of the observation</param>
-        public SatelliteObservation(Satellite satellite, DateTime start, DateTime end, double maxElevation,
-            double startAzimuth, double endAzimuth)
+        public SatelliteObservation(Satellite satellite, DateTime start, DateTime end, Angle maxElevation,
+            Angle startAzimuth, Angle endAzimuth)
         {
             Satellite = satellite;
             Start = start;
@@ -45,16 +46,16 @@ namespace SGPdotNET
         /// <summary>
         ///     The max elevation reached during observation
         /// </summary>
-        public double MaxElevation { get; }
+        public Angle MaxElevation { get; }
 
         /// <summary>
         ///     The azimuth at the start of the observation
         /// </summary>
-        public double StartAzimuth { get; }
+        public Angle StartAzimuth { get; }
 
         /// <summary>
         ///     The azimuth at the end of the observation
         /// </summary>
-        public double EndAzimuth { get; }
+        public Angle EndAzimuth { get; }
     }
 }

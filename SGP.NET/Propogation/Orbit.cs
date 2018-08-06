@@ -1,5 +1,6 @@
 using System;
 using SGPdotNET.TLE;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.Propogation
 {
@@ -15,18 +16,18 @@ namespace SGPdotNET.Propogation
         public Orbit(Tle tle)
         {
             // extract and format tle data
-            MeanAnomoly = tle.GetMeanAnomaly(false);
-            AscendingNode = tle.GetRightAscendingNode(false);
-            ArgumentPerigee = tle.GetArgumentPerigee(false);
+            MeanAnomoly = tle.MeanAnomaly;
+            AscendingNode = tle.RightAscendingNode;
+            ArgumentPerigee = tle.ArgumentPerigee;
             Eccentricity = tle.Eccentricity;
-            Inclination = tle.GetInclination(false);
+            Inclination = tle.Inclination;
             MeanMotion = tle.MeanMotionRevPerDay * SgpConstants.TwoPi / SgpConstants.MinutesPerDay;
             BStar = tle.BStarDragTerm;
             Epoch = tle.Epoch;
 
             // recover original mean motion (xnodp) and semimajor axis (aodp) from input elements
             var a1 = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / MeanMotion, SgpConstants.TwoThirds);
-            var cosio = Math.Cos(Inclination);
+            var cosio = Math.Cos(Inclination.Radians);
             var theta2 = cosio * cosio;
             var x3Thm1 = 3.0 * theta2 - 1.0;
             var eosq = Eccentricity * Eccentricity;
@@ -49,19 +50,19 @@ namespace SGPdotNET.Propogation
         }
 
         /// <summary>
-        ///     The XMO mean anomoly, in dgerees
+        ///     The XMO mean anomoly
         /// </summary>
-        public double MeanAnomoly { get; }
+        public Angle MeanAnomoly { get; }
 
         /// <summary>
-        ///     The XNODEO right ascension of the ascending node, in degrees
+        ///     The XNODEO right ascension of the ascending node
         /// </summary>
-        public double AscendingNode { get; }
+        public Angle AscendingNode { get; }
 
         /// <summary>
-        ///     The OMEGAO argument of perigree, in degrees
+        ///     The OMEGAO argument of perigree
         /// </summary>
-        public double ArgumentPerigee { get; }
+        public Angle ArgumentPerigee { get; }
 
         /// <summary>
         ///     The XNO mean motion, in revolutions per day
@@ -114,9 +115,9 @@ namespace SGPdotNET.Propogation
         public double Eccentricity { get; }
 
         /// <summary>
-        ///     Inclination, in degrees
+        ///     Inclination
         /// </summary>
-        public double Inclination { get; }
+        public Angle Inclination { get; }
 
         /// <inheritdoc />
         public override bool Equals(object obj)

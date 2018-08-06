@@ -22,10 +22,10 @@ namespace SGPdotNET.CoordinateSystem
         ///     Creates a new ECI coordinate with the specified values
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
-        /// <param name="latitude">The latitude in degrees</param>
-        /// <param name="longitude">The longitude in degrees</param>
+        /// <param name="latitude">The latitude</param>
+        /// <param name="longitude">The longitude</param>
         /// <param name="altitude">The altitude in kilometers</param>
-        public EciCoordinate(DateTime dt, double latitude, double longitude, double altitude)
+        public EciCoordinate(DateTime dt, Angle latitude, Angle longitude, double altitude)
             : this(dt, new GeodeticCoordinate(latitude, longitude, altitude))
         {
         }
@@ -114,7 +114,7 @@ namespace SGPdotNET.CoordinateSystem
 
             var alt = r / Math.Cos(lat) - SgpConstants.EarthRadiusKm * c;
 
-            return new GeodeticCoordinate(lat, lon, alt, true);
+            return new GeodeticCoordinate(new Angle(lat), new Angle(lon), alt);
         }
 
         /// <inheritdoc />

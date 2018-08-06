@@ -44,8 +44,8 @@ namespace SGPdotNET
             var state = SatelliteObservationState.Init;
 
             var startedObserving = start;
-            var startAz = 0d;
-            var maxEl = 0d;
+            var startAz = Angle.Zero;
+            var maxEl = Angle.Zero;
 
             while (t <= end || state == SatelliteObservationState.Observing)
             {
@@ -54,7 +54,7 @@ namespace SGPdotNET
                 var eciLocation = Location.ToEci(t);
                 var posEci = satellite.Predict(t);
 
-                if (IsVisible(posEci))
+                if (IsVisible(posEci, Angle.Zero))
                 {
                     if (state == SatelliteObservationState.Init)
                         continue;
@@ -81,7 +81,7 @@ namespace SGPdotNET
                             startAz, azEl.Azimuth));
                     }
 
-                    maxEl = 0;
+                    maxEl = Angle.Zero;
                     state = SatelliteObservationState.NotObserving;
                 }
             }
@@ -90,24 +90,23 @@ namespace SGPdotNET
         }
 
         /// <summary>
-        ///     Tests whether or not a satellite is above a specified elevation, defaulting to 0 degrees
+        ///     Tests whether or not a satellite is above a specified elevation
         /// </summary>
         /// <param name="pos">The position to check</param>
         /// <param name="minElevation">The minimum elevation required to be "visible"</param>
         /// <returns>True if the satellite is above the specified elevation, false otherwise</returns>
-        public bool IsVisible(EciCoordinate pos, double minElevation = 0)
+        public bool IsVisible(Coordinate pos, Angle minElevation)
         {
             var pGeo = pos.ToGeodetic();
             var footprint = pGeo.GetFootprintRadians();
-            var eciLocation = Location.ToEci(pos.Time);
 
             if (Location.DistanceToRadians(pGeo) > footprint) return false;
 
-            if (Math.Abs(minElevation) < double.Epsilon)
+            if (Math.Abs(minElevation.Degrees) < double.Epsilon)
                 return true;
 
-            var aer = eciLocation.LookAt(pos);
-            return aer.Elevation / Math.PI * 180 >= minElevation;
+            var aer = Location.LookAt(pos);
+            return aer.Elevation >= minElevation;
         }
 
         /// <summary>

@@ -10,8 +10,6 @@ namespace SGPdotNET.CoordinateSystem
     /// </summary>
     public abstract class Coordinate
     {
-        private const int MaxLocatorPairs = 6;
-        private const int MinLocatorPairs = 1;
         private static readonly int[] LocCharRangeAaXx = {18, 10, 24, 10, 24, 10};
         private static readonly int[] LocCharRangeAaYy = {18, 10, 24, 10, 25, 10};
 
@@ -68,8 +66,8 @@ namespace SGPdotNET.CoordinateSystem
             for (var xOrY = 0; xOrY < 2; ++xOrY)
             {
                 var ordinate = xOrY == 0
-                    ? MathUtil.RadiansToDegrees(geo.Longitude) / 2.0
-                    : MathUtil.RadiansToDegrees(geo.Latitude);
+                    ? geo.Longitude.Degrees / 2.0
+                    : geo.Latitude.Degrees;
                 var divisions = 1;
 
                 /* The 1e-6 here guards against floating point rounding errors */
@@ -97,16 +95,16 @@ namespace SGPdotNET.CoordinateSystem
         {
             var geo = ToGeodetic();
 
-            var north = geo.Latitude > 0;
-            var east = geo.Longitude > 0;
+            var north = geo.Latitude > Angle.Zero;
+            var east = geo.Longitude > Angle.Zero;
 
-            var latDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Latitude));
+            var latDd = Math.Abs(geo.Latitude.Degrees);
             var latD = Math.Floor(latDd);
             var latM = Math.Floor(latDd % 1 * SgpConstants.MinutesPerDegree);
             var latS = (latDd - latD - latM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree *
                        SgpConstants.SecondsPerMinute;
 
-            var lonDd = Math.Abs(MathUtil.RadiansToDegrees(geo.Longitude));
+            var lonDd = Math.Abs(geo.Longitude.Degrees);
             var lonD = Math.Floor(lonDd);
             var lonM = Math.Floor(lonDd % 1 * SgpConstants.MinutesPerDegree);
             var lonS = (lonDd - lonD - lonM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree *
@@ -123,10 +121,10 @@ namespace SGPdotNET.CoordinateSystem
         {
             var geo = ToGeodetic();
             return new Vector3(
-                Math.Cos(geo.Latitude) * Math.Cos(-geo.Longitude + Math.PI) *
+                Math.Cos(geo.Latitude.Radians) * Math.Cos(-geo.Longitude.Radians + Math.PI) *
                 (geo.Altitude + SgpConstants.EarthRadiusKm),
-                Math.Sin(geo.Latitude) * (geo.Altitude + SgpConstants.EarthRadiusKm),
-                Math.Cos(geo.Latitude) * Math.Sin(-geo.Longitude + Math.PI) *
+                Math.Sin(geo.Latitude.Radians) * (geo.Altitude + SgpConstants.EarthRadiusKm),
+                Math.Cos(geo.Latitude.Radians) * Math.Sin(-geo.Longitude.Radians + Math.PI) *
                 (geo.Altitude + SgpConstants.EarthRadiusKm)
             );
         }
@@ -180,12 +178,12 @@ namespace SGPdotNET.CoordinateSystem
             {
                 var perc = i / (float) numPoints * 2 * Math.PI;
 
-                var latRadians = Math.Asin(Math.Sin(lat) * Math.Cos(d) + Math.Cos(lat) * Math.Sin(d) * Math.Cos(perc));
-                var lngRadians = lon +
-                                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat),
-                                     Math.Cos(d) - Math.Sin(lat) * Math.Sin(latRadians));
+                var latRadians = Math.Asin(Math.Sin(lat.Radians) * Math.Cos(d) + Math.Cos(lat.Radians) * Math.Sin(d) * Math.Cos(perc));
+                var lngRadians = lon.Radians +
+                                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
+                                     Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
 
-                coords.Add(new GeodeticCoordinate(latRadians, lngRadians, 10, true));
+                coords.Add(new GeodeticCoordinate(new Angle(latRadians), new Angle(lngRadians), 10));
             }
 
             return coords;
@@ -210,8 +208,8 @@ namespace SGPdotNET.CoordinateSystem
         {
             var geo = ToGeodetic();
             var toGeo = to.ToGeodetic();
-            var dist = Math.Sin(geo.Latitude) * Math.Sin(toGeo.Latitude) +
-                       Math.Cos(geo.Latitude) * Math.Cos(toGeo.Latitude) * Math.Cos(geo.Longitude - toGeo.Longitude);
+            var dist = Math.Sin(geo.Latitude.Radians) * Math.Sin(toGeo.Latitude.Radians) +
+                       Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) * Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
             dist = Math.Acos(dist);
 
             return dist;
@@ -236,10 +234,10 @@ namespace SGPdotNET.CoordinateSystem
             var rangeRate = eci.Velocity - self.Velocity;
             var range = eci.Position - self.Position;
 
-            var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude);
+            var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude.Radians);
 
-            var sinLat = Math.Sin(geo.Latitude);
-            var cosLat = Math.Cos(geo.Latitude);
+            var sinLat = Math.Sin(geo.Latitude.Radians);
+            var cosLat = Math.Cos(geo.Latitude.Radians);
             var sinTheta = Math.Sin(theta);
             var cosTheta = Math.Cos(theta);
 
@@ -260,7 +258,7 @@ namespace SGPdotNET.CoordinateSystem
             var el = Math.Asin(topZ / range.Length);
             var rate = range.Dot(rangeRate) / range.Length;
 
-            return new TopocentricCoordinate(az, el, range.Length, rate);
+            return new TopocentricCoordinate(new Angle(az), new Angle(el), range.Length, rate);
         }
     }
 }

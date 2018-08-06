@@ -50,6 +50,7 @@
     <Compile Include="Exception\SatelliteException.cs" />
     <Compile Include="SatelliteObservation.cs" />
     <Compile Include="Propogation\SGP4.cs" />
+    <Compile Include="Util\Angle.cs" />
     <Compile Include="Util\TimeExtensions.cs" />
     <Compile Include="TLE\Tle.cs" />
     <Compile Include="Exception\TleException.cs" />

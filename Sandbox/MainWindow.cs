@@ -15,7 +15,9 @@ using SGPdotNET;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Exception;
 using SGPdotNET.TLE;
+using SGPdotNET.Util;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using Vector3 = OpenTK.Vector3;
 
 namespace Sandbox
 {
@@ -28,7 +30,7 @@ namespace Sandbox
         private static readonly Earth Earth = new Earth();
 
         private static readonly GroundStation GroundStation =
-            new GroundStation(new GeodeticCoordinate(30.2333, -81.6744, 0));
+            new GroundStation(new GeodeticCoordinate(new Angle(30.2333, true), new Angle(-81.6744, true), 0));
 
         private static readonly List<Satellite> TrackedSatellites = new List<Satellite>();
 
@@ -248,7 +250,7 @@ namespace Sandbox
                         .Predict(time);
                     var predictPos = predictEci.ToSphericalEcef() / 100;
 
-                    GL.Color3(GroundStation.IsVisible(predictEci) ? Color.DodgerBlue : Color.Yellow);
+                    GL.Color3(GroundStation.IsVisible(predictEci, Angle.Zero) ? Color.DodgerBlue : Color.Yellow);
 
                     GL.Vertex3(predictPos.ToGlVector3());
                     time = time.AddMinutes(1);
@@ -261,7 +263,7 @@ namespace Sandbox
 
                 var prediction = satellite.Predict();
                 var center = prediction.ToGeodetic();
-                var centerOnSurface = new GeodeticCoordinate(center.Latitude, center.Longitude, 0, true);
+                var centerOnSurface = new GeodeticCoordinate(center.Latitude, center.Longitude, 0);
 
                 GL.Begin(PrimitiveType.LineStrip);
                 GL.Vertex3((center.ToSphericalEcef() / 100).ToGlVector3());

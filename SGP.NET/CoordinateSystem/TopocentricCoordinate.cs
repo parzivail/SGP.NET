@@ -1,3 +1,5 @@
+using SGPdotNET.Util;
+
 namespace SGPdotNET.CoordinateSystem
 {
     /// <summary>
@@ -15,11 +17,11 @@ namespace SGPdotNET.CoordinateSystem
         /// <summary>
         ///     Creates a new topocentirc coordinate with the specified values
         /// </summary>
-        /// <param name="azimuth">Azimuth in radians</param>
-        /// <param name="elevation">Elevation in radians</param>
+        /// <param name="azimuth">Azimuth</param>
+        /// <param name="elevation">Elevation</param>
         /// <param name="range">Range in kilometers</param>
         /// <param name="rangeRate">Range rate in kilometers/second</param>
-        public TopocentricCoordinate(double azimuth, double elevation, double range, double rangeRate)
+        public TopocentricCoordinate(Angle azimuth, Angle elevation, double range, double rangeRate)
         {
             Azimuth = azimuth;
             Elevation = elevation;
@@ -42,12 +44,12 @@ namespace SGPdotNET.CoordinateSystem
         /// <summary>
         ///     Azimuth in radians
         /// </summary>
-        public double Azimuth { get; }
+        public Angle Azimuth { get; }
 
         /// <summary>
         ///     Elevation in radians
         /// </summary>
-        public double Elevation { get; }
+        public Angle Elevation { get; }
 
         /// <summary>
         ///     Range in kilometers

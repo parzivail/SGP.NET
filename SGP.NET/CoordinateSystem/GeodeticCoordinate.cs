@@ -20,23 +20,13 @@ namespace SGPdotNET.CoordinateSystem
         /// <summary>
         ///     Creates a new geodetic coordinate with the specified values
         /// </summary>
-        /// <param name="lat">The latitude (degrees by default)</param>
-        /// <param name="lon">The longitude (degrees by default)</param>
+        /// <param name="lat">The latitude</param>
+        /// <param name="lon">The longitude</param>
         /// <param name="alt">The altitude in kilometers</param>
-        /// <param name="isRadians">True if the provided latitude and longitude are in radians</param>
-        public GeodeticCoordinate(double lat, double lon, double alt, bool isRadians = false)
+        public GeodeticCoordinate(Angle lat, Angle lon, double alt)
         {
-            if (isRadians)
-            {
-                Latitude = lat;
-                Longitude = lon;
-            }
-            else
-            {
-                Latitude = MathUtil.DegreesToRadians(lat);
-                Longitude = MathUtil.DegreesToRadians(lon);
-            }
-
+            Latitude = lat;
+            Longitude = lon;
             Altitude = alt;
         }
 
@@ -53,14 +43,14 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Latitude in radians, where -PI &lt;= latitude &lt; PI
+        ///     Latitude, where -PI &lt;= latitude (radians) &lt; PI
         /// </summary>
-        public double Latitude { get; }
+        public Angle Latitude { get; }
 
         /// <summary>
-        ///     Longitude in radians, where -PI/2 &lt;= latitude &lt; PI/2
+        ///     Longitude, where -PI/2 &lt;= latitude (radians) &lt; PI/2
         /// </summary>
-        public double Longitude { get; }
+        public Angle Longitude { get; }
 
         /// <summary>
         ///     Altitude in kilometers
@@ -80,17 +70,17 @@ namespace SGPdotNET.CoordinateSystem
             const double mfactor =
                 SgpConstants.TwoPi * (SgpConstants.EarthRotationPerSiderealDay / SgpConstants.SecondsPerDay);
 
-            var theta = time.ToLocalMeanSiderealTime(Longitude);
+            var theta = time.ToLocalMeanSiderealTime(Longitude.Radians);
 
             var c = 1.0 /
                     Math.Sqrt(1.0 +
                               SgpConstants.EarthFlatteningConstant * (SgpConstants.EarthFlatteningConstant - 2.0) *
-                              Math.Pow(Math.Sin(Latitude), 2.0));
+                              Math.Pow(Math.Sin(Latitude.Radians), 2.0));
             var s = Math.Pow(1.0 - SgpConstants.EarthFlatteningConstant, 2.0) * c;
-            var achcp = (SgpConstants.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude);
+            var achcp = (SgpConstants.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude.Radians);
 
             var position = new Vector3(achcp * Math.Cos(theta), achcp * Math.Sin(theta),
-                (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude));
+                (SgpConstants.EarthRadiusKm * s + Altitude) * Math.Sin(Latitude.Radians));
             var velocity = new Vector3(-mfactor * position.Y, mfactor * position.X, 0);
 
             return new EciCoordinate(time, position, velocity);
@@ -135,7 +125,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"GeodeticCoordinate[Latitude={Latitude}, Longitude={Longitude}, Altitude={Altitude}]";
+            return $"GeodeticCoordinate[Latitude={Latitude.Radians}, Longitude={Longitude.Radians}, Altitude={Altitude}]";
         }
     }
 }

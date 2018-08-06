@@ -73,11 +73,11 @@ namespace SGPdotNET.Propogation
             if (Orbit.Eccentricity < 0.0 || Orbit.Eccentricity > 0.999)
                 throw new SatelliteException("GetEccentricity out of range");
 
-            if (Orbit.Inclination < 0.0 || Orbit.Inclination > Math.PI)
+            if (Orbit.Inclination.Radians < 0.0 || Orbit.Inclination.Radians > Math.PI)
                 throw new SatelliteException("GetInclination out of range");
 
-            _commonConsts.Cosio = Math.Cos(Orbit.Inclination);
-            _commonConsts.Sinio = Math.Sin(Orbit.Inclination);
+            _commonConsts.Cosio = Math.Cos(Orbit.Inclination.Radians);
+            _commonConsts.Sinio = Math.Sin(Orbit.Inclination.Radians);
             var theta2 = _commonConsts.Cosio * _commonConsts.Cosio;
             _commonConsts.X3Thm1 = 3.0 * theta2 - 1.0;
             var eosq = Orbit.Eccentricity * Orbit.Eccentricity;
@@ -151,7 +151,7 @@ namespace SGPdotNET.Propogation
                                                                         * (1.5 - 0.5 * eeta))
                                          + 0.75 * _commonConsts.X1Mth2 * (2.0 * etasq - eeta *
                                                                           (1.0 + etasq)) *
-                                         Math.Cos(2.0 * Orbit.ArgumentPerigee)));
+                                         Math.Cos(2.0 * Orbit.ArgumentPerigee.Radians)));
             var theta4 = theta2 * theta2;
             var temp1 = 3.0 * SgpConstants.Ck2 * pinvsq * Orbit.RecoveredMeanMotion;
             var temp2 = temp1 * SgpConstants.Ck2 * pinvsq;
@@ -198,15 +198,15 @@ namespace SGPdotNET.Propogation
                 _nearspaceConsts.C5 = 2.0 * coef1 * Orbit.RecoveredSemiMajorAxis * betao2 * (1.0 + 2.75 *
                                                                                              (etasq + eeta) +
                                                                                              eeta * etasq);
-                _nearspaceConsts.Omgcof = Orbit.BStar * c3 * Math.Cos(Orbit.ArgumentPerigee);
+                _nearspaceConsts.Omgcof = Orbit.BStar * c3 * Math.Cos(Orbit.ArgumentPerigee.Radians);
 
                 _nearspaceConsts.Xmcof = 0.0;
                 if (Orbit.Eccentricity > 1.0e-4)
                     _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * Orbit.BStar *
                                              SgpConstants.DistanceUnitsPerEarthRadii / eeta;
 
-                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(Orbit.MeanAnomoly), 3.0);
-                _nearspaceConsts.Sinmo = Math.Sin(Orbit.MeanAnomoly);
+                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(Orbit.MeanAnomoly.Radians), 3.0);
+                _nearspaceConsts.Sinmo = Math.Sin(Orbit.MeanAnomoly.Radians);
 
                 if (_useSimpleModel) return;
 
@@ -231,11 +231,11 @@ namespace SGPdotNET.Propogation
             /*
              * update for secular gravity and atmospheric drag
              */
-            var xmdf = Orbit.MeanAnomoly
+            var xmdf = Orbit.MeanAnomoly.Radians
                        + _commonConsts.Xmdot * tsince;
-            var omgadf = Orbit.ArgumentPerigee
+            var omgadf = Orbit.ArgumentPerigee.Radians
                          + _commonConsts.Omgdot * tsince;
-            var xnoddf = Orbit.AscendingNode
+            var xnoddf = Orbit.AscendingNode.Radians
                          + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
@@ -263,9 +263,9 @@ namespace SGPdotNET.Propogation
              * keeping xincl positive important unless you need to display xincl
              * and dislike negative inclinations
              */
-            if (xincl < 0.0)
+            if (xincl.Radians < 0.0)
             {
-                xincl = -xincl;
+                xincl = new Angle(-xincl.Radians);
                 xnode += Math.PI;
                 omgadf -= Math.PI;
             }
@@ -287,8 +287,8 @@ namespace SGPdotNET.Propogation
             /*
              * re-compute the perturbed values
              */
-            var perturbedSinio = Math.Sin(xincl);
-            var perturbedCosio = Math.Cos(xincl);
+            var perturbedSinio = Math.Sin(xincl.Radians);
+            var perturbedCosio = Math.Cos(xincl.Radians);
 
             var perturbedTheta2 = perturbedCosio * perturbedCosio;
 
@@ -312,7 +312,7 @@ namespace SGPdotNET.Propogation
              */
             return CalculateFinalPositionVelocity(tsince, e,
                 a, omega, xl, xnode,
-                xincl, perturbedXlcof, perturbedAycof,
+                xincl.Radians, perturbedXlcof, perturbedAycof,
                 perturbedX3Thm1, perturbedX1Mth2, perturbedX7Thm1,
                 perturbedCosio, perturbedSinio);
         }
@@ -322,11 +322,11 @@ namespace SGPdotNET.Propogation
             /*
              * update for secular gravity and atmospheric drag
              */
-            var xmdf = Orbit.MeanAnomoly
+            var xmdf = Orbit.MeanAnomoly.Radians
                        + _commonConsts.Xmdot * tsince;
-            var omgadf = Orbit.ArgumentPerigee
+            var omgadf = Orbit.ArgumentPerigee.Radians
                          + _commonConsts.Omgdot * tsince;
-            var xnoddf = Orbit.AscendingNode
+            var xnoddf = Orbit.AscendingNode.Radians
                          + _commonConsts.Xnodot * tsince;
 
             var tsq = tsince * tsince;
@@ -381,7 +381,7 @@ namespace SGPdotNET.Propogation
              */
             return CalculateFinalPositionVelocity(tsince, e,
                 a, omega, xl, xnode,
-                xincl, _commonConsts.Xlcof, _commonConsts.Aycof,
+                xincl.Radians, _commonConsts.Xlcof, _commonConsts.Aycof,
                 _commonConsts.X3Thm1, _commonConsts.X1Mth2, _commonConsts.X7Thm1,
                 _commonConsts.Cosio, _commonConsts.Sinio);
         }
@@ -600,10 +600,10 @@ namespace SGPdotNET.Propogation
 
             var aqnv = 1.0 / Orbit.RecoveredSemiMajorAxis;
             var xpidot = omgdot + xnodot;
-            var sinq = Math.Sin(Orbit.AscendingNode);
-            var cosq = Math.Cos(Orbit.AscendingNode);
-            var sing = Math.Sin(Orbit.ArgumentPerigee);
-            var cosg = Math.Cos(Orbit.ArgumentPerigee);
+            var sinq = Math.Sin(Orbit.AscendingNode.Radians);
+            var cosq = Math.Cos(Orbit.AscendingNode.Radians);
+            var sing = Math.Sin(Orbit.ArgumentPerigee.Radians);
+            var cosg = Math.Cos(Orbit.ArgumentPerigee.Radians);
 
             /*
              * initialize lunar / solar terms
@@ -710,8 +710,8 @@ namespace SGPdotNET.Propogation
                  * with
                  * shdq = (-zn * s2 * (z21 + z23)) / sinio
                  */
-                if (Orbit.Inclination < 5.2359877e-2
-                    || Orbit.Inclination > Math.PI - 5.2359877e-2)
+                if (Orbit.Inclination.Radians < 5.2359877e-2
+                    || Orbit.Inclination.Radians > Math.PI - 5.2359877e-2)
                     shdq = 0.0;
                 else
                     shdq = -zn * s2 * (z21 + z23) / sinio;
@@ -799,9 +799,9 @@ namespace SGPdotNET.Propogation
                 _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                                         * f311 * g310 * q31 * aqnv;
 
-                _integratorConsts.Xlamo = Orbit.MeanAnomoly
-                                          + Orbit.AscendingNode
-                                          + Orbit.ArgumentPerigee
+                _integratorConsts.Xlamo = Orbit.MeanAnomoly.Radians
+                                          + Orbit.AscendingNode.Radians
+                                          + Orbit.ArgumentPerigee.Radians
                                           - _deepspaceConsts.Gsto;
                 bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad;
                 bfact += _deepspaceConsts.Ssl
@@ -931,9 +931,9 @@ namespace SGPdotNET.Propogation
                 _deepspaceConsts.D5421 = temp * f542 * g521;
                 _deepspaceConsts.D5433 = temp * f543 * g533;
 
-                _integratorConsts.Xlamo = Orbit.MeanAnomoly
-                                          + Orbit.AscendingNode
-                                          + Orbit.AscendingNode
+                _integratorConsts.Xlamo = Orbit.MeanAnomoly.Radians
+                                          + Orbit.AscendingNode.Radians
+                                          + Orbit.AscendingNode.Radians
                                           - _deepspaceConsts.Gsto
                                           - _deepspaceConsts.Gsto;
                 bfact = xmdot
@@ -1022,7 +1022,7 @@ namespace SGPdotNET.Propogation
             ph = shs + shl;
         }
 
-        private void DeepSpacePeriodics(double tsince, ref double em, ref double xinc, ref double omgasm,
+        private void DeepSpacePeriodics(double tsince, ref double em, ref Angle xinc, ref double omgasm,
             ref double xnodes, ref double xll)
         {
             /*
@@ -1040,7 +1040,7 @@ namespace SGPdotNET.Propogation
              */
             DeepSpaceCalculateLunarSolarTerms(tsince, ref pe, ref pinc, ref pl, ref pgh, ref ph);
 
-            xinc += pinc;
+            xinc = new Angle(xinc.Radians + pinc);
             em += pe;
 
             /* Spacetrack report #3 has sin/cos from before perturbations
@@ -1052,10 +1052,10 @@ namespace SGPdotNET.Propogation
              * if (xinc >= 0.2)
              * (moved from start of function)
              */
-            var sinis = Math.Sin(xinc);
-            var cosis = Math.Cos(xinc);
+            var sinis = Math.Sin(xinc.Radians);
+            var cosis = Math.Cos(xinc.Radians);
 
-            if (xinc >= 0.2)
+            if (xinc.Radians >= 0.2)
             {
                 /*
                  * apply periodics directly
@@ -1113,7 +1113,7 @@ namespace SGPdotNET.Propogation
         }
 
         private void DeepSpaceSecular(double tsince, ref double xll, double omgasm, double xnodes, ref double em,
-            ref double xinc, ref double xn)
+            ref Angle xinc, ref double xn)
         {
             const double step = 720.0;
             const double step2 = 259200.0;
@@ -1122,7 +1122,7 @@ namespace SGPdotNET.Propogation
             omgasm += _deepspaceConsts.Ssg * tsince;
             xnodes += _deepspaceConsts.Ssh * tsince;
             em += _deepspaceConsts.Sse * tsince;
-            xinc += _deepspaceConsts.Ssi * tsince;
+            xinc = new Angle(xinc.Radians + _deepspaceConsts.Ssi * tsince);
 
             if (_deepspaceConsts.ResonanceFlag)
             {
@@ -1229,7 +1229,7 @@ namespace SGPdotNET.Propogation
             }
             else
             {
-                var xomi = Orbit.ArgumentPerigee
+                var xomi = Orbit.ArgumentPerigee.Radians
                            + _commonConsts.Omgdot * _integratorParams.Atime;
                 var x2Omi = xomi + xomi;
                 var x2Li = _integratorParams.Xli + _integratorParams.Xli;
