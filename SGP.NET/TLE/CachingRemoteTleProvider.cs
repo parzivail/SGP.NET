@@ -12,7 +12,7 @@ namespace SGPdotNET.TLE
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
     /// </summary>
-    public class LocallyBackedRemoteTleProvider : RemoteTleProvider
+    public class CachingRemoteTleProvider : RemoteTleProvider
     {
         private readonly string _localFilename;
 
@@ -23,7 +23,7 @@ namespace SGPdotNET.TLE
         /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, string localFilename)
+        public CachingRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, string localFilename)
             : this(sources, threeLine,
                 TimeSpan.FromDays(1), localFilename)
         {
@@ -37,7 +37,7 @@ namespace SGPdotNET.TLE
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public LocallyBackedRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge,
+        public CachingRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge,
             string localFilename) : base(sources, threeLine, maxAge)
         {
             _localFilename = localFilename;

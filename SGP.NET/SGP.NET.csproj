@@ -44,13 +44,14 @@
     <Compile Include="Propogation\SgpConstants.cs" />
     <Compile Include="Propogation\Orbit.cs" />
     <Compile Include="TLE\ITleProvider.cs" />
-    <Compile Include="TLE\LocallyBackedRemoteTleProvider.cs" />
+    <Compile Include="TLE\CachingRemoteTleProvider.cs" />
     <Compile Include="TLE\RemoteTleProvider.cs" />
     <Compile Include="Satellite.cs" />
     <Compile Include="Exception\SatelliteException.cs" />
     <Compile Include="SatelliteObservation.cs" />
     <Compile Include="Propogation\SGP4.cs" />
     <Compile Include="Util\Angle.cs" />
+    <Compile Include="Util\AngleDegrees.cs" />
     <Compile Include="Util\TimeExtensions.cs" />
     <Compile Include="TLE\Tle.cs" />
     <Compile Include="Exception\TleException.cs" />

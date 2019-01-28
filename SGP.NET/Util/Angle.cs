@@ -29,11 +29,10 @@ namespace SGPdotNET.Util
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="angle">The angle to be stored in the object</param>
-        /// <param name="degrees">True if the supplied angle is in degrees, otherwise radians is assumed</param>
-        public Angle(double angle, bool degrees = false)
+        /// <param name="angle">The angle to be stored in the object, in radians</param>
+        public Angle(double angle)
         {
-            Radians = degrees ? angle / 180 * Math.PI : angle;
+            Radians = angle;
         }
 
         /// <inheritdoc />

@@ -30,7 +30,7 @@ namespace Sandbox
         private static readonly Earth Earth = new Earth();
 
         private static readonly GroundStation GroundStation =
-            new GroundStation(new GeodeticCoordinate(new Angle(30.2333, true), new Angle(-81.6744, true), 0));
+            new GroundStation(new GeodeticCoordinate(new AngleDegrees(30.2333), new AngleDegrees(-81.6744), 0));
 
         private static readonly List<Satellite> TrackedSatellites = new List<Satellite>();
 
@@ -437,7 +437,7 @@ namespace Sandbox
                 new Url("http://www.celestrak.com/NORAD/elements/weather.txt")
             };
 
-            var remote = new LocallyBackedRemoteTleProvider(sources, true, "cachedTles.txt");
+            var remote = new CachingRemoteTleProvider(sources, true, "cachedTles.txt");
 
             TrackedSatellites.Add(new Satellite(remote.GetTle(25544))); // ISS
             TrackedSatellites.Add(new Satellite(remote.GetTle(28654))); // NOAA 18
