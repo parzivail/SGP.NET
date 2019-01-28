@@ -16,7 +16,7 @@ namespace SGPdotNET.Exception
         /// <param name="time">Time of the event</param>
         /// <param name="position">Position of the satellite at time</param>
         /// <param name="velocity">Velocity of the satellite at time</param>
-        public DecayedException(DateTime time, Vector3 position, Vector3 velocity) : base("Error: Satellite decayed")
+        public DecayedException(DateTime time, Vector3 position, Vector3 velocity) : base("Satellite decayed")
         {
             Time = time;
             Position = position;

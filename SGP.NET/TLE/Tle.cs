@@ -224,15 +224,15 @@ namespace SGPdotNET.TLE
             var builder = new StringBuilder();
             builder.AppendLine($"Norad Number:         {NoradNumber}");
             builder.AppendLine($"Int. Designator:      {IntDesignator}");
-            builder.AppendLine($"GetEpoch:                {Epoch}");
+            builder.AppendLine($"GetEpoch:             {Epoch}");
             builder.AppendLine($"Orbit Number:         {OrbitNumber}");
             builder.AppendLine($"Mean Motion Dt2:      {MeanMotionDtOver2}");
             builder.AppendLine($"Mean Motion Ddt6:     {MeanMotionDdtOver6}");
-            builder.AppendLine($"GetEccentricity:         {Eccentricity}");
-            builder.AppendLine($"GetBStar:                {BStarDragTerm}");
-            builder.AppendLine($"GetInclination:          {Inclination}");
+            builder.AppendLine($"GetEccentricity:      {Eccentricity}");
+            builder.AppendLine($"GetBStar:             {BStarDragTerm}");
+            builder.AppendLine($"GetInclination:       {Inclination}");
             builder.AppendLine($"Right Ascending Node: {RightAscendingNode}");
-            builder.AppendLine($"Argument GetPerigee:     {ArgumentPerigee}");
+            builder.AppendLine($"Argument GetPerigee:  {ArgumentPerigee}");
             builder.AppendLine($"Mean Anomaly:         {MeanAnomaly}");
             builder.AppendLine($"Mean Motion:          {MeanMotionRevPerDay}");
 
