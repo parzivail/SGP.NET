@@ -4,7 +4,7 @@ using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
-namespace SGPdotNET
+namespace SGPdotNET.Observation
 {
     /// <summary>
     ///     A representation of a ground station that can observe satellites

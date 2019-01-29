@@ -3,7 +3,7 @@ using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
 
-namespace SGPdotNET
+namespace SGPdotNET.Observation
 {
     /// <summary>
     ///     A representation of a satellite in orbit

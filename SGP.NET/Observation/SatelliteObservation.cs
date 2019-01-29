@@ -1,7 +1,7 @@
 ﻿using System;
 using SGPdotNET.Util;
 
-namespace SGPdotNET
+namespace SGPdotNET.Observation
 {
     /// <summary>
     ///     Stores a satellite observation

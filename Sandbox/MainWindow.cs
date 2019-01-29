@@ -14,6 +14,7 @@ using PFX.Util;
 using SGPdotNET;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Exception;
+using SGPdotNET.Observation;
 using SGPdotNET.TLE;
 using SGPdotNET.Util;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
