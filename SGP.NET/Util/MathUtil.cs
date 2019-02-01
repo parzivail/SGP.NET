@@ -63,11 +63,5 @@ namespace SGPdotNET.Util
 
             return Math.PI + Math.Atan(sinx / cosx);
         }
-
-        public static DateTime Round(this DateTime date, TimeSpan span)
-        {
-            var ticks = (date.Ticks + span.Ticks / 2 + 1) / span.Ticks;
-            return new DateTime(ticks * span.Ticks);
-        }
     }
 }

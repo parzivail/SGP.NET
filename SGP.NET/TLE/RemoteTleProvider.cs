@@ -68,23 +68,12 @@ namespace SGPdotNET.TLE
             return _cachedTles;
         }
 
-        private void CacheRemoteTles(bool async = true)
+        private void CacheRemoteTles()
         {
             if (DateTime.UtcNow < LastRefresh + MaxAge)
                 return;
 
-            var hasCachedTles = !(_cachedTles is null) && _cachedTles.Count > 0;
-            if (async && hasCachedTles)
-                new Thread(() =>
-                {
-                    Thread.CurrentThread.IsBackground = true;
-                    lock (_lock)
-                    {
-                        _cachedTles = FetchNewTles();
-                    }
-                }).Start();
-            else
-                _cachedTles = FetchNewTles();
+            _cachedTles = FetchNewTles();
 
             LastRefresh = DateTime.UtcNow;
         }

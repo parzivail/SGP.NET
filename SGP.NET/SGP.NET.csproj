@@ -38,7 +38,7 @@
     <Compile Include="CoordinateSystem\Coordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoordinateSystem\GeodeticCoordinate.cs" />
-    <Compile Include="CoordinateSystem\TopocentricCoordinate.cs" />
+    <Compile Include="Observation\TopocentricObservation.cs" />
     <Compile Include="Exception\DecayedException.cs" />
     <Compile Include="CoordinateSystem\EciCoordinate.cs" />
     <Compile Include="Propogation\SgpConstants.cs" />

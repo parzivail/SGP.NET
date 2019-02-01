@@ -120,7 +120,12 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override EciCoordinate ToEci(DateTime dt)
         {
+            if (dt == Time)
             return this;
+
+            // Have to hand off to another coordinate system to get the new time integrated into the coordinate set
+            var geo = ToGeodetic();
+            return geo.ToEci(dt);
         }
 
         /// <inheritdoc />

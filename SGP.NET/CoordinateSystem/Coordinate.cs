@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SGPdotNET.Observation;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
@@ -221,7 +222,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="time">The time of observation</param>
         /// <param name="to">The coordinate to observe</param>
         /// <returns>The topocentric angles between this coordinate and another</returns>
-        public TopocentricCoordinate LookAt(Coordinate to, DateTime? time = null)
+        public TopocentricObservation LookAt(Coordinate to, DateTime? time = null)
         {
             var t = DateTime.UtcNow;
             if (time.HasValue)
@@ -234,7 +235,7 @@ namespace SGPdotNET.CoordinateSystem
             var rangeRate = eci.Velocity - self.Velocity;
             var range = eci.Position - self.Position;
 
-            var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude.Radians);
+            var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude);
 
             var sinLat = Math.Sin(geo.Latitude.Radians);
             var cosLat = Math.Cos(geo.Latitude.Radians);
@@ -258,7 +259,7 @@ namespace SGPdotNET.CoordinateSystem
             var el = Math.Asin(topZ / range.Length);
             var rate = range.Dot(rangeRate) / range.Length;
 
-            return new TopocentricCoordinate(new Angle(az), new Angle(el), range.Length, rate);
+            return new TopocentricObservation(new Angle(az), new Angle(el), range.Length, rate);
         }
     }
 }

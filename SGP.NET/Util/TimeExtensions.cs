@@ -44,9 +44,21 @@ namespace SGPdotNET.Util
         /// <param name="dt">The time to convert</param>
         /// <param name="longitude">The longitude of observation</param>
         /// <returns>The Local Mean Sidereal Time representation the DateTime</returns>
-        public static double ToLocalMeanSiderealTime(this DateTime dt, double longitude)
+        public static double ToLocalMeanSiderealTime(this DateTime dt, Angle longitude)
         {
-            return MathUtil.WrapTwoPi(dt.ToGreenwichSiderealTime() + longitude);
+            return MathUtil.WrapTwoPi(dt.ToGreenwichSiderealTime() + longitude.Radians);
+        }
+
+        /// <summary>
+        /// Rounds a DateTime to the nearest TimeSpan unit
+        /// </summary>
+        /// <param name="date">The time to round</param>
+        /// <param name="span">The unit to round towards</param>
+        /// <returns>The rounded DateTime</returns>
+        internal static DateTime Round(this DateTime date, TimeSpan span)
+        {
+            var ticks = (date.Ticks + span.Ticks / 2 + 1) / span.Ticks;
+            return new DateTime(ticks * span.Ticks);
         }
     }
 }

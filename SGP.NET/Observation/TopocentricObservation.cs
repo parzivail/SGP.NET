@@ -1,16 +1,17 @@
+using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Util;
 
-namespace SGPdotNET.CoordinateSystem
+namespace SGPdotNET.Observation
 {
     /// <summary>
     ///     Stores a topocentric location (azimuth, elevation, range and range rate).
     /// </summary>
-    public class TopocentricCoordinate
+    public class TopocentricObservation
     {
         /// <summary>
         ///     Creates a new topocentirc coordinate at the origin
         /// </summary>
-        public TopocentricCoordinate()
+        public TopocentricObservation()
         {
         }
 
@@ -21,7 +22,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="elevation">Elevation</param>
         /// <param name="range">Range in kilometers</param>
         /// <param name="rangeRate">Range rate in kilometers/second</param>
-        public TopocentricCoordinate(Angle azimuth, Angle elevation, double range, double rangeRate)
+        public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate)
         {
             Azimuth = azimuth;
             Elevation = elevation;
@@ -33,7 +34,7 @@ namespace SGPdotNET.CoordinateSystem
         ///     Creates a new topocentirc coordinate as a copy of the specified one
         /// </summary>
         /// <param name="topo">Object to copy from</param>
-        public TopocentricCoordinate(TopocentricCoordinate topo)
+        public TopocentricObservation(TopocentricObservation topo)
         {
             Azimuth = topo.Azimuth;
             Elevation = topo.Elevation;
@@ -42,12 +43,12 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Azimuth in radians
+        ///     Azimuth
         /// </summary>
         public Angle Azimuth { get; }
 
         /// <summary>
-        ///     Elevation in radians
+        ///     Elevation
         /// </summary>
         public Angle Elevation { get; }
 
@@ -73,7 +74,7 @@ namespace SGPdotNET.CoordinateSystem
         /// </summary>
         /// <param name="other">The other object of comparison</param>
         /// <returns>True if the two objects are equal</returns>
-        protected bool Equals(TopocentricCoordinate other)
+        protected bool Equals(TopocentricObservation other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
                    RangeRate.Equals(other.RangeRate);
@@ -95,7 +96,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"TopocentricCoordinate[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
+            return $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
         }
     }
 }

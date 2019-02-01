@@ -70,7 +70,7 @@ namespace SGPdotNET.CoordinateSystem
             const double mfactor =
                 SgpConstants.TwoPi * (SgpConstants.EarthRotationPerSiderealDay / SgpConstants.SecondsPerDay);
 
-            var theta = time.ToLocalMeanSiderealTime(Longitude.Radians);
+            var theta = time.ToLocalMeanSiderealTime(Longitude);
 
             var c = 1.0 /
                     Math.Sqrt(1.0 +
