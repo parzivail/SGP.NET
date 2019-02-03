@@ -58,7 +58,7 @@ namespace SGPdotNET.TLE
                             .Replace("\r\n", "\n") // normalize line endings
                             .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                        var elementSets = Tle.ParseElements(restOfFile, true);
+                        var elementSets = Tle.ParseElements(restOfFile, ThreeLine);
 
                         return elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
                     }

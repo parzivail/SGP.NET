@@ -62,6 +62,7 @@
       <DependentUpon>FormLauncher.cs</DependentUpon>
     </Compile>
     <Compile Include="FragVertShaderProgram.cs" />
+    <Compile Include="GettingStarted.cs" />
     <Compile Include="GlslBufferInitializer.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="Program.cs" />

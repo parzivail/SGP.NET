@@ -134,5 +134,10 @@ namespace SGPdotNET.Util
         {
             return new Angle(angle1.Radians - angle2.Radians);
         }
+
+        public override string ToString()
+        {
+            return $"Angle[{Degrees}°]";
+        }
     }
 }

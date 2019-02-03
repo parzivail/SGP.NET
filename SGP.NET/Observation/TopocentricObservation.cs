@@ -96,7 +96,7 @@ namespace SGPdotNET.Observation
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}, Range={RangeRate}]";
+            return $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}km, RangeRate={RangeRate}km/s]";
         }
     }
 }

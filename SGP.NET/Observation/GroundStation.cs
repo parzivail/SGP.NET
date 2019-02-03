@@ -90,6 +90,19 @@ namespace SGPdotNET.Observation
         }
 
         /// <summary>
+        ///     Observes a satellite at an instant in time, relative to this GroundStation
+        /// </summary>
+        /// <param name="satellite">The satellite to observe</param>
+        /// <param name="time">The time of observation</param>
+        /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
+        public TopocentricObservation Observe(Satellite satellite, DateTime time)
+        {
+            var eciLocation = Location.ToEci(time);
+            var posEci = satellite.Predict(time);
+            return eciLocation.LookAt(posEci);
+        }
+
+        /// <summary>
         ///     Tests whether or not a satellite is above a specified elevation
         /// </summary>
         /// <param name="pos">The position to check</param>

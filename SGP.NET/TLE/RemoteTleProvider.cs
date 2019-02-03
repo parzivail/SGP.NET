@@ -58,6 +58,7 @@ namespace SGPdotNET.TLE
             return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
         /// </summary>

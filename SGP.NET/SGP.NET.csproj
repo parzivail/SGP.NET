@@ -27,6 +27,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,6 +46,7 @@
     <Compile Include="CoordinateSystem\EciCoordinate.cs" />
     <Compile Include="Propogation\SgpConstants.cs" />
     <Compile Include="Propogation\Orbit.cs" />
+    <Compile Include="TLE\LocalTleProvider.cs" />
     <Compile Include="TLE\ITleProvider.cs" />
     <Compile Include="TLE\CachingRemoteTleProvider.cs" />
     <Compile Include="TLE\RemoteTleProvider.cs" />
