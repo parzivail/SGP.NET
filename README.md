@@ -1,6 +1,8 @@
 # SGP.NET
 SGP.NET is a multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.
 
+See the [wiki](https://github.com/parzivail/SGP.NET/wiki) for complete documentation.
+
 # Getting Started
 ```csharp
 // Create a set of TLE strings
