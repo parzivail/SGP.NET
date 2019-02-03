@@ -10,7 +10,7 @@ namespace SGPdotNET.TLE
 {
     /// <inheritdoc cref="ITleProvider" />
     /// <summary>
-    ///     Provides a class to retrieve TLEs from a remote network resource
+    ///     Provides a class to retrieve TLEs from a local resource
     /// </summary>
     public class LocalTleProvider : ITleProvider
     {
