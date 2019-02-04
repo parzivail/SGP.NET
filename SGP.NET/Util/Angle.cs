@@ -1,39 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SGPdotNET.Util
 {
     /// <summary>
-    /// Stores an angle
+    ///     Stores an angle
     /// </summary>
     public class Angle
     {
         /// <summary>
-        /// The Angle that represents zero radians/degrees
+        ///     The Angle that represents zero radians/degrees
         /// </summary>
         public static readonly Angle Zero = new Angle(0);
 
         /// <summary>
-        /// The angle represented by this object, in degrees
-        /// </summary>
-        public double Degrees => MathUtil.RadiansToDegrees(Radians);
-
-        /// <summary>
-        /// The angle represented by this object, in radians
-        /// </summary>
-        public double Radians { get; }
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="angle">The angle to be stored in the object, in radians</param>
         public Angle(double angle)
         {
             Radians = angle;
         }
+
+        /// <summary>
+        ///     The angle represented by this object, in degrees
+        /// </summary>
+        public double Degrees => MathUtil.RadiansToDegrees(Radians);
+
+        /// <summary>
+        ///     The angle represented by this object, in radians
+        /// </summary>
+        public double Radians { get; }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
@@ -48,7 +44,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Checks two angles for equality
+        ///     Checks two angles for equality
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -59,7 +55,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Checks two angles for inequality
+        ///     Checks two angles for inequality
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -70,7 +66,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Compares two angles
+        ///     Compares two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -81,7 +77,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Compares two angles
+        ///     Compares two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -92,7 +88,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Compares two angles
+        ///     Compares two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -103,7 +99,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Compares two angles
+        ///     Compares two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -114,7 +110,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Adds two angles
+        ///     Adds two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>
@@ -125,7 +121,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Subtracts two angles
+        ///     Subtracts two angles
         /// </summary>
         /// <param name="angle1">The first angle</param>
         /// <param name="angle2">The second angle</param>

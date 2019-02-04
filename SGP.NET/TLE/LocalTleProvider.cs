@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
 
 namespace SGPdotNET.TLE
 {
@@ -27,20 +24,6 @@ namespace SGPdotNET.TLE
             LoadTles(sourceFilename, threeLine);
         }
 
-        private void LoadTles(string sourceFilename, bool threeLine)
-        {
-            using (var sr = new StreamReader(sourceFilename))
-            {
-                var restOfFile = sr.ReadToEnd()
-                    .Replace("\r\n", "\n") // normalize line endings
-                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
-
-                var elementSets = Tle.ParseElements(restOfFile, threeLine);
-
-                _tles = elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
-            }
-        }
-
         /// <inheritdoc />
         public Tle GetTle(int satelliteId)
         {
@@ -51,6 +34,20 @@ namespace SGPdotNET.TLE
         public Dictionary<int, Tle> GetTles()
         {
             return _tles;
+        }
+
+        private void LoadTles(string sourceFilename, bool threeLine)
+        {
+            using (var sr = new StreamReader(sourceFilename))
+            {
+                var restOfFile = sr.ReadToEnd()
+                    .Replace("\r\n", "\n") // normalize line endings
+                    .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+
+                var elementSets = Tle.ParseElements(restOfFile, threeLine);
+
+                _tles = elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+            }
         }
     }
 }

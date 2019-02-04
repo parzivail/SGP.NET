@@ -1,11 +1,13 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Resources;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle("SGP.NET")]
-[assembly: AssemblyDescription("C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.")]
+[assembly:
+    AssemblyDescription(
+        "C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("parzivail")]
 [assembly: AssemblyProduct("SGP.NET")]

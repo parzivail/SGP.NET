@@ -179,7 +179,8 @@ namespace SGPdotNET.CoordinateSystem
             {
                 var perc = i / (float) numPoints * 2 * Math.PI;
 
-                var latRadians = Math.Asin(Math.Sin(lat.Radians) * Math.Cos(d) + Math.Cos(lat.Radians) * Math.Sin(d) * Math.Cos(perc));
+                var latRadians = Math.Asin(Math.Sin(lat.Radians) * Math.Cos(d) +
+                                           Math.Cos(lat.Radians) * Math.Sin(d) * Math.Cos(perc));
                 var lngRadians = lon.Radians +
                                  Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
                                      Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
@@ -210,7 +211,8 @@ namespace SGPdotNET.CoordinateSystem
             var geo = ToGeodetic();
             var toGeo = to.ToGeodetic();
             var dist = Math.Sin(geo.Latitude.Radians) * Math.Sin(toGeo.Latitude.Radians) +
-                       Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) * Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
+                       Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) *
+                       Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
             dist = Math.Acos(dist);
 
             return new Angle(dist);

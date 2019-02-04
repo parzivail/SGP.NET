@@ -50,7 +50,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Rounds a DateTime to the nearest TimeSpan unit
+        ///     Rounds a DateTime to the nearest TimeSpan unit
         /// </summary>
         /// <param name="date">The time to round</param>
         /// <param name="span">The unit to round towards</param>

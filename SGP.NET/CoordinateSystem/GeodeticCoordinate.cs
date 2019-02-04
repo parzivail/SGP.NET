@@ -125,7 +125,8 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"GeodeticCoordinate[Latitude={Latitude.Radians}, Longitude={Longitude.Radians}, Altitude={Altitude}]";
+            return
+                $"GeodeticCoordinate[Latitude={Latitude.Radians}, Longitude={Longitude.Radians}, Altitude={Altitude}]";
         }
     }
 }
