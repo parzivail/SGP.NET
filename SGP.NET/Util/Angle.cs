@@ -38,7 +38,7 @@ namespace SGPdotNET.Util
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is Angle angle && Radians == angle.Radians;
+            return obj is Angle angle && Radians.Equals(angle.Radians);
         }
 
         /// <inheritdoc />
@@ -135,6 +135,7 @@ namespace SGPdotNET.Util
             return new Angle(angle1.Radians - angle2.Radians);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"Angle[{Degrees}°]";
