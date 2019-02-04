@@ -173,7 +173,7 @@ namespace SGPdotNET.CoordinateSystem
 
             var lat = center.Latitude;
             var lon = center.Longitude;
-            var d = center.GetFootprintAngle();
+            var d = center.GetFootprintAngle().Radians;
 
             for (var i = 0; i < numPoints; i++)
             {
