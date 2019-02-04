@@ -111,9 +111,9 @@ namespace SGPdotNET.Observation
         public bool IsVisible(Coordinate pos, Angle minElevation)
         {
             var pGeo = pos.ToGeodetic();
-            var footprint = pGeo.GetFootprintRadians();
+            var footprint = pGeo.GetFootprintAngle();
 
-            if (Location.DistanceToRadians(pGeo) > footprint) return false;
+            if (Location.AngleTo(pGeo) > footprint) return false;
 
             if (Math.Abs(minElevation.Degrees) < double.Epsilon)
                 return true;

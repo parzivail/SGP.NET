@@ -137,18 +137,18 @@ namespace SGPdotNET.CoordinateSystem
         /// <returns>The visibility radius, in kilometers</returns>
         public double GetFootprint()
         {
-            return GetFootprintRadians() * SgpConstants.EarthRadiusKm;
+            return GetFootprintAngle().Radians * SgpConstants.EarthRadiusKm;
         }
 
         /// <summary>
         ///     Calculates the visibility radius (radians) of the satellite by which any distances from this position less than the
         ///     radius are able to see this position
         /// </summary>
-        /// <returns>The visibility radius, in radians</returns>
-        public double GetFootprintRadians()
+        /// <returns>The visibility radius as an angle across Earth's surface</returns>
+        public Angle GetFootprintAngle()
         {
             var geo = ToGeodetic();
-            return Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude));
+            return new Angle(Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude)));
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace SGPdotNET.CoordinateSystem
 
             var lat = center.Latitude;
             var lon = center.Longitude;
-            var d = center.GetFootprintRadians();
+            var d = center.GetFootprintAngle();
 
             for (var i = 0; i < numPoints; i++)
             {
@@ -197,15 +197,15 @@ namespace SGPdotNET.CoordinateSystem
         /// <returns>The distance between the coordinates, in kilometers</returns>
         public double DistanceTo(Coordinate to)
         {
-            return DistanceToRadians(to) * SgpConstants.EarthRadiusKm;
+            return AngleTo(to).Radians * SgpConstants.EarthRadiusKm;
         }
 
         /// <summary>
-        ///     Calculates the Great Circle distance (radians) to another geodetic coordinate
+        ///     Calculates the Great Circle distance as an angle to another geodetic coordinate
         /// </summary>
         /// <param name="to">The coordinate to measure against</param>
-        /// <returns>The distance between the coordinates, in radians</returns>
-        public double DistanceToRadians(Coordinate to)
+        /// <returns>The distance between the coordinates as an angle across Earth's surface</returns>
+        public Angle AngleTo(Coordinate to)
         {
             var geo = ToGeodetic();
             var toGeo = to.ToGeodetic();
@@ -213,7 +213,7 @@ namespace SGPdotNET.CoordinateSystem
                        Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) * Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
             dist = Math.Acos(dist);
 
-            return dist;
+            return new Angle(dist);
         }
 
         /// <summary>
