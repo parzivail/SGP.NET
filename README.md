@@ -3,6 +3,10 @@ SGP.NET is a multi-function library with support for loading satellites from TLE
 
 See the [wiki](https://github.com/parzivail/SGP.NET/wiki) for complete documentation.
 
+# NuGet
+
+[https://www.nuget.org/packages/SGP.NET/](https://www.nuget.org/packages/SGP.NET/)
+
 # Getting Started
 ```csharp
 // Create a set of TLE strings
