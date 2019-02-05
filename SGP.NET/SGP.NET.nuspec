@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/parzivail/SGP.NET</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial release.</releaseNotes>
+    <releaseNotes>Fixed ECI to ECI conversion.</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>satellite orbit tracking prediction observation sgp4</tags>
   </metadata>
