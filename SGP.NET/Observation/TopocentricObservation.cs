@@ -1,3 +1,4 @@
+using System;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Util;
 
@@ -62,6 +63,11 @@ namespace SGPdotNET.Observation
         /// </summary>
         public double RangeRate { get; }
 
+        /// <summary>
+        ///     Direction relative to the observer
+        /// </summary>
+        public RelativeDirection Direction => RangeRate < 0 ? RelativeDirection.Approaching : (Math.Abs(RangeRate) < double.Epsilon ? RelativeDirection.Fixed : RelativeDirection.Receding);
+
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
@@ -99,5 +105,12 @@ namespace SGPdotNET.Observation
             return
                 $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}km, RangeRate={RangeRate}km/s]";
         }
+    }
+
+    public enum RelativeDirection
+    {
+        Approaching,
+        Fixed,
+        Receding
     }
 }
