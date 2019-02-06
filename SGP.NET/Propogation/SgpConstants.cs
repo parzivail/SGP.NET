@@ -150,5 +150,10 @@ namespace SGPdotNET.Propogation
         public static double ReciprocalOfMinutesPerTimeUnit = 60 /
                                                               Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
                                                                         EarthGravitation);
+
+        /// <summary>
+        ///     The number of meters in a kilometer
+        /// </summary>
+        public static double MetersPerKilometer = 1000;
     }
 }

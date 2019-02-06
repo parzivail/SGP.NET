@@ -1,5 +1,6 @@
 using System;
 using SGPdotNET.CoordinateSystem;
+using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation
@@ -66,7 +67,34 @@ namespace SGPdotNET.Observation
         /// <summary>
         ///     Direction relative to the observer
         /// </summary>
-        public RelativeDirection Direction => RangeRate < 0 ? RelativeDirection.Approaching : (Math.Abs(RangeRate) < double.Epsilon ? RelativeDirection.Fixed : RelativeDirection.Receding);
+        public RelativeDirection Direction => GetRelativeDirection();
+
+        /// <summary>
+        ///     Time for an ideal radio signal to travel the distance between the observer and the satellite, in seconds
+        /// </summary>
+        public double SignalDelay => GetSignalDelay();
+
+        private double GetSignalDelay()
+        {
+            return SgpConstants.SpeedOfLight / (Range * SgpConstants.MetersPerKilometer);
+        }
+
+        private RelativeDirection GetRelativeDirection()
+        {
+            if (Math.Abs(RangeRate) < double.Epsilon) return RelativeDirection.Fixed;
+            return RangeRate < 0 ? RelativeDirection.Approaching : RelativeDirection.Receding;
+        }
+
+        /// <summary>
+        ///     Predicts the doppler shift of the satellite relative to the observer, in Hz
+        /// </summary>
+        /// <param name="inputFrequency">The base RX/TX frequency, in Hz</param>
+        /// <returns>The doppler shift of the satellite</returns>
+        public double GetDopplerShift(double inputFrequency)
+        {
+            var rr = RangeRate * SgpConstants.MetersPerKilometer;
+            return -rr / SgpConstants.SpeedOfLight * inputFrequency;
+        }
 
         /// <inheritdoc />
         public override bool Equals(object obj)

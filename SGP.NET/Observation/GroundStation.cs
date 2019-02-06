@@ -122,20 +122,6 @@ namespace SGPdotNET.Observation
             return aer.Elevation >= minElevation;
         }
 
-        /// <summary>
-        ///     Predicts the doppler shift of the satellite relative to the ground station, in Hz
-        /// </summary>
-        /// <param name="satellite">The satellite to calculate the doppler shift for</param>
-        /// <param name="inputFrequency">The base RX/TX frequency, in Hz</param>
-        /// <returns>The doppler shift of the satellite</returns>
-        public double GetDopplerShift(Satellite satellite, double inputFrequency)
-        {
-            // *= 1000 => km/s to m/s
-            var rr = Location.LookAt(satellite.Predict()).RangeRate * 1000;
-
-            return -rr / SgpConstants.SpeedOfLight * inputFrequency;
-        }
-
         private enum SatelliteObservationState
         {
             Init,
