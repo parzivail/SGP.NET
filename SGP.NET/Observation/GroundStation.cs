@@ -34,11 +34,11 @@ namespace SGPdotNET.Observation
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
-        public List<SatelliteObservation> Observe(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime)
+        public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime)
         {
             start = start.Round(deltaTime);
 
-            var obs = new List<SatelliteObservation>();
+            var obs = new List<SatelliteVisibilityPeriod>();
 
             var t = start - deltaTime;
             var state = SatelliteObservationState.Init;
@@ -77,7 +77,7 @@ namespace SGPdotNET.Observation
                     if (state == SatelliteObservationState.Observing)
                     {
                         var azEl = eciLocation.LookAt(posEci);
-                        obs.Add(new SatelliteObservation(satellite, startedObserving, t, maxEl,
+                        obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl,
                             startAz, azEl.Azimuth));
                     }
 

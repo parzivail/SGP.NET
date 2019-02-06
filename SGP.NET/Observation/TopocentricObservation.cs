@@ -45,22 +45,22 @@ namespace SGPdotNET.Observation
         }
 
         /// <summary>
-        ///     Azimuth
+        ///     Azimuth relative to the observer
         /// </summary>
         public Angle Azimuth { get; }
 
         /// <summary>
-        ///     Elevation
+        ///     Elevation relative to the observer
         /// </summary>
         public Angle Elevation { get; }
 
         /// <summary>
-        ///     Range in kilometers
+        ///     Range relative to the observer, in kilometers
         /// </summary>
         public double Range { get; }
 
         /// <summary>
-        ///     Range rate in kilometers/second
+        ///     Range rate relative to the observer, in kilometers/second
         /// </summary>
         public double RangeRate { get; }
 
@@ -99,15 +99,11 @@ namespace SGPdotNET.Observation
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is GeodeticCoordinate geodetic &&
+            return obj is TopocentricObservation geodetic &&
                    Equals(geodetic);
         }
 
-        /// <summary>
-        ///     Checks equality between this object and another
-        /// </summary>
-        /// <param name="other">The other object of comparison</param>
-        /// <returns>True if the two objects are equal</returns>
+        /// <inheritdoc />
         protected bool Equals(TopocentricObservation other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
@@ -133,12 +129,5 @@ namespace SGPdotNET.Observation
             return
                 $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}km, RangeRate={RangeRate}km/s]";
         }
-    }
-
-    public enum RelativeDirection
-    {
-        Approaching,
-        Fixed,
-        Receding
     }
 }
