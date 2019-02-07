@@ -28,16 +28,19 @@ namespace SGPSandbox
             var state = TrackingState.ListingComPorts;
             Satellite tracking = null;
             SerialPort comPort = null;
-            
+
             while (true)
             {
                 switch (state)
                 {
                     case TrackingState.ListingComPorts:
                         comPort = SelectComPort();
-                        if (comPort.IsOpen)
-                            comPort.Close();
-                        comPort.Open();
+                        if (comPort != null)
+                        {
+                            if (comPort.IsOpen)
+                                comPort.Close();
+                            comPort.Open();
+                        }
                         state = TrackingState.ListingVisible;
                         break;
                     case TrackingState.ListingVisible:
@@ -55,7 +58,7 @@ namespace SGPSandbox
                         Console.WriteLine(tracking.Name);
                         Console.WriteLine($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
 
-                        comPort.Write($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
+                        comPort?.Write($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
 
                         Thread.Sleep(250);
                         break;
@@ -72,7 +75,12 @@ namespace SGPSandbox
         {
             Console.Clear();
 
+            const string none = "None";
             var ports = SerialPort.GetPortNames();
+            var portsL = ports.ToList();
+            portsL.Insert(0, "None");
+            ports = portsL.ToArray();
+
             for (var i = 0; i < ports.Length; i++)
             {
                 var sat = ports[i];
@@ -87,7 +95,7 @@ namespace SGPSandbox
                 input = Console.ReadLine();
             } while (!int.TryParse(input, out selectedPort));
 
-            return new SerialPort(ports[selectedPort], 115200);
+            return ports[selectedPort] == none ? null : new SerialPort(ports[selectedPort], 115200);
         }
 
         private static bool PressedKey(ConsoleKey needle)
