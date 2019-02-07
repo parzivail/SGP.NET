@@ -17,7 +17,7 @@ namespace SGPSandbox
         static void Main(string[] args)
         {
             var tleUrl = new Url("https://celestrak.com/NORAD/elements/weather.txt");
-            var provider = new RemoteTleProvider(new[] { tleUrl }, true);
+            var provider = new RemoteTleProvider(true, tleUrl);
             var tles = provider.GetTles();
             var satellites = tles.Select(pair => new Satellite(pair.Value)).ToList();
 
@@ -39,7 +39,7 @@ namespace SGPSandbox
                         if (PressedKey(ConsoleKey.Q))
                             state = TrackingState.ListingVisible;
                         TrackSatellite(gs, tracking);
-                        Thread.Sleep(500);
+                        Thread.Sleep(250);
                         break;
                 }
             }
