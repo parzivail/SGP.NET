@@ -17,11 +17,11 @@ namespace SGPdotNET.TLE
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="sourceFilename">The source that should be loaded</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
-        public LocalTleProvider(string sourceFilename, bool threeLine)
+        /// <param name="sourceFilenames">The source that should be loaded</param>
+        public LocalTleProvider(bool threeLine, params string[] sourceFilenames)
         {
-            LoadTles(sourceFilename, threeLine);
+            LoadTles(threeLine, sourceFilenames);
         }
 
         /// <inheritdoc />
@@ -36,17 +36,23 @@ namespace SGPdotNET.TLE
             return _tles;
         }
 
-        private void LoadTles(string sourceFilename, bool threeLine)
+        private void LoadTles(bool threeLine, IEnumerable<string> sourceFilenames)
         {
-            using (var sr = new StreamReader(sourceFilename))
+            _tles = new Dictionary<int, Tle>();
+            foreach (var sourceFilename in sourceFilenames)
             {
-                var restOfFile = sr.ReadToEnd()
-                    .Replace("\r\n", "\n") // normalize line endings
-                    .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                using (var sr = new StreamReader(sourceFilename))
+                {
+                    var restOfFile = sr.ReadToEnd()
+                        .Replace("\r\n", "\n") // normalize line endings
+                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                var elementSets = Tle.ParseElements(restOfFile, threeLine);
+                    var elementSets = Tle.ParseElements(restOfFile, threeLine);
 
-                _tles = elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+                    var tempSet = elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
+
+                    _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key))).ToDictionary(x => x.Key, x => x.Value);
+                }
             }
         }
     }

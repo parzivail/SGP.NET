@@ -23,22 +23,21 @@ namespace SGPdotNET.TLE
 
         /// <inheritdoc />
         /// <summary>
-        ///     Constructor
+        ///     Constructor, defaulting to max-age of 24 hours
         /// </summary>
-        /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
-        public RemoteTleProvider(IEnumerable<Url> sources, bool threeLine) : this(sources, threeLine,
-            TimeSpan.FromDays(1))
+        /// <param name="sources">The sources that should be queried</param>
+        public RemoteTleProvider(bool threeLine, params Url[] sources) : this(threeLine, TimeSpan.FromDays(1), sources)
         {
         }
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
-        public RemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge)
+        /// <param name="sources">The sources that should be queried</param>
+        public RemoteTleProvider(bool threeLine, TimeSpan maxAge, params Url[] sources)
         {
             _sources = sources;
             ThreeLine = threeLine;

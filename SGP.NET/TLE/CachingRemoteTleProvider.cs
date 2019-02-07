@@ -18,14 +18,14 @@ namespace SGPdotNET.TLE
 
         /// <inheritdoc />
         /// <summary>
-        ///     Constructor
+        ///     Constructor, defaulting to max-age of 24 hours
         /// </summary>
-        /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public CachingRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, string localFilename)
-            : this(sources, threeLine,
-                TimeSpan.FromDays(1), localFilename)
+        /// <param name="sources">The sources that should be queried</param>
+        public CachingRemoteTleProvider(bool threeLine, string localFilename, params Url[] sources)
+            : this(threeLine, TimeSpan.FromDays(1),
+                localFilename, sources)
         {
         }
 
@@ -33,12 +33,12 @@ namespace SGPdotNET.TLE
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="sources">The sources that should be queried</param>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        public CachingRemoteTleProvider(IEnumerable<Url> sources, bool threeLine, TimeSpan maxAge,
-            string localFilename) : base(sources, threeLine, maxAge)
+        /// <param name="sources">The sources that should be queried</param>
+        public CachingRemoteTleProvider(bool threeLine, TimeSpan maxAge, string localFilename,
+            params Url[] sources) : base(threeLine, maxAge, sources)
         {
             _localFilename = localFilename;
         }
