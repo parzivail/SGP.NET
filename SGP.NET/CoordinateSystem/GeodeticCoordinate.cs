@@ -43,12 +43,12 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Latitude, where -PI &lt;= latitude (radians) &lt; PI
+        ///     Latitude, where -PI/2 (South Pole) &lt;= latitude (radians) &lt; PI/2 (North Pole)
         /// </summary>
         public Angle Latitude { get; }
 
         /// <summary>
-        ///     Longitude, where -PI/2 &lt;= latitude (radians) &lt; PI/2
+        ///     Longitude, where -PI &lt;= longitude (radians) &lt; PI
         /// </summary>
         public Angle Longitude { get; }
 
