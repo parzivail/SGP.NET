@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SGPdotNET.CoordinateSystem;
-using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation
@@ -34,7 +33,8 @@ namespace SGPdotNET.Observation
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
-        public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime)
+        public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end,
+            TimeSpan deltaTime)
         {
             start = start.Round(deltaTime);
 

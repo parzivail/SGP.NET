@@ -1,5 +1,4 @@
 using System;
-using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 

@@ -36,7 +36,11 @@ namespace SGPdotNET.TLE
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
-        /// <param name="sources">The sources that should be queried</param>
+        /// <param name="sources">
+        ///     The sources that should be queried. If the sources change after a cache has already been written,
+        ///     the cached TLEs will take priority over the new sources. Consider having the filename reflect the source it's
+        ///     caching.
+        /// </param>
         public CachingRemoteTleProvider(bool threeLine, TimeSpan maxAge, string localFilename,
             params Url[] sources) : base(threeLine, maxAge, sources)
         {
