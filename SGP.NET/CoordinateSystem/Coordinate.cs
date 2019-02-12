@@ -155,7 +155,7 @@ namespace SGPdotNET.CoordinateSystem
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
         /// </summary>
         /// <returns>A list of geodetic coordinates</returns>
-        public List<Coordinate> GetFootprintBoundary()
+        public List<GeodeticCoordinate> GetFootprintBoundary()
         {
             return GetFootprintBoundary(DateTime.UtcNow);
         }
@@ -166,10 +166,10 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="time">The time to predict the footprint</param>
         /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<Coordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
+        public List<GeodeticCoordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
         {
             var center = ToGeodetic();
-            var coords = new List<Coordinate>();
+            var coords = new List<GeodeticCoordinate>();
 
             var lat = center.Latitude;
             var lon = center.Longitude;
@@ -184,6 +184,8 @@ namespace SGPdotNET.CoordinateSystem
                 var lngRadians = lon.Radians +
                                  Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
                                      Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
+                
+                lngRadians = MathUtil.WrapNegPosPi(lngRadians);
 
                 coords.Add(new GeodeticCoordinate(new Angle(latRadians), new Angle(lngRadians), 10));
             }
