@@ -11,6 +11,21 @@ namespace SGPdotNET.CoordinateSystem
     public class GeodeticCoordinate : Coordinate
     {
         /// <summary>
+        ///     Latitude, where -PI/2 (South Pole) &lt;= latitude (radians) &lt; PI/2 (North Pole)
+        /// </summary>
+        public Angle Latitude { get; }
+
+        /// <summary>
+        ///     Longitude, where -PI &lt;= longitude (radians) &lt; PI
+        /// </summary>
+        public Angle Longitude { get; }
+
+        /// <summary>
+        ///     Altitude in kilometers
+        /// </summary>
+        public double Altitude { get; }
+
+        /// <summary>
         ///     Creates a new geodetic coordinate at the origin
         /// </summary>
         public GeodeticCoordinate()
@@ -41,21 +56,6 @@ namespace SGPdotNET.CoordinateSystem
             Longitude = geo.Longitude;
             Altitude = geo.Altitude;
         }
-
-        /// <summary>
-        ///     Latitude, where -PI/2 (South Pole) &lt;= latitude (radians) &lt; PI/2 (North Pole)
-        /// </summary>
-        public Angle Latitude { get; }
-
-        /// <summary>
-        ///     Longitude, where -PI &lt;= longitude (radians) &lt; PI
-        /// </summary>
-        public Angle Longitude { get; }
-
-        /// <summary>
-        ///     Altitude in kilometers
-        /// </summary>
-        public double Altitude { get; }
 
         /// <inheritdoc />
         /// <summary>

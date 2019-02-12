@@ -13,15 +13,6 @@ namespace SGPdotNET.Util
         public static readonly Angle Zero = new Angle(0);
 
         /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="angle">The angle to be stored in the object, in radians</param>
-        public Angle(double angle)
-        {
-            Radians = angle;
-        }
-
-        /// <summary>
         ///     The angle represented by this object, in degrees
         /// </summary>
         public double Degrees => MathUtil.RadiansToDegrees(Radians);
@@ -30,6 +21,15 @@ namespace SGPdotNET.Util
         ///     The angle represented by this object, in radians
         /// </summary>
         public double Radians { get; }
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="angle">The angle to be stored in the object, in radians</param>
+        public Angle(double angle)
+        {
+            Radians = angle;
+        }
 
         /// <inheritdoc />
         public override bool Equals(object obj)

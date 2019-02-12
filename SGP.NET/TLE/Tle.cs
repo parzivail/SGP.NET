@@ -61,57 +61,6 @@ namespace SGPdotNET.TLE
         private double _rightAscendingNode;
 
         /// <summary>
-        ///     Initialise TLE with two lines
-        /// </summary>
-        /// <param name="lineOne">The first line of the set</param>
-        /// <param name="lineTwo">The second line of the set</param>
-        public Tle(string lineOne, string lineTwo)
-        {
-            Line1 = lineOne;
-            Line2 = lineTwo;
-            Initialize();
-        }
-
-        /// <summary>
-        ///     Initialise 3LE with a name and two lines
-        /// </summary>
-        /// <param name="name">The 0th line (name) of the set</param>
-        /// <param name="lineOne">The first line of the set</param>
-        /// <param name="lineTwo">The second line of the set</param>
-        public Tle(string name, string lineOne, string lineTwo)
-        {
-            Name = name;
-            Line1 = lineOne;
-            Line2 = lineTwo;
-            Initialize();
-        }
-
-        /// <summary>
-        ///     Create a new Tle as a copy of the specified one
-        /// </summary>
-        /// <param name="tle">Object to copy from</param>
-        public Tle(Tle tle)
-        {
-            Name = tle.Name;
-            Line1 = tle.Line1;
-            Line2 = tle.Line2;
-
-            NoradNumber = tle.NoradNumber;
-            IntDesignator = tle.IntDesignator;
-            Epoch = tle.Epoch;
-            _meanMotionDt2 = tle._meanMotionDt2;
-            _meanMotionDdt6 = tle._meanMotionDdt6;
-            _bstar = tle._bstar;
-            _inclination = tle._inclination;
-            _rightAscendingNode = tle._rightAscendingNode;
-            _eccentricity = tle._eccentricity;
-            _argumentPerigee = tle._argumentPerigee;
-            _meanAnomaly = tle._meanAnomaly;
-            _meanMotion = tle._meanMotion;
-            _orbitNumber = tle._orbitNumber;
-        }
-
-        /// <summary>
         ///     The name of the satellite
         /// </summary>
         public string Name { get; private set; }
@@ -194,6 +143,57 @@ namespace SGPdotNET.TLE
         /// </summary>
         /// <returns></returns>
         public Angle MeanAnomaly => new AngleDegrees(_meanAnomaly);
+
+        /// <summary>
+        ///     Initialise TLE with two lines
+        /// </summary>
+        /// <param name="lineOne">The first line of the set</param>
+        /// <param name="lineTwo">The second line of the set</param>
+        public Tle(string lineOne, string lineTwo)
+        {
+            Line1 = lineOne;
+            Line2 = lineTwo;
+            Initialize();
+        }
+
+        /// <summary>
+        ///     Initialise 3LE with a name and two lines
+        /// </summary>
+        /// <param name="name">The 0th line (name) of the set</param>
+        /// <param name="lineOne">The first line of the set</param>
+        /// <param name="lineTwo">The second line of the set</param>
+        public Tle(string name, string lineOne, string lineTwo)
+        {
+            Name = name;
+            Line1 = lineOne;
+            Line2 = lineTwo;
+            Initialize();
+        }
+
+        /// <summary>
+        ///     Create a new Tle as a copy of the specified one
+        /// </summary>
+        /// <param name="tle">Object to copy from</param>
+        public Tle(Tle tle)
+        {
+            Name = tle.Name;
+            Line1 = tle.Line1;
+            Line2 = tle.Line2;
+
+            NoradNumber = tle.NoradNumber;
+            IntDesignator = tle.IntDesignator;
+            Epoch = tle.Epoch;
+            _meanMotionDt2 = tle._meanMotionDt2;
+            _meanMotionDdt6 = tle._meanMotionDdt6;
+            _bstar = tle._bstar;
+            _inclination = tle._inclination;
+            _rightAscendingNode = tle._rightAscendingNode;
+            _eccentricity = tle._eccentricity;
+            _argumentPerigee = tle._argumentPerigee;
+            _meanAnomaly = tle._meanAnomaly;
+            _meanMotion = tle._meanMotion;
+            _orbitNumber = tle._orbitNumber;
+        }
 
         /// <summary>
         ///     Parses a list of TLEs from a list of TLE lines

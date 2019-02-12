@@ -11,6 +11,11 @@ namespace SGPdotNET.Observation
     public class GroundStation
     {
         /// <summary>
+        ///     The location of the ground station
+        /// </summary>
+        public Coordinate Location { get; }
+
+        /// <summary>
         ///     Creates a new ground station at the specified location
         /// </summary>
         /// <param name="location">The location of the ground station</param>
@@ -18,11 +23,6 @@ namespace SGPdotNET.Observation
         {
             Location = location;
         }
-
-        /// <summary>
-        ///     The location of the ground station
-        /// </summary>
-        public Coordinate Location { get; }
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the

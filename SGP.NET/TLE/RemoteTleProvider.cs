@@ -44,29 +44,6 @@ namespace SGPdotNET.TLE
             MaxAge = maxAge;
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
-        /// </summary>
-        /// <param name="satelliteId">The satellite to retrieve</param>
-        /// <returns>The remote TLE for the specified satellite</returns>
-        public Tle GetTle(int satelliteId)
-        {
-            CacheRemoteTles();
-            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
-        /// </summary>
-        /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
-        public Dictionary<int, Tle> GetTles()
-        {
-            CacheRemoteTles();
-            return _cachedTles;
-        }
-
         private void CacheRemoteTles()
         {
             if (DateTime.UtcNow < LastRefresh + MaxAge)
@@ -96,6 +73,29 @@ namespace SGPdotNET.TLE
             }
 
             return tles;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
+        /// </summary>
+        /// <param name="satelliteId">The satellite to retrieve</param>
+        /// <returns>The remote TLE for the specified satellite</returns>
+        public Tle GetTle(int satelliteId)
+        {
+            CacheRemoteTles();
+            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
+        /// </summary>
+        /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+        public Dictionary<int, Tle> GetTles()
+        {
+            CacheRemoteTles();
+            return _cachedTles;
         }
     }
 }

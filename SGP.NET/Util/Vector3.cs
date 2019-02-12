@@ -7,6 +7,26 @@ namespace SGPdotNET.Util
     /// </summary>
     public class Vector3
     {
+        /// <summary>
+        ///     The X component of this vector
+        /// </summary>
+        public double X { get; }
+
+        /// <summary>
+        ///     The Y component of this vector
+        /// </summary>
+        public double Y { get; }
+
+        /// <summary>
+        ///     The Z component of this vector
+        /// </summary>
+        public double Z { get; }
+
+        /// <summary>
+        ///     The length of this vector
+        /// </summary>
+        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
+
         /// <inheritdoc />
         /// <summary>
         ///     Create a new Vector3 at the origin
@@ -40,26 +60,6 @@ namespace SGPdotNET.Util
             Y = v.Y;
             Z = v.Z;
         }
-
-        /// <summary>
-        ///     The X component of this vector
-        /// </summary>
-        public double X { get; }
-
-        /// <summary>
-        ///     The Y component of this vector
-        /// </summary>
-        public double Y { get; }
-
-        /// <summary>
-        ///     The Z component of this vector
-        /// </summary>
-        public double Z { get; }
-
-        /// <summary>
-        ///     The length of this vector
-        /// </summary>
-        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
 
         /// <summary>
         ///     Calculates the dot product of this vector and another

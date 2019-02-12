@@ -9,20 +9,6 @@ namespace SGPdotNET.Exception
     /// </summary>
     public class DecayedException : System.Exception
     {
-        /// <inheritdoc />
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="time">Time of the event</param>
-        /// <param name="position">Position of the satellite at time</param>
-        /// <param name="velocity">Velocity of the satellite at time</param>
-        public DecayedException(DateTime time, Vector3 position, Vector3 velocity) : base("Satellite decayed")
-        {
-            Time = time;
-            Position = position;
-            Velocity = velocity;
-        }
-
         /// <summary>
         ///     Time of the event
         /// </summary>
@@ -37,5 +23,19 @@ namespace SGPdotNET.Exception
         ///     Velocity of the satellite at time
         /// </summary>
         public Vector3 Velocity { get; }
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="time">Time of the event</param>
+        /// <param name="position">Position of the satellite at time</param>
+        /// <param name="velocity">Velocity of the satellite at time</param>
+        public DecayedException(DateTime time, Vector3 position, Vector3 velocity) : base("Satellite decayed")
+        {
+            Time = time;
+            Position = position;
+            Velocity = velocity;
+        }
     }
 }

@@ -10,6 +10,36 @@ namespace SGPdotNET.Observation
     public class TopocentricObservation
     {
         /// <summary>
+        ///     Azimuth relative to the observer
+        /// </summary>
+        public Angle Azimuth { get; }
+
+        /// <summary>
+        ///     Elevation relative to the observer
+        /// </summary>
+        public Angle Elevation { get; }
+
+        /// <summary>
+        ///     Range relative to the observer, in kilometers
+        /// </summary>
+        public double Range { get; }
+
+        /// <summary>
+        ///     Range rate relative to the observer, in kilometers/second
+        /// </summary>
+        public double RangeRate { get; }
+
+        /// <summary>
+        ///     Direction relative to the observer
+        /// </summary>
+        public RelativeDirection Direction => GetRelativeDirection();
+
+        /// <summary>
+        ///     Time for an ideal radio signal to travel the distance between the observer and the satellite, in seconds
+        /// </summary>
+        public double SignalDelay => GetSignalDelay();
+
+        /// <summary>
         ///     Creates a new topocentirc coordinate at the origin
         /// </summary>
         public TopocentricObservation()
@@ -42,36 +72,6 @@ namespace SGPdotNET.Observation
             Range = topo.Range;
             RangeRate = topo.RangeRate;
         }
-
-        /// <summary>
-        ///     Azimuth relative to the observer
-        /// </summary>
-        public Angle Azimuth { get; }
-
-        /// <summary>
-        ///     Elevation relative to the observer
-        /// </summary>
-        public Angle Elevation { get; }
-
-        /// <summary>
-        ///     Range relative to the observer, in kilometers
-        /// </summary>
-        public double Range { get; }
-
-        /// <summary>
-        ///     Range rate relative to the observer, in kilometers/second
-        /// </summary>
-        public double RangeRate { get; }
-
-        /// <summary>
-        ///     Direction relative to the observer
-        /// </summary>
-        public RelativeDirection Direction => GetRelativeDirection();
-
-        /// <summary>
-        ///     Time for an ideal radio signal to travel the distance between the observer and the satellite, in seconds
-        /// </summary>
-        public double SignalDelay => GetSignalDelay();
 
         private double GetSignalDelay()
         {

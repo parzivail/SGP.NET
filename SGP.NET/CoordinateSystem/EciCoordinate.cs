@@ -11,6 +11,21 @@ namespace SGPdotNET.CoordinateSystem
     public class EciCoordinate : Coordinate
     {
         /// <summary>
+        ///     The time component of the coordinate
+        /// </summary>
+        public DateTime Time { get; }
+
+        /// <summary>
+        ///     The position component of the coordinate
+        /// </summary>
+        public Vector3 Position { get; }
+
+        /// <summary>
+        ///     The velocity component of the coordinate
+        /// </summary>
+        public Vector3 Velocity { get; }
+
+        /// <summary>
         ///     Creates a new ECI coordinate at the origin
         /// </summary>
         public EciCoordinate()
@@ -67,21 +82,6 @@ namespace SGPdotNET.CoordinateSystem
             Position = position;
             Velocity = velocity;
         }
-
-        /// <summary>
-        ///     The time component of the coordinate
-        /// </summary>
-        public DateTime Time { get; }
-
-        /// <summary>
-        ///     The position component of the coordinate
-        /// </summary>
-        public Vector3 Position { get; }
-
-        /// <summary>
-        ///     The velocity component of the coordinate
-        /// </summary>
-        public Vector3 Velocity { get; }
 
         /// <inheritdoc />
         /// <summary>

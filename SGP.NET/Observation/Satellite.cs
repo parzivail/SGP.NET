@@ -12,6 +12,21 @@ namespace SGPdotNET.Observation
     {
         private readonly Sgp4 _sgp4;
 
+        /// <summary>
+        ///     The two-line element representation of the satellite
+        /// </summary>
+        public Tle Tle { get; }
+
+        /// <summary>
+        ///     The name of this satellite
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        ///     The orbit information of the satellite
+        /// </summary>
+        public Orbit Orbit => _sgp4.Orbit;
+
         /// <inheritdoc />
         /// <summary>
         ///     Constructor
@@ -44,21 +59,6 @@ namespace SGPdotNET.Observation
 
             Name = tle.Name;
         }
-
-        /// <summary>
-        ///     The two-line element representation of the satellite
-        /// </summary>
-        public Tle Tle { get; }
-
-        /// <summary>
-        ///     The name of this satellite
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        ///     The orbit information of the satellite
-        /// </summary>
-        public Orbit Orbit => _sgp4.Orbit;
 
         /// <summary>
         ///     Predicts the satellite's real-time location

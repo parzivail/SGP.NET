@@ -184,7 +184,7 @@ namespace SGPdotNET.CoordinateSystem
                 var lngRadians = lon.Radians +
                                  Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
                                      Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
-                
+
                 lngRadians = MathUtil.WrapNegPosPi(lngRadians);
 
                 coords.Add(new GeodeticCoordinate(new Angle(latRadians), new Angle(lngRadians), 10));

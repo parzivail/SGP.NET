@@ -24,18 +24,6 @@ namespace SGPdotNET.TLE
             LoadTles(threeLine, sourceFilenames);
         }
 
-        /// <inheritdoc />
-        public Tle GetTle(int satelliteId)
-        {
-            return !_tles.ContainsKey(satelliteId) ? null : _tles[satelliteId];
-        }
-
-        /// <inheritdoc />
-        public Dictionary<int, Tle> GetTles()
-        {
-            return _tles;
-        }
-
         private void LoadTles(bool threeLine, IEnumerable<string> sourceFilenames)
         {
             _tles = new Dictionary<int, Tle>();
@@ -53,6 +41,18 @@ namespace SGPdotNET.TLE
                     _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
                         .ToDictionary(x => x.Key, x => x.Value);
                 }
+        }
+
+        /// <inheritdoc />
+        public Tle GetTle(int satelliteId)
+        {
+            return !_tles.ContainsKey(satelliteId) ? null : _tles[satelliteId];
+        }
+
+        /// <inheritdoc />
+        public Dictionary<int, Tle> GetTles()
+        {
+            return _tles;
         }
     }
 }
