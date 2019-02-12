@@ -19,7 +19,7 @@ using System.Resources;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion("1.0.2.1")]
+[assembly: AssemblyVersion("1.0.3.0")]
 [assembly: NeutralResourcesLanguage("")]
 
 // The following attributes are used to specify the signing key for the assembly,

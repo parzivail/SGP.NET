@@ -10,7 +10,15 @@
     <projectUrl>https://github.com/parzivail/SGP.NET</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixed ECI to ECI conversion.</releaseNotes>
+    <releaseNotes>
+		* Added direction property to TopocentricObservation
+		* Added signal delay calculation to TopocentricObservation
+		* Moved GetDopplerShift to TopocentricObservation
+		* Fixed TopocentricObservation equality comparison infinite loop
+		* Moved SatelliteObservation to SatelliteVisibilityPeriod, added equality comparisons
+		* Added multiple local source capability to LocalTleProvider
+		* Added `params` supply system URLs/filenames of ITleProviders
+	</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>satellite orbit tracking prediction observation sgp4</tags>
   </metadata>
