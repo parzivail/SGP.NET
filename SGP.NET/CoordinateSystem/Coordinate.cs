@@ -15,6 +15,16 @@ namespace SGPdotNET.CoordinateSystem
         private static readonly int[] LocCharRangeAaYy = {18, 10, 24, 10, 25, 10};
 
         /// <summary>
+        ///     A coordinate that represents the geographic North Pole
+        /// </summary>
+        public static Coordinate NorthPole = new GeodeticCoordinate(new AngleDegrees(90), Angle.Zero, 0);
+
+        /// <summary>
+        ///     A coordinate that represents the geographic South Pole
+        /// </summary>
+        public static Coordinate SouthPole = new GeodeticCoordinate(new AngleDegrees(-90), Angle.Zero, 0);
+
+        /// <summary>
         ///     Converts this position to an ECI one
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
@@ -204,7 +214,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Calculates the Great Circle distance as an angle to another geodetic coordinate
+        ///     Calculates the Great Circle distance as an angle to another geodetic coordinate, ignoring altitude
         /// </summary>
         /// <param name="to">The coordinate to measure against</param>
         /// <returns>The distance between the coordinates as an angle across Earth's surface</returns>
@@ -221,12 +231,23 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
+        ///     Returns true if there is line-of-sight between this coordinate and the supplied one by checking if this coordinate
+        ///     is within the footprint of the other
+        /// </summary>
+        /// <param name="other">The coordinate to check against</param>
+        /// <returns>True if there is line-of-sight between this coordinate and the supplied one</returns>
+        public bool CanSee(Coordinate other)
+        {
+            return DistanceTo(other) < other.GetFootprint();
+        }
+
+        /// <summary>
         ///     Calculates the look angles between this coordinate and target
         /// </summary>
         /// <param name="time">The time of observation</param>
         /// <param name="to">The coordinate to observe</param>
         /// <returns>The topocentric angles between this coordinate and another</returns>
-        public TopocentricObservation LookAt(Coordinate to, DateTime? time = null)
+        public TopocentricObservation Observe(Coordinate to, DateTime? time = null)
         {
             var t = DateTime.UtcNow;
             if (time.HasValue)

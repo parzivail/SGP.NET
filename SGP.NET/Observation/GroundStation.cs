@@ -59,7 +59,7 @@ namespace SGPdotNET.Observation
                     if (state == SatelliteObservationState.Init)
                         continue;
 
-                    var azEl = eciLocation.LookAt(posEci);
+                    var azEl = eciLocation.Observe(posEci);
 
                     if (azEl.Elevation > maxEl)
                         maxEl = azEl.Elevation;
@@ -76,7 +76,7 @@ namespace SGPdotNET.Observation
                 {
                     if (state == SatelliteObservationState.Observing)
                     {
-                        var azEl = eciLocation.LookAt(posEci);
+                        var azEl = eciLocation.Observe(posEci);
                         obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl,
                             startAz, azEl.Azimuth));
                     }
@@ -99,7 +99,7 @@ namespace SGPdotNET.Observation
         {
             var eciLocation = Location.ToEci(time);
             var posEci = satellite.Predict(time);
-            return eciLocation.LookAt(posEci);
+            return eciLocation.Observe(posEci);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace SGPdotNET.Observation
             if (Math.Abs(minElevation.Degrees) < double.Epsilon)
                 return true;
 
-            var aer = Location.LookAt(pos);
+            var aer = Location.Observe(pos);
             return aer.Elevation >= minElevation;
         }
 
