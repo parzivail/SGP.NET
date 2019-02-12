@@ -25,20 +25,20 @@ namespace SGPdotNET.CoordinateSystem
         public static Coordinate SouthPole = new GeodeticCoordinate(new AngleDegrees(-90), Angle.Zero, 0);
 
         /// <summary>
-        ///     Converts this position to an ECI one
+        ///     Converts this coordinate to an ECI one
         /// </summary>
         /// <param name="dt">The time for the ECI frame</param>
-        /// <returns>The position in an ECI reference frame with the supplied time</returns>
+        /// <returns>The coordinate in an ECI reference frame with the supplied time</returns>
         public abstract EciCoordinate ToEci(DateTime dt);
 
         /// <summary>
-        ///     Converts this position to a geodetic one
+        ///     Converts this coordinate to a geodetic one
         /// </summary>
-        /// <returns>The position in a geodetic reference frame</returns>
+        /// <returns>The coordinate in a geodetic reference frame</returns>
         public abstract GeodeticCoordinate ToGeodetic();
 
         /// <summary>
-        ///     Converts this position to it's Maidenhead Locator System representation, disregarding altitude
+        ///     Converts this coordinate to its Maidenhead Locator System representation, disregarding altitude
         /// </summary>
         /// <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
@@ -50,7 +50,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Converts this position to it's Maidenhead Locator System representation, disregarding altitude
+        ///     Converts this coordinate to its Maidenhead Locator System representation, disregarding altitude
         /// </summary>
         /// <param name="pairCount">The number of pairs in the conversion, which defines the precision</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
@@ -99,7 +99,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Converts this position to it's Degrees-Minutes-Seconds (DMS) representation, disregarding altitude
+        ///     Converts this coordinate to its Degrees-Minutes-Seconds (DMS) representation, disregarding altitude
         /// </summary>
         /// <returns>The Degrees-Minutes-Seconds representation string</returns>
         public string ToDegreesMinutesSeconds()
@@ -125,7 +125,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Converts this position to an ECEF one, assuming a spherical earth
+        ///     Converts this coordinate to an ECEF one, assuming a spherical earth
         /// </summary>
         /// <returns>A spherical ECEF coordinate vector</returns>
         public Vector3 ToSphericalEcef()
@@ -141,8 +141,8 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Calculates the visibility radius (km) of the satellite by which any distances from this position less than the
-        ///     radius are able to see this position
+        ///     Calculates the visibility radius (km) of the satellite by which any distances from this coordinate less than the
+        ///     radius are able to see this coordinate
         /// </summary>
         /// <returns>The visibility radius, in kilometers</returns>
         public double GetFootprint()
@@ -151,8 +151,8 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Calculates the visibility radius (radians) of the satellite by which any distances from this position less than the
-        ///     radius are able to see this position
+        ///     Calculates the visibility radius (radians) of the satellite by which any distances from this coordinate less than the
+        ///     radius are able to see this coordinate
         /// </summary>
         /// <returns>The visibility radius as an angle across Earth's surface</returns>
         public Angle GetFootprintAngle()
@@ -238,7 +238,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <returns>True if there is line-of-sight between this coordinate and the supplied one</returns>
         public bool CanSee(Coordinate other)
         {
-            return DistanceTo(other) < other.GetFootprint();
+            return AngleTo(other) < other.GetFootprintAngle();
         }
 
         /// <summary>
