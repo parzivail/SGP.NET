@@ -52,7 +52,7 @@
     <Compile Include="TLE\CachingRemoteTleProvider.cs" />
     <Compile Include="TLE\RemoteTleProvider.cs" />
     <Compile Include="Observation\Satellite.cs" />
-    <Compile Include="Exception\SatelliteException.cs" />
+    <Compile Include="Exception\SatellitePropagationException.cs" />
     <Compile Include="Observation\SatelliteVisibilityPeriod.cs" />
     <Compile Include="Propogation\SGP4.cs" />
     <Compile Include="Util\Angle.cs" />

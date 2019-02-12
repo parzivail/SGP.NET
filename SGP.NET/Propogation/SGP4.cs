@@ -70,11 +70,11 @@ namespace SGPdotNET.Propogation
         {
             Reset();
 
-            if (Orbit.Eccentricity < 0.0 || Orbit.Eccentricity > 0.999)
-                throw new SatelliteException("GetEccentricity out of range");
+            if (Orbit.Eccentricity < 0 || Orbit.Eccentricity >= 1)
+                throw new SatellitePropagationException("GetEccentricity out of range");
 
             if (Orbit.Inclination.Radians < 0.0 || Orbit.Inclination.Radians > Math.PI)
-                throw new SatelliteException("GetInclination out of range");
+                throw new SatellitePropagationException("GetInclination out of range");
 
             _commonConsts.Cosio = Math.Cos(Orbit.Inclination.Radians);
             _commonConsts.Sinio = Math.Sin(Orbit.Inclination.Radians);
@@ -251,7 +251,7 @@ namespace SGPdotNET.Propogation
             DeepSpaceSecular(tsince, ref xmdf, omgadf, xnode, ref e, ref xincl, ref xn);
 
             if (xn <= 0.0)
-                throw new SatelliteException("Error: (xn <= 0.0)");
+                throw new SatellitePropagationException("Error: (xn <= 0.0)");
 
             var a = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / xn, SgpConstants.TwoThirds) * tempa * tempa;
             e -= tempe;
@@ -277,7 +277,7 @@ namespace SGPdotNET.Propogation
              * fix tolerance for error recognition
              */
             if (e <= -0.001)
-                throw new SatelliteException("Error: (e <= -0.001)");
+                throw new SatellitePropagationException("Error: (e <= -0.001)");
 
             if (e < 1.0e-6)
                 e = 1.0e-6;
@@ -369,7 +369,7 @@ namespace SGPdotNET.Propogation
              * fix tolerance for error recognition
              */
             if (e <= -0.001)
-                throw new SatelliteException("Error: (e <= -0.001)");
+                throw new SatellitePropagationException("Error: (e <= -0.001)");
             if (e < 1.0e-6)
                 e = 1.0e-6;
             else if (e > 1.0 - 1.0e-6)
@@ -416,7 +416,7 @@ namespace SGPdotNET.Propogation
             var elsq = axn * axn + ayn * ayn;
 
             if (elsq >= 1.0)
-                throw new SatelliteException("Error: (elsq >= 1.0)");
+                throw new SatellitePropagationException("Error: (elsq >= 1.0)");
 
             /*
              * solve keplers equation
@@ -492,7 +492,7 @@ namespace SGPdotNET.Propogation
             var pl = a * temp21;
 
             if (pl < 0.0)
-                throw new SatelliteException("Error: (pl < 0.0)");
+                throw new SatellitePropagationException("Error: (pl < 0.0)");
 
             var r = a * (1.0 - ecose);
             var temp31 = 1.0 / r;
