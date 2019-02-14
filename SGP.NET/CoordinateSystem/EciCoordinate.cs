@@ -140,12 +140,28 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <inheritdoc />
+        protected bool Equals(EciCoordinate other)
+        {
+            return base.Equals(other) && Time.Equals(other.Time) && Equals(Position, other.Position) &&
+                   Equals(Velocity, other.Velocity);
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(EciCoordinate left, EciCoordinate right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(EciCoordinate left, EciCoordinate right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is EciCoordinate eci &&
-                   Time == eci.Time &&
-                   Position.Equals(eci.Position) &&
-                   Velocity.Equals(eci.Velocity);
+            return obj is EciCoordinate eci && Equals(eci);
         }
     }
 }

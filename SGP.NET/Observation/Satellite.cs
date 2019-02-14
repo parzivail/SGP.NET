@@ -78,5 +78,37 @@ namespace SGPdotNET.Observation
         {
             return _sgp4.FindPosition(time);
         }
+
+        /// <inheritdoc />
+        protected bool Equals(Satellite other)
+        {
+            return Tle.Equals(other.Tle);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Satellite sat && Equals(sat);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Tle.GetHashCode();
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(Satellite left, Satellite right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(Satellite left, Satellite right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

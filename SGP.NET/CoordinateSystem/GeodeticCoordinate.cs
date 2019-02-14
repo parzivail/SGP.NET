@@ -111,6 +111,18 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <inheritdoc />
+        public static bool operator ==(GeodeticCoordinate left, GeodeticCoordinate right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(GeodeticCoordinate left, GeodeticCoordinate right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked

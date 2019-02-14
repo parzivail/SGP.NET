@@ -96,17 +96,18 @@ namespace SGPdotNET.Observation
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
-        {
-            return obj is TopocentricObservation geodetic &&
-                   Equals(geodetic);
-        }
-
-        /// <inheritdoc />
         protected bool Equals(TopocentricObservation other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
                    RangeRate.Equals(other.RangeRate);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is TopocentricObservation top && Equals(top);
         }
 
         /// <inheritdoc />
@@ -120,6 +121,18 @@ namespace SGPdotNET.Observation
                 hashCode = (hashCode * 397) ^ RangeRate.GetHashCode();
                 return hashCode;
             }
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(TopocentricObservation left, TopocentricObservation right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(TopocentricObservation left, TopocentricObservation right)
+        {
+            return !Equals(left, right);
         }
 
         /// <inheritdoc />

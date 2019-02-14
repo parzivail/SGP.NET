@@ -151,7 +151,8 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Calculates the visibility radius (radians) of the satellite by which any distances from this coordinate less than the
+        ///     Calculates the visibility radius (radians) of the satellite by which any distances from this coordinate less than
+        ///     the
         ///     radius are able to see this coordinate
         /// </summary>
         /// <returns>The visibility radius as an angle across Earth's surface</returns>
@@ -285,6 +286,36 @@ namespace SGPdotNET.CoordinateSystem
             var rate = range.Dot(rangeRate) / range.Length;
 
             return new TopocentricObservation(new Angle(az), new Angle(el), range.Length, rate);
+        }
+
+        /// <inheritdoc />
+        protected bool Equals(Coordinate other)
+        {
+            return ToGeodetic().Equals(other.ToGeodetic());
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(Coordinate left, Coordinate right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(Coordinate left, Coordinate right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            return obj is Coordinate coord && Equals(coord);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return ToGeodetic().GetHashCode();
         }
     }
 }

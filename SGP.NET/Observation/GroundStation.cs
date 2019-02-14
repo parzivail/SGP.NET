@@ -18,9 +18,11 @@ namespace SGPdotNET.Observation
         /// <summary>
         ///     Creates a new ground station at the specified location
         /// </summary>
-        /// <param name="location">The location of the ground station</param>
+        /// <param name="location">The location of the ground station. Cannot be null</param>
         public GroundStation(Coordinate location)
         {
+            if (location is null)
+                throw new ArgumentNullException(nameof(location));
             Location = location;
         }
 
@@ -120,6 +122,38 @@ namespace SGPdotNET.Observation
 
             var aer = Location.Observe(pos);
             return aer.Elevation >= minElevation;
+        }
+
+        /// <inheritdoc />
+        protected bool Equals(GroundStation other)
+        {
+            return Equals(Location, other.Location);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is GroundStation gs && Equals(gs);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Location.GetHashCode();
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(GroundStation left, GroundStation right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(GroundStation left, GroundStation right)
+        {
+            return !Equals(left, right);
         }
 
         private enum SatelliteObservationState

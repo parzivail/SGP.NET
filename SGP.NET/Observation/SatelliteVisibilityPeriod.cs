@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation
@@ -59,30 +58,47 @@ namespace SGPdotNET.Observation
             EndAzimuth = endAzimuth;
         }
 
-        /// <inhetitdoc />
+        /// <inheritdoc />
+        protected bool Equals(SatelliteVisibilityPeriod other)
+        {
+            return Satellite.Equals(other.Satellite) && Start.Equals(other.Start) && End.Equals(other.End) &&
+                   MaxElevation.Equals(other.MaxElevation) && StartAzimuth.Equals(other.StartAzimuth) &&
+                   EndAzimuth.Equals(other.EndAzimuth);
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            var period = obj as SatelliteVisibilityPeriod;
-            return period != null &&
-                   EqualityComparer<Satellite>.Default.Equals(Satellite, period.Satellite) &&
-                   Start == period.Start &&
-                   End == period.End &&
-                   EqualityComparer<Angle>.Default.Equals(MaxElevation, period.MaxElevation) &&
-                   EqualityComparer<Angle>.Default.Equals(StartAzimuth, period.StartAzimuth) &&
-                   EqualityComparer<Angle>.Default.Equals(EndAzimuth, period.EndAzimuth);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is SatelliteVisibilityPeriod per && Equals(per);
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            var hashCode = -1273434506;
-            hashCode = hashCode * -1521134295 + EqualityComparer<Satellite>.Default.GetHashCode(Satellite);
-            hashCode = hashCode * -1521134295 + Start.GetHashCode();
-            hashCode = hashCode * -1521134295 + End.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<Angle>.Default.GetHashCode(MaxElevation);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Angle>.Default.GetHashCode(StartAzimuth);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Angle>.Default.GetHashCode(EndAzimuth);
-            return hashCode;
+            unchecked
+            {
+                var hashCode = Satellite.GetHashCode();
+                hashCode = (hashCode * 397) ^ Start.GetHashCode();
+                hashCode = (hashCode * 397) ^ End.GetHashCode();
+                hashCode = (hashCode * 397) ^ MaxElevation.GetHashCode();
+                hashCode = (hashCode * 397) ^ StartAzimuth.GetHashCode();
+                hashCode = (hashCode * 397) ^ EndAzimuth.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(SatelliteVisibilityPeriod left, SatelliteVisibilityPeriod right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(SatelliteVisibilityPeriod left, SatelliteVisibilityPeriod right)
+        {
+            return !Equals(left, right);
         }
     }
 }

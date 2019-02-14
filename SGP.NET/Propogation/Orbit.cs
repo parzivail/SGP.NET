@@ -120,40 +120,57 @@ namespace SGPdotNET.Propogation
         }
 
         /// <inheritdoc />
+        protected bool Equals(Orbit other)
+        {
+            return MeanAnomoly.Equals(other.MeanAnomoly) && AscendingNode.Equals(other.AscendingNode) &&
+                   ArgumentPerigee.Equals(other.ArgumentPerigee) && MeanMotion.Equals(other.MeanMotion) &&
+                   RecoveredSemiMajorAxis.Equals(other.RecoveredSemiMajorAxis) &&
+                   RecoveredMeanMotion.Equals(other.RecoveredMeanMotion) && Perigee.Equals(other.Perigee) &&
+                   Apogee.Equals(other.Apogee) && Period.Equals(other.Period) && Epoch.Equals(other.Epoch) &&
+                   BStar.Equals(other.BStar) && Eccentricity.Equals(other.Eccentricity) &&
+                   Inclination.Equals(other.Inclination);
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is Orbit elements &&
-                   Equals(MeanAnomoly, elements.MeanAnomoly) &&
-                   Equals(AscendingNode, elements.AscendingNode) &&
-                   Equals(ArgumentPerigee, elements.ArgumentPerigee) &&
-                   Equals(MeanMotion, elements.MeanMotion) &&
-                   Equals(RecoveredSemiMajorAxis, elements.RecoveredSemiMajorAxis) &&
-                   Equals(RecoveredMeanMotion, elements.RecoveredMeanMotion) &&
-                   Equals(Perigee, elements.Perigee) &&
-                   Equals(Period, elements.Period) &&
-                   Equals(Epoch, elements.Epoch) &&
-                   Equals(BStar, elements.BStar) &&
-                   Equals(Eccentricity, elements.Eccentricity) &&
-                   Equals(Inclination, elements.Inclination);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Orbit o && Equals(o);
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            var hashCode = 410639991;
-            hashCode = hashCode * -1521134295 + MeanAnomoly.GetHashCode();
-            hashCode = hashCode * -1521134295 + AscendingNode.GetHashCode();
-            hashCode = hashCode * -1521134295 + ArgumentPerigee.GetHashCode();
-            hashCode = hashCode * -1521134295 + MeanMotion.GetHashCode();
-            hashCode = hashCode * -1521134295 + RecoveredSemiMajorAxis.GetHashCode();
-            hashCode = hashCode * -1521134295 + RecoveredMeanMotion.GetHashCode();
-            hashCode = hashCode * -1521134295 + Perigee.GetHashCode();
-            hashCode = hashCode * -1521134295 + Period.GetHashCode();
-            hashCode = hashCode * -1521134295 + Epoch.GetHashCode();
-            hashCode = hashCode * -1521134295 + BStar.GetHashCode();
-            hashCode = hashCode * -1521134295 + Eccentricity.GetHashCode();
-            hashCode = hashCode * -1521134295 + Inclination.GetHashCode();
-            return hashCode;
+            unchecked
+            {
+                var hashCode = MeanAnomoly.GetHashCode();
+                hashCode = (hashCode * 397) ^ AscendingNode.GetHashCode();
+                hashCode = (hashCode * 397) ^ ArgumentPerigee.GetHashCode();
+                hashCode = (hashCode * 397) ^ MeanMotion.GetHashCode();
+                hashCode = (hashCode * 397) ^ RecoveredSemiMajorAxis.GetHashCode();
+                hashCode = (hashCode * 397) ^ RecoveredMeanMotion.GetHashCode();
+                hashCode = (hashCode * 397) ^ Perigee.GetHashCode();
+                hashCode = (hashCode * 397) ^ Apogee.GetHashCode();
+                hashCode = (hashCode * 397) ^ Period.GetHashCode();
+                hashCode = (hashCode * 397) ^ Epoch.GetHashCode();
+                hashCode = (hashCode * 397) ^ BStar.GetHashCode();
+                hashCode = (hashCode * 397) ^ Eccentricity.GetHashCode();
+                hashCode = (hashCode * 397) ^ Inclination.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(Orbit left, Orbit right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(Orbit left, Orbit right)
+        {
+            return !Equals(left, right);
         }
     }
 }

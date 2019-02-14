@@ -409,5 +409,40 @@ namespace SGPdotNET.TLE
             if (!double.TryParse(temp, out val))
                 throw new TleException("Failed to convert value to double");
         }
+
+        /// <inheritdoc />
+        protected bool Equals(Tle other)
+        {
+            return string.Equals(Line1, other.Line1) && string.Equals(Line2, other.Line2);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Tle t && Equals(t);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Line1.GetHashCode() * 397) ^ Line2.GetHashCode();
+            }
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(Tle left, Tle right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(Tle left, Tle right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

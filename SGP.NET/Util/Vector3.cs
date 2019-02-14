@@ -144,22 +144,41 @@ namespace SGPdotNET.Util
         }
 
         /// <inheritdoc />
+        protected bool Equals(Vector3 other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is Vector3 vector &&
-                   Equals(X, vector.X) &&
-                   Equals(Y, vector.Y) &&
-                   Equals(Z, vector.Z);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Vector3 v && Equals(v);
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            var hashCode = 707706286;
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            hashCode = hashCode * -1521134295 + Z.GetHashCode();
-            return hashCode;
+            unchecked
+            {
+                var hashCode = X.GetHashCode();
+                hashCode = (hashCode * 397) ^ Y.GetHashCode();
+                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(Vector3 left, Vector3 right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(Vector3 left, Vector3 right)
+        {
+            return !Equals(left, right);
         }
     }
 }
