@@ -43,21 +43,10 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
         /// <returns>The Maidenhead representation string</returns>
-        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers,
-            MaidenheadStandard standard = MaidenheadStandard.AaToXx)
-        {
-            return ToMaidenhead((int) precision + 1, standard);
-        }
-
-        /// <summary>
-        ///     Converts this coordinate to its Maidenhead Locator System representation, disregarding altitude
-        /// </summary>
-        /// <param name="pairCount">The number of pairs in the conversion, which defines the precision</param>
-        /// <param name="standard">The conversion standard to use for the 5th pair</param>
-        /// <returns>The Maidenhead representation string</returns>
-        public string ToMaidenhead(int pairCount, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
-        {
+        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
+        { 
             var geo = ToGeodetic();
+            var pairCount = (int) precision + 1;
 
             var locator = new char[pairCount * 2];
             int[] charRange;
