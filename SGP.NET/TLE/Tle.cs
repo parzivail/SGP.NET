@@ -334,7 +334,7 @@ namespace SGPdotNET.TLE
         {
             if (pointPos == -1)
                 str = "0." + str;
-            val = double.Parse(str);
+            val = double.Parse(str, CultureInfo.InvariantCulture);
         }
 
         private static void ExtractExponential(string str, out double val)
@@ -367,7 +367,7 @@ namespace SGPdotNET.TLE
                                        str.Substring(str.IndexOf("-"));
             }
 
-            val = (double) decimal.Parse(correctedString, NumberStyles.Float);
+            val = (double)decimal.Parse(correctedString, NumberStyles.Float, CultureInfo.InvariantCulture);
 
             var temp = "";
 
@@ -406,7 +406,7 @@ namespace SGPdotNET.TLE
                         throw new TleException("Invalid digit");
                 }
 
-            if (!double.TryParse(temp, out val))
+            if (!double.TryParse(temp, NumberStyles.Float, CultureInfo.InvariantCulture, out val))
                 throw new TleException("Failed to convert value to double");
         }
 
