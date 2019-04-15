@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 
 namespace SGPdotNET.TLE
@@ -23,7 +22,7 @@ namespace SGPdotNET.TLE
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="localFilename">The file in which the TLEs will be locally cached</param>
         /// <param name="sources">The sources that should be queried</param>
-        public CachingRemoteTleProvider(bool threeLine, string localFilename, params Url[] sources)
+        public CachingRemoteTleProvider(bool threeLine, string localFilename, params Uri[] sources)
             : this(threeLine, TimeSpan.FromDays(1),
                 localFilename, sources)
         {
@@ -42,7 +41,7 @@ namespace SGPdotNET.TLE
         ///     caching.
         /// </param>
         public CachingRemoteTleProvider(bool threeLine, TimeSpan maxAge, string localFilename,
-            params Url[] sources) : base(threeLine, maxAge, sources)
+            params Uri[] sources) : base(threeLine, maxAge, sources)
         {
             _localFilename = localFilename;
         }

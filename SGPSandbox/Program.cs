@@ -17,7 +17,7 @@ namespace SGPSandbox
     {
         static void Main(string[] args)
         {
-            var tleUrl = new Url("https://celestrak.com/NORAD/elements/visual.txt");
+            var tleUrl = new Uri("https://celestrak.com/NORAD/elements/visual.txt");
             var provider = new RemoteTleProvider(true, tleUrl);
             var tles = provider.GetTles();
             var satellites = tles.Select(pair => new Satellite(pair.Value)).ToList();

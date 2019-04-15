@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Security.Policy;
 
 namespace SGPdotNET.TLE
 {
@@ -12,7 +11,7 @@ namespace SGPdotNET.TLE
     public class RemoteTleProvider : ITleProvider
     {
         private readonly object _lock = new object();
-        private readonly IEnumerable<Url> _sources;
+        private readonly IEnumerable<Uri> _sources;
 
         internal readonly TimeSpan MaxAge;
         internal readonly bool ThreeLine;
@@ -27,7 +26,7 @@ namespace SGPdotNET.TLE
         /// </summary>
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="sources">The sources that should be queried</param>
-        public RemoteTleProvider(bool threeLine, params Url[] sources) : this(threeLine, TimeSpan.FromDays(1), sources)
+        public RemoteTleProvider(bool threeLine, params Uri[] sources) : this(threeLine, TimeSpan.FromDays(1), sources)
         {
         }
 
@@ -37,7 +36,7 @@ namespace SGPdotNET.TLE
         /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
         /// <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
         /// <param name="sources">The sources that should be queried</param>
-        public RemoteTleProvider(bool threeLine, TimeSpan maxAge, params Url[] sources)
+        public RemoteTleProvider(bool threeLine, TimeSpan maxAge, params Uri[] sources)
         {
             _sources = sources;
             ThreeLine = threeLine;
@@ -61,7 +60,7 @@ namespace SGPdotNET.TLE
             {
                 foreach (var source in _sources)
                 {
-                    var file = wc.DownloadString(source.Value)
+                    var file = wc.DownloadString(source)
                         .Replace("\r\n", "\n") // normalize line endings
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
