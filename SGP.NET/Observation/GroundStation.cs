@@ -21,9 +21,7 @@ namespace SGPdotNET.Observation
         /// <param name="location">The location of the ground station. Cannot be null</param>
         public GroundStation(Coordinate location)
         {
-            if (location is null)
-                throw new ArgumentNullException(nameof(location));
-            Location = location;
+            Location = location ?? throw new ArgumentNullException(nameof(location));
         }
 
         /// <summary>

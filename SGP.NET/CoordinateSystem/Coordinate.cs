@@ -43,8 +43,9 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
         /// <param name="standard">The conversion standard to use for the 5th pair</param>
         /// <returns>The Maidenhead representation string</returns>
-        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers, MaidenheadStandard standard = MaidenheadStandard.AaToXx)
-        { 
+        public string ToMaidenhead(MaidenheadPrecision precision = MaidenheadPrecision.FiveKilometers,
+            MaidenheadStandard standard = MaidenheadStandard.AaToXx)
+        {
             var geo = ToGeodetic();
             var pairCount = (int) precision + 1;
 

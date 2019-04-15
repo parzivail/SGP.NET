@@ -367,7 +367,7 @@ namespace SGPdotNET.TLE
                                        str.Substring(str.IndexOf("-"));
             }
 
-            val = (double)decimal.Parse(correctedString, NumberStyles.Float, CultureInfo.InvariantCulture);
+            val = (double) decimal.Parse(correctedString, NumberStyles.Float, CultureInfo.InvariantCulture);
 
             var temp = "";
 
