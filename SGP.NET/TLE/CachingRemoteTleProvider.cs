@@ -7,6 +7,7 @@ using System.Text;
 
 namespace SGPdotNET.TLE
 {
+#if !NETSTANDARD1_4
     /// <inheritdoc cref="RemoteTleProvider" />
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
@@ -49,21 +50,24 @@ namespace SGPdotNET.TLE
         internal override Dictionary<int, Tle> FetchNewTles()
         {
             if (File.Exists(_localFilename))
-                using (var sr = new StreamReader(_localFilename))
+                using (var file = File.OpenRead(_localFilename))
                 {
-                    var dateLine = sr.ReadLine();
-
-                    if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
-                            out var date) && DateTime.UtcNow - date < MaxAge)
+                    using (var sr = new StreamReader(file))
                     {
-                        LastRefresh = date;
-                        var restOfFile = sr.ReadToEnd()
-                            .Replace("\r\n", "\n") // normalize line endings
-                            .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                        var dateLine = sr.ReadLine();
 
-                        var elementSets = Tle.ParseElements(restOfFile, ThreeLine);
+                        if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
+                                out var date) && DateTime.UtcNow - date < MaxAge)
+                        {
+                            LastRefresh = date;
+                            var restOfFile = sr.ReadToEnd()
+                                .Replace("\r\n", "\n") // normalize line endings
+                                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                        return elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+                            var elementSets = Tle.ParseElements(restOfFile, ThreeLine);
+
+                            return elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
+                        }
                     }
                 }
 
@@ -87,4 +91,5 @@ namespace SGPdotNET.TLE
             File.WriteAllText(_localFilename, sb.ToString(), Encoding.UTF8);
         }
     }
+#endif
 }

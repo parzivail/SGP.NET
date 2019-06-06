@@ -4,6 +4,7 @@ using System.Net;
 
 namespace SGPdotNET.TLE
 {
+#if !NETSTANDARD1_4
     /// <inheritdoc cref="ITleProvider" />
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
@@ -97,4 +98,5 @@ namespace SGPdotNET.TLE
             return _cachedTles;
         }
     }
+#endif
 }
