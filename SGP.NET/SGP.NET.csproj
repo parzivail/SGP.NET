@@ -1,68 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A8C667B9-1875-4083-829D-72566A69C0F6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>SGPdotNET</RootNamespace>
-    <AssemblyName>SGP.NET</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworks>netstandard1.4;net45</TargetFrameworks>
+    <PackageId>SGP.NET</PackageId>
+    <Version>1.0.5</Version>
+    <Authors>parzivail</Authors>
+    <Company>parzivail</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/parzivail/SGP.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/parzivail/SGP.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright 2019</Copyright>
+    <PackageTags>satellite orbit tracking prediction observation sgp4</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <Description>C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.</Description>
+    <GenerateDocumentationFile Condition="'$(Configuration)'=='Release'">true</GenerateDocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\Debug\SGP.NET.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>
-    </DocumentationFile>
-    <RegisterForComInterop>false</RegisterForComInterop>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CoordinateSystem\MaidenheadPrecision.cs" />
-    <Compile Include="CoordinateSystem\MaidenheadStandard.cs" />
-    <Compile Include="Observation\GroundStation.cs" />
-    <Compile Include="CoordinateSystem\Coordinate.cs" />
-    <Compile Include="Observation\RelativeDirection.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CoordinateSystem\GeodeticCoordinate.cs" />
-    <Compile Include="Observation\TopocentricObservation.cs" />
-    <Compile Include="Exception\DecayedException.cs" />
-    <Compile Include="CoordinateSystem\EciCoordinate.cs" />
-    <Compile Include="Propogation\SgpConstants.cs" />
-    <Compile Include="Propogation\Orbit.cs" />
-    <Compile Include="TLE\LocalTleProvider.cs" />
-    <Compile Include="TLE\ITleProvider.cs" />
-    <Compile Include="TLE\CachingRemoteTleProvider.cs" />
-    <Compile Include="TLE\RemoteTleProvider.cs" />
-    <Compile Include="Observation\Satellite.cs" />
-    <Compile Include="Exception\SatellitePropagationException.cs" />
-    <Compile Include="Observation\SatelliteVisibilityPeriod.cs" />
-    <Compile Include="Propogation\SGP4.cs" />
-    <Compile Include="Util\Angle.cs" />
-    <Compile Include="Util\AngleDegrees.cs" />
-    <Compile Include="Util\TimeExtensions.cs" />
-    <Compile Include="TLE\Tle.cs" />
-    <Compile Include="Exception\TleException.cs" />
-    <Compile Include="Util\MathUtil.cs" />
-    <Compile Include="Util\Vector3.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
 </Project>

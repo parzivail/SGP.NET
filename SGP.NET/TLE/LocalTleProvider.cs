@@ -28,18 +28,21 @@ namespace SGPdotNET.TLE
         {
             _tles = new Dictionary<int, Tle>();
             foreach (var sourceFilename in sourceFilenames)
-                using (var sr = new StreamReader(sourceFilename))
+                using (var file = File.OpenRead(sourceFilename))
                 {
-                    var restOfFile = sr.ReadToEnd()
-                        .Replace("\r\n", "\n") // normalize line endings
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                    using (var sr = new StreamReader(file))
+                    {
+                        var restOfFile = sr.ReadToEnd()
+                            .Replace("\r\n", "\n") // normalize line endings
+                            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                    var elementSets = Tle.ParseElements(restOfFile, threeLine);
+                        var elementSets = Tle.ParseElements(restOfFile, threeLine);
 
-                    var tempSet = elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+                        var tempSet = elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
 
-                    _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
-                        .ToDictionary(x => x.Key, x => x.Value);
+                        _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
+                            .ToDictionary(x => x.Key, x => x.Value);
+                    }
                 }
         }
 
