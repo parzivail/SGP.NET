@@ -129,10 +129,16 @@ namespace SGPdotNET.Util
         public static Angle operator -(Angle angle1, Angle angle2)
         {
             return new Angle(angle1.Radians - angle2.Radians);
-        }
+		}
 
-        /// <inheritdoc />
-        public override string ToString()
+		/// <summary>
+		/// Implicit cast operator that assumes numbers that are found without a typecast are degrees
+		/// </summary>
+		/// <param name="d"></param>
+		public static implicit operator Angle(double d) => new AngleDegrees(d);
+
+		/// <inheritdoc />
+		public override string ToString()
         {
             return $"Angle[{Degrees}°]";
         }

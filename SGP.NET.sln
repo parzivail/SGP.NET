@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP.NET", "SGP.NET\SGP.NET.csproj", "{A8C667B9-1875-4083-829D-72566A69C0F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGP.NET", "SGP.NET\SGP.NET.csproj", "{A8C667B9-1875-4083-829D-72566A69C0F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGPSandbox", "SGPSandbox\SGPSandbox.csproj", "{5C9B47B4-C685-42B6-B3F4-C46C9A266A50}"
 EndProject

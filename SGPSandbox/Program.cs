@@ -29,6 +29,14 @@ namespace SGPSandbox
             Satellite tracking = null;
             SerialPort comPort = null;
 
+            Angle a = 180;
+            var b = (AngleDegrees) 180;
+            var c = (AngleRadians) Math.PI;
+
+			Console.WriteLine(a.Degrees);
+			Console.WriteLine(b.Degrees);
+			Console.WriteLine(c.Degrees);
+
             while (true)
             {
                 switch (state)

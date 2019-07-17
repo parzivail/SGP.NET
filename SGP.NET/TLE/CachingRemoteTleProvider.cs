@@ -4,10 +4,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SGPdotNET.TLE
 {
-#if !NETSTANDARD1_4
     /// <inheritdoc cref="RemoteTleProvider" />
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
@@ -47,7 +47,7 @@ namespace SGPdotNET.TLE
             _localFilename = localFilename;
         }
 
-        internal override Dictionary<int, Tle> FetchNewTles()
+        internal override async Task<Dictionary<int, Tle>> FetchNewTles()
         {
             if (File.Exists(_localFilename))
                 using (var file = File.OpenRead(_localFilename))
@@ -71,7 +71,7 @@ namespace SGPdotNET.TLE
                     }
                 }
 
-            var tles = base.FetchNewTles();
+            var tles = await base.FetchNewTles();
             WriteOutNewTles(tles);
 
             return tles;
@@ -91,5 +91,4 @@ namespace SGPdotNET.TLE
             File.WriteAllText(_localFilename, sb.ToString(), Encoding.UTF8);
         }
     }
-#endif
 }

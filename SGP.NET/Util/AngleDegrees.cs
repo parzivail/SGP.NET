@@ -12,5 +12,7 @@
         public AngleDegrees(double angle) : base(MathUtil.DegreesToRadians(angle))
         {
         }
-    }
+
+        public static explicit operator AngleDegrees(double d) => new AngleDegrees(d);
+	}
 }

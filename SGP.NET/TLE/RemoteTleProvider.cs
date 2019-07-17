@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SGPdotNET.TLE
 {
-#if !NETSTANDARD1_4
     /// <inheritdoc cref="ITleProvider" />
     /// <summary>
     ///     Provides a class to retrieve TLEs from a remote network resource
@@ -44,24 +45,25 @@ namespace SGPdotNET.TLE
             MaxAge = maxAge;
         }
 
-        private void CacheRemoteTles()
+        private async Task CacheRemoteTles()
         {
             if (DateTime.UtcNow < LastRefresh + MaxAge)
                 return;
 
-            _cachedTles = FetchNewTles();
+            _cachedTles = await FetchNewTles();
 
             LastRefresh = DateTime.UtcNow;
         }
 
-        internal virtual Dictionary<int, Tle> FetchNewTles()
+        internal virtual async Task<Dictionary<int, Tle>> FetchNewTles()
         {
             var tles = new Dictionary<int, Tle>();
-            using (var wc = new WebClient())
+            using (var wc = new HttpClient())
             {
                 foreach (var source in _sources)
                 {
-                    var file = wc.DownloadString(source)
+	                var str = await wc.GetStringAsync(source);
+					var file = str
                         .Replace("\r\n", "\n") // normalize line endings
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
@@ -75,7 +77,27 @@ namespace SGPdotNET.TLE
             return tles;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
+        /// </summary>
+        /// <param name="satelliteId">The satellite to retrieve</param>
+        /// <returns>The remote TLE for the specified satellite</returns>
+        public async Task<Tle> GetTleAsync(int satelliteId)
+        {
+            await CacheRemoteTles();
+            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+        }
+
+        /// <summary>
+        ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
+        /// </summary>
+        /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+        public async Task<Dictionary<int, Tle>> GetTlesAsync()
+        {
+            await CacheRemoteTles();
+            return _cachedTles;
+        }
+
         /// <summary>
         ///     Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
         /// </summary>
@@ -83,20 +105,18 @@ namespace SGPdotNET.TLE
         /// <returns>The remote TLE for the specified satellite</returns>
         public Tle GetTle(int satelliteId)
         {
-            CacheRemoteTles();
-            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+            CacheRemoteTles().Wait();
+			return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
-        /// <inheritdoc />
         /// <summary>
         ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
         /// </summary>
         /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
         public Dictionary<int, Tle> GetTles()
         {
-            CacheRemoteTles();
+            CacheRemoteTles().Wait();
             return _cachedTles;
         }
     }
-#endif
 }
