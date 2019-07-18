@@ -1,4 +1,5 @@
 using System;
+using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
@@ -29,6 +30,11 @@ namespace SGPdotNET.Observation
         /// </summary>
         public double RangeRate { get; }
 
+		/// <summary>
+		///		The position from which the satellite was observed to generate this observation
+		/// </summary>
+        public Coordinate ReferencePosition { get; }
+
         /// <summary>
         ///     Direction relative to the observer
         /// </summary>
@@ -40,37 +46,40 @@ namespace SGPdotNET.Observation
         public double SignalDelay => GetSignalDelay();
 
         /// <summary>
-        ///     Creates a new topocentirc coordinate at the origin
+        ///     Creates a new topocentric coordinate at the origin
         /// </summary>
         public TopocentricObservation()
         {
         }
 
-        /// <summary>
-        ///     Creates a new topocentirc coordinate with the specified values
-        /// </summary>
-        /// <param name="azimuth">Azimuth</param>
-        /// <param name="elevation">Elevation</param>
-        /// <param name="range">Range in kilometers</param>
-        /// <param name="rangeRate">Range rate in kilometers/second</param>
-        public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate)
+		/// <summary>
+		///     Creates a new topocentric coordinate with the specified values
+		/// </summary>
+		/// <param name="azimuth">Azimuth</param>
+		/// <param name="elevation">Elevation</param>
+		/// <param name="range">Range in kilometers</param>
+		/// <param name="rangeRate">Range rate in kilometers/second</param>
+		/// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+		public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
         {
             Azimuth = azimuth;
             Elevation = elevation;
             Range = range;
             RangeRate = rangeRate;
+            ReferencePosition = referencePosition;
         }
 
-        /// <summary>
-        ///     Creates a new topocentirc coordinate as a copy of the specified one
-        /// </summary>
-        /// <param name="topo">Object to copy from</param>
-        public TopocentricObservation(TopocentricObservation topo)
+		/// <summary>
+		///     Creates a new topocentric coordinate as a copy of the specified one
+		/// </summary>
+		/// <param name="topo">Object to copy from</param>
+		public TopocentricObservation(TopocentricObservation topo)
         {
             Azimuth = topo.Azimuth;
             Elevation = topo.Elevation;
             Range = topo.Range;
             RangeRate = topo.RangeRate;
+            ReferencePosition = topo.ReferencePosition;
         }
 
         private double GetSignalDelay()

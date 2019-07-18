@@ -275,7 +275,7 @@ namespace SGPdotNET.CoordinateSystem
             var el = Math.Asin(topZ / range.Length);
             var rate = range.Dot(rangeRate) / range.Length;
 
-            return new TopocentricObservation(new Angle(az), new Angle(el), range.Length, rate);
+            return new TopocentricObservation(new Angle(az), new Angle(el), range.Length, rate, this);
         }
 
         /// <inheritdoc />

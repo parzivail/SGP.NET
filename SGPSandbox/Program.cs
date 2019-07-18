@@ -22,20 +22,12 @@ namespace SGPSandbox
             var tles = provider.GetTles();
             var satellites = tles.Select(pair => new Satellite(pair.Value)).ToList();
 
-            var minAngle = new AngleDegrees(10);
-            var gs = new GroundStation(new GeodeticCoordinate(new AngleDegrees(30.229777), new AngleDegrees(-81.617525), 0));
+            var minAngle = (Angle)10;
+            var gs = new GroundStation(new GeodeticCoordinate(30.229777, -81.617525, 0));
 
             var state = TrackingState.ListingComPorts;
             Satellite tracking = null;
             SerialPort comPort = null;
-
-            Angle a = 180;
-            var b = (AngleDegrees) 180;
-            var c = (AngleRadians) Math.PI;
-
-			Console.WriteLine(a.Degrees);
-			Console.WriteLine(b.Degrees);
-			Console.WriteLine(c.Degrees);
 
             while (true)
             {
@@ -115,7 +107,7 @@ namespace SGPSandbox
 
         }
 
-        private static Satellite SelectVisibleSatellite(List<Satellite> satellites, GroundStation gs, AngleDegrees minAngle)
+        private static Satellite SelectVisibleSatellite(List<Satellite> satellites, GroundStation gs, Angle minAngle)
         {
             var visible = new List<Satellite>();
             visible.Clear();
