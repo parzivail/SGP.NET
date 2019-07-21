@@ -26,15 +26,16 @@ namespace SGPdotNET.Observation
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
-        ///     satellite from this ground station is seen at or after the start parameter
+        ///     satellite from this ground station is seen at, after, or optionally before (see <paramref name="includeIntrerrupted"/>) the start parameter
         /// </summary>
         /// <param name="satellite">The satellite to observe</param>
         /// <param name="start">The time to start observing</param>
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
+        /// <param name="includeIntrerrupted">Whether or not to include periods which may have started before the observation start time</param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
         public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end,
-            TimeSpan deltaTime)
+            TimeSpan deltaTime, bool includeIntrerrupted = false)
         {
             start = start.Round(deltaTime);
 
@@ -44,7 +45,6 @@ namespace SGPdotNET.Observation
             var state = SatelliteObservationState.Init;
 
             var startedObserving = start;
-            var startAz = Angle.Zero;
             var maxEl = Angle.Zero;
 
             while (t <= end || state == SatelliteObservationState.Observing)
@@ -56,7 +56,7 @@ namespace SGPdotNET.Observation
 
                 if (IsVisible(posEci, Angle.Zero))
                 {
-                    if (state == SatelliteObservationState.Init)
+                    if (state == SatelliteObservationState.Init && !includeIntrerrupted)
                         continue;
 
                     var azEl = eciLocation.Observe(posEci);
@@ -64,21 +64,14 @@ namespace SGPdotNET.Observation
                     if (azEl.Elevation > maxEl)
                         maxEl = azEl.Elevation;
 
-                    if (state == SatelliteObservationState.NotObserving)
-                    {
-                        startAz = azEl.Azimuth;
-                        startedObserving = t;
-                    }
+                    if (state == SatelliteObservationState.NotObserving) startedObserving = t;
 
                     state = SatelliteObservationState.Observing;
                 }
                 else
                 {
                     if (state == SatelliteObservationState.Observing)
-                    {
-                        var azEl = eciLocation.Observe(posEci);
                         obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl, Location));
-                    }
 
                     maxEl = Angle.Zero;
                     state = SatelliteObservationState.NotObserving;
@@ -113,9 +106,6 @@ namespace SGPdotNET.Observation
             var footprint = pGeo.GetFootprintAngle();
 
             if (Location.AngleTo(pGeo) > footprint) return false;
-
-            if (Math.Abs(minElevation.Degrees) < double.Epsilon)
-                return true;
 
             var aer = Location.Observe(pos);
             return aer.Elevation >= minElevation;
