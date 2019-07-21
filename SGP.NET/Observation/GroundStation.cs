@@ -77,8 +77,7 @@ namespace SGPdotNET.Observation
                     if (state == SatelliteObservationState.Observing)
                     {
                         var azEl = eciLocation.Observe(posEci);
-                        obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl,
-                            startAz, azEl.Azimuth));
+                        obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl, Location));
                     }
 
                     maxEl = Angle.Zero;

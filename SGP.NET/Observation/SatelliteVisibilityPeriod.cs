@@ -1,4 +1,5 @@
 ﻿using System;
+using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation
@@ -29,14 +30,9 @@ namespace SGPdotNET.Observation
         public Angle MaxElevation { get; }
 
         /// <summary>
-        ///     The azimuth at the start of the observation
+        ///		The position from which the satellite was observed to generate this observation
         /// </summary>
-        public Angle StartAzimuth { get; }
-
-        /// <summary>
-        ///     The azimuth at the end of the observation
-        /// </summary>
-        public Angle EndAzimuth { get; }
+        public Coordinate ReferencePosition { get; }
 
         /// <summary>
         ///     Constructor
@@ -45,25 +41,21 @@ namespace SGPdotNET.Observation
         /// <param name="start">The start time of the observation</param>
         /// <param name="end">The end time of the observation</param>
         /// <param name="maxElevation">The max elevation reached during observation</param>
-        /// <param name="startAzimuth">The azimuth at the start of the observation</param>
-        /// <param name="endAzimuth">The azimuth at the end of the observation</param>
-        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation,
-            Angle startAzimuth, Angle endAzimuth)
+        /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation, Coordinate referencePosition = null)
         {
             Satellite = satellite;
             Start = start;
             End = end;
             MaxElevation = maxElevation;
-            StartAzimuth = startAzimuth;
-            EndAzimuth = endAzimuth;
+            ReferencePosition = referencePosition;
         }
 
         /// <inheritdoc />
         protected bool Equals(SatelliteVisibilityPeriod other)
         {
             return Satellite.Equals(other.Satellite) && Start.Equals(other.Start) && End.Equals(other.End) &&
-                   MaxElevation.Equals(other.MaxElevation) && StartAzimuth.Equals(other.StartAzimuth) &&
-                   EndAzimuth.Equals(other.EndAzimuth);
+                   MaxElevation.Equals(other.MaxElevation) && ReferencePosition.Equals(other.ReferencePosition);
         }
 
         /// <inheritdoc />
@@ -83,8 +75,7 @@ namespace SGPdotNET.Observation
                 hashCode = (hashCode * 397) ^ Start.GetHashCode();
                 hashCode = (hashCode * 397) ^ End.GetHashCode();
                 hashCode = (hashCode * 397) ^ MaxElevation.GetHashCode();
-                hashCode = (hashCode * 397) ^ StartAzimuth.GetHashCode();
-                hashCode = (hashCode * 397) ^ EndAzimuth.GetHashCode();
+                hashCode = (hashCode * 397) ^ ReferencePosition.GetHashCode();
                 return hashCode;
             }
         }

@@ -59,7 +59,6 @@ namespace SGPdotNET.Observation
 		/// <param name="elevation">Elevation</param>
 		/// <param name="range">Range in kilometers</param>
 		/// <param name="rangeRate">Range rate in kilometers/second</param>
-		/// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
 		public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
         {
             Azimuth = azimuth;
@@ -108,7 +107,7 @@ namespace SGPdotNET.Observation
         protected bool Equals(TopocentricObservation other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) &&
-                   RangeRate.Equals(other.RangeRate);
+                   RangeRate.Equals(other.RangeRate) && ReferencePosition.Equals(other.ReferencePosition);
         }
 
         /// <inheritdoc />
@@ -128,6 +127,7 @@ namespace SGPdotNET.Observation
                 hashCode = (hashCode * 397) ^ Elevation.GetHashCode();
                 hashCode = (hashCode * 397) ^ Range.GetHashCode();
                 hashCode = (hashCode * 397) ^ RangeRate.GetHashCode();
+                hashCode = (hashCode * 397) ^ ReferencePosition.GetHashCode();
                 return hashCode;
             }
         }
