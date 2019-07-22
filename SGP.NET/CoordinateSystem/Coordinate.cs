@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
 using SGPdotNET.Observation;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
+using System;
+using System.Collections.Generic;
 
 namespace SGPdotNET.CoordinateSystem
 {
@@ -72,7 +72,7 @@ namespace SGPdotNET.CoordinateSystem
                 var divisions = 1;
 
                 /* The 1e-6 here guards against floating point rounding errors */
-                ordinate = ordinate + 270.000001 % 180.0;
+                ordinate += 270.000001 % 180.0;
                 for (var pair = 0; pair < pairCount; ++pair)
                 {
                     divisions *= charRange[pair];
@@ -153,21 +153,11 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <summary>
-        ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint
-        /// </summary>
-        /// <returns>A list of geodetic coordinates</returns>
-        public List<GeodeticCoordinate> GetFootprintBoundary()
-        {
-            return GetFootprintBoundary(DateTime.UtcNow);
-        }
-
-        /// <summary>
         ///     Gets a list of geodetic coordinates which define the bounds of the visibility footprint at a specific time
         /// </summary>
-        /// <param name="time">The time to predict the footprint</param>
         /// <param name="numPoints">The number of points in the resulting circle</param>
         /// <returns>A list of geodetic coordinates for the specified time</returns>
-        public List<GeodeticCoordinate> GetFootprintBoundary(DateTime time, int numPoints = 60)
+        public List<GeodeticCoordinate> GetFootprintBoundary(int numPoints = 60)
         {
             var center = ToGeodetic();
             var coords = new List<GeodeticCoordinate>();

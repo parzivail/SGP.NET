@@ -52,14 +52,15 @@ namespace SGPdotNET.Observation
         {
         }
 
-		/// <summary>
-		///     Creates a new topocentric coordinate with the specified values
-		/// </summary>
-		/// <param name="azimuth">Azimuth</param>
-		/// <param name="elevation">Elevation</param>
-		/// <param name="range">Range in kilometers</param>
-		/// <param name="rangeRate">Range rate in kilometers/second</param>
-		public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
+        /// <summary>
+        ///     Creates a new topocentric coordinate with the specified values
+        /// </summary>
+        /// <param name="azimuth">Azimuth</param>
+        /// <param name="elevation">Elevation</param>
+        /// <param name="range">Range in kilometers</param>
+        /// <param name="rangeRate">Range rate in kilometers/second</param>
+        /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+        public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
         {
             Azimuth = azimuth;
             Elevation = elevation;
