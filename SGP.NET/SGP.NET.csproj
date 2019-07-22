@@ -17,6 +17,12 @@
     <Description>C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.</Description>
     <GenerateDocumentationFile Condition="'$(Configuration)'=='Release'">true</GenerateDocumentationFile>
     <RootNamespace>SGPdotNET</RootNamespace>
+    <PackageReleaseNotes>Add explicit and implicit angle casts, assuming raw numbers are degrees but allowing casts to either system,
+Change to HttpClient for remote TLEs and add async methods to TLE providers,
+Add reference positions to TopocentricCoordinates and SatelliteVisibilityPreiods,
+Add option in ground stations for observing satellites already in a pass instead of ignoring those without a state change in the given period,
+Remove unused time parameter in Coordinate's GetFootprint,
+Made constants constant</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
