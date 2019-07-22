@@ -142,18 +142,18 @@ namespace SGPdotNET.Propogation
         /// <summary>
         ///     QOMS2T propogation constant
         /// </summary>
-        public static double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4);
+        public static readonly double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4);
 
         /// <summary>
         ///     Also called XKE
         /// </summary>
-        public static double ReciprocalOfMinutesPerTimeUnit = 60 /
+        public static readonly double ReciprocalOfMinutesPerTimeUnit = 60 /
                                                               Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
                                                                         EarthGravitation);
 
         /// <summary>
         ///     The number of meters in a kilometer
         /// </summary>
-        public static double MetersPerKilometer = 1000;
+        public const double MetersPerKilometer = 1000;
     }
 }
