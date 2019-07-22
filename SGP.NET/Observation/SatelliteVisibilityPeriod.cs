@@ -30,7 +30,7 @@ namespace SGPdotNET.Observation
         public Angle MaxElevation { get; }
 
         /// <summary>
-        ///		The position from which the satellite was observed to generate this observation
+        ///     The position from which the satellite was observed to generate this observation
         /// </summary>
         public Coordinate ReferencePosition { get; }
 

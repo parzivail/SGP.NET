@@ -34,11 +34,11 @@ namespace SGPdotNET.TLE
                     {
                         var restOfFile = sr.ReadToEnd()
                             .Replace("\r\n", "\n") // normalize line endings
-                            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                            .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
                         var elementSets = Tle.ParseElements(restOfFile, threeLine);
 
-                        var tempSet = elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
+                        var tempSet = elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
 
                         _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
                             .ToDictionary(x => x.Key, x => x.Value);

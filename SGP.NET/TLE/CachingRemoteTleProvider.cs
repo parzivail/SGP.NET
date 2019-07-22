@@ -62,11 +62,11 @@ namespace SGPdotNET.TLE
                             LastRefresh = date;
                             var restOfFile = sr.ReadToEnd()
                                 .Replace("\r\n", "\n") // normalize line endings
-                                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
+                                .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
                             var elementSets = Tle.ParseElements(restOfFile, ThreeLine);
 
-                            return elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
+                            return elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
                         }
                     }
                 }

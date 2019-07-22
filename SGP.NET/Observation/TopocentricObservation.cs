@@ -30,9 +30,9 @@ namespace SGPdotNET.Observation
         /// </summary>
         public double RangeRate { get; }
 
-		/// <summary>
-		///		The position from which the satellite was observed to generate this observation
-		/// </summary>
+        /// <summary>
+        ///     The position from which the satellite was observed to generate this observation
+        /// </summary>
         public Coordinate ReferencePosition { get; }
 
         /// <summary>
@@ -69,11 +69,11 @@ namespace SGPdotNET.Observation
             ReferencePosition = referencePosition;
         }
 
-		/// <summary>
-		///     Creates a new topocentric coordinate as a copy of the specified one
-		/// </summary>
-		/// <param name="topo">Object to copy from</param>
-		public TopocentricObservation(TopocentricObservation topo)
+        /// <summary>
+        ///     Creates a new topocentric coordinate as a copy of the specified one
+        /// </summary>
+        /// <param name="topo">Object to copy from</param>
+        public TopocentricObservation(TopocentricObservation topo)
         {
             Azimuth = topo.Azimuth;
             Elevation = topo.Elevation;

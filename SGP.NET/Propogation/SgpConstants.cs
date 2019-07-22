@@ -140,6 +140,11 @@ namespace SGPdotNET.Propogation
         public const double EpochJan112H2000 = 2451545;
 
         /// <summary>
+        ///     The number of meters in a kilometer
+        /// </summary>
+        public const double MetersPerKilometer = 1000;
+
+        /// <summary>
         ///     QOMS2T propogation constant
         /// </summary>
         public static readonly double Qoms2T = Math.Pow((Q0 - S0) / EarthRadiusKm, 4);
@@ -148,12 +153,7 @@ namespace SGPdotNET.Propogation
         ///     Also called XKE
         /// </summary>
         public static readonly double ReciprocalOfMinutesPerTimeUnit = 60 /
-                                                              Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
-                                                                        EarthGravitation);
-
-        /// <summary>
-        ///     The number of meters in a kilometer
-        /// </summary>
-        public const double MetersPerKilometer = 1000;
+                                                                       Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
+                                                                                 EarthGravitation);
     }
 }

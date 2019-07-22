@@ -26,13 +26,17 @@ namespace SGPdotNET.Observation
 
         /// <summary>
         ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
-        ///     satellite from this ground station is seen at, after, or optionally before (see <paramref name="includeIntrerrupted"/>) the start parameter
+        ///     satellite from this ground station is seen at, after, or optionally before (see
+        ///     <paramref name="includeIntrerrupted" />) the start parameter
         /// </summary>
         /// <param name="satellite">The satellite to observe</param>
         /// <param name="start">The time to start observing</param>
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
-        /// <param name="includeIntrerrupted">Whether or not to include periods which may have started before the observation start time</param>
+        /// <param name="includeIntrerrupted">
+        ///     Whether or not to include periods which may have started before the observation start
+        ///     time
+        /// </param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
         public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end,
             TimeSpan deltaTime, bool includeIntrerrupted = false)

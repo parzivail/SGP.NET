@@ -12,12 +12,15 @@
         public AngleRadians(double angle) : base(angle)
         {
         }
-        
+
         /// <summary>
-        /// Converts an explicit number to an angle in radians via a cast
+        ///     Converts an explicit number to an angle in radians via a cast
         /// </summary>
         /// <param name="d">The angle, in radians</param>
         /// <returns>An AngleRadians object representing the angle</returns>
-        public static explicit operator AngleRadians(double d) => new AngleRadians(d);
-	}
+        public static explicit operator AngleRadians(double d)
+        {
+            return new AngleRadians(d);
+        }
+    }
 }

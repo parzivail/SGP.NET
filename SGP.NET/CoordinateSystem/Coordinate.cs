@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using SGPdotNET.Observation;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
-using System;
-using System.Collections.Generic;
 
 namespace SGPdotNET.CoordinateSystem
 {

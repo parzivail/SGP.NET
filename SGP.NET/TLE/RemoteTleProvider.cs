@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -62,8 +61,8 @@ namespace SGPdotNET.TLE
             {
                 foreach (var source in _sources)
                 {
-	                var str = await wc.GetStringAsync(source);
-					var file = str
+                    var str = await wc.GetStringAsync(source);
+                    var file = str
                         .Replace("\r\n", "\n") // normalize line endings
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
@@ -106,7 +105,7 @@ namespace SGPdotNET.TLE
         public Tle GetTle(int satelliteId)
         {
             CacheRemoteTles().Wait();
-			return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+            return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
         /// <summary>

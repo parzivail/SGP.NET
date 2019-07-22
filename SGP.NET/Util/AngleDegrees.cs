@@ -14,10 +14,13 @@
         }
 
         /// <summary>
-        /// Converts an explicit number to an angle in degrees via a cast
+        ///     Converts an explicit number to an angle in degrees via a cast
         /// </summary>
         /// <param name="d">The angle, in degrees</param>
         /// <returns>An AngleDegrees object representing the angle</returns>
-        public static explicit operator AngleDegrees(double d) => new AngleDegrees(d);
-	}
+        public static explicit operator AngleDegrees(double d)
+        {
+            return new AngleDegrees(d);
+        }
+    }
 }
