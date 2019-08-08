@@ -104,7 +104,7 @@ namespace SGPdotNET.CoordinateSystem
         /// </summary>
         /// <param name="other">The other object of comparison</param>
         /// <returns>True if the two objects are equal</returns>
-        protected bool Equals(GeodeticCoordinate other)
+        public bool Equals(GeodeticCoordinate other)
         {
             return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) &&
                    Altitude.Equals(other.Altitude);

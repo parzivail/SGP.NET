@@ -140,7 +140,7 @@ namespace SGPdotNET.CoordinateSystem
         }
 
         /// <inheritdoc />
-        protected bool Equals(EciCoordinate other)
+        public bool Equals(EciCoordinate other)
         {
             return base.Equals(other) && Time.Equals(other.Time) && Equals(Position, other.Position) &&
                    Equals(Velocity, other.Velocity);
