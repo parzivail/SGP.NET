@@ -120,7 +120,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override EciCoordinate ToEci(DateTime dt)
         {
-            return dt == Time ? this : new EciCoordinate(dt, Position, Velocity);
+            return dt == Time ? this : ToGeodetic().ToEci(dt);
         }
 
         /// <inheritdoc />
