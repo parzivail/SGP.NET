@@ -116,7 +116,7 @@ namespace SGPSandbox
             foreach (var satellite in satellites)
             {
                 var satPos = satellite.Predict();
-                if (gs.IsVisible(satPos, minAngle))
+                if (gs.IsVisible(satPos, minAngle, satPos.Time))
                     visible.Add(satellite);
             }
 
