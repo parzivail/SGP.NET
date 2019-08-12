@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.4</TargetFrameworks>
     <PackageId>SGP.NET</PackageId>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Authors>parzivail</Authors>
     <Company>parzivail</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,12 +17,18 @@
     <Description>C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.</Description>
     <GenerateDocumentationFile Condition="'$(Configuration)'=='Release'">true</GenerateDocumentationFile>
     <RootNamespace>SGPdotNET</RootNamespace>
-    <PackageReleaseNotes>Add explicit and implicit angle casts, assuming raw numbers are degrees but allowing casts to either system,
-Change to HttpClient for remote TLEs and add async methods to TLE providers,
-Add reference positions to TopocentricCoordinates and SatelliteVisibilityPreiods,
-Add option in ground stations for observing satellites already in a pass instead of ignoring those without a state change in the given period,
-Remove unused time parameter in Coordinate's GetFootprint,
-Made constants constant</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix infinte recursion when comparing coordinate equality,
+Fix coordinate observations when obsercing ECI coordinates at times other than the internal ECI time</PackageReleaseNotes>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.4|AnyCPU'">
+    <DocumentationFile>obj\Debug\netstandard1.4\SGP.NET.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.4|AnyCPU'">
+    <DocumentationFile>obj\Release\netstandard1.4\SGP.NET.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

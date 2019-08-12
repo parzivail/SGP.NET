@@ -58,12 +58,12 @@ namespace SGPdotNET.Observation
                 var eciLocation = Location.ToEci(t);
                 var posEci = satellite.Predict(t);
 
-                if (IsVisible(posEci, Angle.Zero))
+                if (IsVisible(posEci, Angle.Zero, posEci.Time))
                 {
                     if (state == SatelliteObservationState.Init && !includeIntrerrupted)
                         continue;
 
-                    var azEl = eciLocation.Observe(posEci);
+                    var azEl = eciLocation.Observe(posEci, posEci.Time);
 
                     if (azEl.Elevation > maxEl)
                         maxEl = azEl.Elevation;
@@ -95,7 +95,7 @@ namespace SGPdotNET.Observation
         {
             var eciLocation = Location.ToEci(time);
             var posEci = satellite.Predict(time);
-            return eciLocation.Observe(posEci);
+            return eciLocation.Observe(posEci, time);
         }
 
         /// <summary>
@@ -103,15 +103,16 @@ namespace SGPdotNET.Observation
         /// </summary>
         /// <param name="pos">The position to check</param>
         /// <param name="minElevation">The minimum elevation required to be "visible"</param>
+        /// <param name="time">The time the check is occurring</param>
         /// <returns>True if the satellite is above the specified elevation, false otherwise</returns>
-        public bool IsVisible(Coordinate pos, Angle minElevation)
+        public bool IsVisible(Coordinate pos, Angle minElevation, DateTime time)
         {
             var pGeo = pos.ToGeodetic();
             var footprint = pGeo.GetFootprintAngle();
 
             if (Location.AngleTo(pGeo) > footprint) return false;
 
-            var aer = Location.Observe(pos);
+            var aer = Location.Observe(pos, time);
             return aer.Elevation >= minElevation;
         }
 

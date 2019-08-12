@@ -1,0 +1,1505 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SGP.NET</name>
+    </assembly>
+    <members>
+        <member name="T:SGPdotNET.CoordinateSystem.Coordinate">
+            <summary>
+                Stores a generic location
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.Coordinate.NorthPole">
+            <summary>
+                A coordinate that represents the geographic North Pole
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.Coordinate.SouthPole">
+            <summary>
+                A coordinate that represents the geographic South Pole
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.ToEci(System.DateTime)">
+            <summary>
+                Converts this coordinate to an ECI one
+            </summary>
+            <param name="dt">The time for the ECI frame</param>
+            <returns>The coordinate in an ECI reference frame with the supplied time</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.ToGeodetic">
+            <summary>
+                Converts this coordinate to a geodetic one
+            </summary>
+            <returns>The coordinate in a geodetic reference frame</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.ToMaidenhead(SGPdotNET.CoordinateSystem.MaidenheadPrecision,SGPdotNET.CoordinateSystem.MaidenheadStandard)">
+            <summary>
+                Converts this coordinate to its Maidenhead Locator System representation, disregarding altitude
+            </summary>
+            <param name="precision">The precision of the conversion, which defines the number of pairs in the conversion</param>
+            <param name="standard">The conversion standard to use for the 5th pair</param>
+            <returns>The Maidenhead representation string</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.ToDegreesMinutesSeconds">
+            <summary>
+                Converts this coordinate to its Degrees-Minutes-Seconds (DMS) representation, disregarding altitude
+            </summary>
+            <returns>The Degrees-Minutes-Seconds representation string</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.ToSphericalEcef">
+            <summary>
+                Converts this coordinate to an ECEF one, assuming a spherical earth
+            </summary>
+            <returns>A spherical ECEF coordinate vector</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.GetFootprint">
+            <summary>
+                Calculates the visibility radius (km) of the satellite by which any distances from this coordinate less than the
+                radius are able to see this coordinate
+            </summary>
+            <returns>The visibility radius, in kilometers</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.GetFootprintAngle">
+            <summary>
+                Calculates the visibility radius (radians) of the satellite by which any distances from this coordinate less than
+                the
+                radius are able to see this coordinate
+            </summary>
+            <returns>The visibility radius as an angle across Earth's surface</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.GetFootprintBoundary(System.Int32)">
+            <summary>
+                Gets a list of geodetic coordinates which define the bounds of the visibility footprint at a specific time
+            </summary>
+            <param name="numPoints">The number of points in the resulting circle</param>
+            <returns>A list of geodetic coordinates for the specified time</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.DistanceTo(SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Calculates the Great Circle distance (km) to another coordinate
+            </summary>
+            <param name="to">The coordinate to measure against</param>
+            <returns>The distance between the coordinates, in kilometers</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.AngleTo(SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Calculates the Great Circle distance as an angle to another geodetic coordinate, ignoring altitude
+            </summary>
+            <param name="to">The coordinate to measure against</param>
+            <returns>The distance between the coordinates as an angle across Earth's surface</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.CanSee(SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Returns true if there is line-of-sight between this coordinate and the supplied one by checking if this coordinate
+                is within the footprint of the other
+            </summary>
+            <param name="other">The coordinate to check against</param>
+            <returns>True if there is line-of-sight between this coordinate and the supplied one</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.Observe(SGPdotNET.CoordinateSystem.Coordinate,System.Nullable{System.DateTime})">
+            <summary>
+                Calculates the look angles between this coordinate and target
+            </summary>
+            <param name="time">The time of observation</param>
+            <param name="to">The coordinate to observe</param>
+            <returns>The topocentric angles between this coordinate and another</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.Equals(SGPdotNET.CoordinateSystem.Coordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.op_Equality(SGPdotNET.CoordinateSystem.Coordinate,SGPdotNET.CoordinateSystem.Coordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.op_Inequality(SGPdotNET.CoordinateSystem.Coordinate,SGPdotNET.CoordinateSystem.Coordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.Coordinate.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.CoordinateSystem.EciCoordinate">
+            <inheritdoc />
+            <summary>
+                Stores an Earth-centered inertial position for a particular time
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.EciCoordinate.Time">
+            <summary>
+                The time component of the coordinate
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.EciCoordinate.Position">
+            <summary>
+                The position component of the coordinate
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.EciCoordinate.Velocity">
+            <summary>
+                The velocity component of the coordinate
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.#ctor">
+            <summary>
+                Creates a new ECI coordinate at the origin
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.#ctor(System.DateTime,SGPdotNET.Util.Angle,SGPdotNET.Util.Angle,System.Double)">
+            <inheritdoc />
+            <summary>
+                Creates a new ECI coordinate with the specified values
+            </summary>
+            <param name="dt">The date to be used for this position</param>
+            <param name="latitude">The latitude</param>
+            <param name="longitude">The longitude</param>
+            <param name="altitude">The altitude in kilometers</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.#ctor(System.DateTime,SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Creates a new ECI coordinate with the specified values
+            </summary>
+            <param name="dt">The date to be used for this position</param>
+            <param name="coord">The position top copy</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.#ctor(System.DateTime,SGPdotNET.Util.Vector3)">
+            <summary>
+                Creates a new ECI coordinate with the specified values
+            </summary>
+            <param name="dt">The date to be used for this position</param>
+            <param name="position">The ECI vector position</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.#ctor(System.DateTime,SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <summary>
+                Creates a new ECI coordinate with the specified values
+            </summary>
+            <param name="dt">The date to be used for this position</param>
+            <param name="position">The ECI position vector</param>
+            <param name="velocity">The ECI velocity vector</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.ToGeodetic">
+            <inheritdoc />
+            <summary>
+                Converts this ECI position to a geodetic one
+            </summary>
+            <returns>The position in a geodetic reference frame</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.ToEci(System.DateTime)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.Equals(SGPdotNET.CoordinateSystem.EciCoordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.op_Equality(SGPdotNET.CoordinateSystem.EciCoordinate,SGPdotNET.CoordinateSystem.EciCoordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.op_Inequality(SGPdotNET.CoordinateSystem.EciCoordinate,SGPdotNET.CoordinateSystem.EciCoordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.EciCoordinate.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.CoordinateSystem.GeodeticCoordinate">
+            <inheritdoc />
+            <summary>
+                Stores a geodetic location
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.GeodeticCoordinate.Latitude">
+            <summary>
+                Latitude, where -PI/2 (South Pole) &lt;= latitude (radians) &lt; PI/2 (North Pole)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.GeodeticCoordinate.Longitude">
+            <summary>
+                Longitude, where -PI &lt;= longitude (radians) &lt; PI
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.CoordinateSystem.GeodeticCoordinate.Altitude">
+            <summary>
+                Altitude in kilometers
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.#ctor">
+            <summary>
+                Creates a new geodetic coordinate at the origin
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.#ctor(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle,System.Double)">
+            <summary>
+                Creates a new geodetic coordinate with the specified values
+            </summary>
+            <param name="lat">The latitude</param>
+            <param name="lon">The longitude</param>
+            <param name="alt">The altitude in kilometers</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.#ctor(SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Creates a new geodetic coordinate as a copy of the specified one
+            </summary>
+            <param name="coord">Object to copy from</param>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.ToEci(System.DateTime)">
+            <inheritdoc />
+            <summary>
+                Converts this geodetic position to an ECI one
+            </summary>
+            <param name="dt">The time for the ECI frame</param>
+            <returns>The position in an ECI reference frame with the supplied time</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.ToGeodetic">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.Equals(SGPdotNET.CoordinateSystem.GeodeticCoordinate)">
+            <summary>
+                Checks equality between this object and another
+            </summary>
+            <param name="other">The other object of comparison</param>
+            <returns>True if the two objects are equal</returns>
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.op_Equality(SGPdotNET.CoordinateSystem.GeodeticCoordinate,SGPdotNET.CoordinateSystem.GeodeticCoordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.op_Inequality(SGPdotNET.CoordinateSystem.GeodeticCoordinate,SGPdotNET.CoordinateSystem.GeodeticCoordinate)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.CoordinateSystem.GeodeticCoordinate.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.CoordinateSystem.MaidenheadPrecision">
+            <summary>
+                Defines the avilable granularities for the conversion to the Maidenhead system
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.ThousandKilometers">
+            <summary>
+                One pair, accurate to 1111.2 kilometers
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.HunderedKilometers">
+            <summary>
+                Two pairs, accurate to 111.12 kilometers
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.FiveKilometers">
+            <summary>
+                Three pairs, accurate to 4.630 kilometers
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.FiveHundredMeters">
+            <summary>
+                Four pairs, accurate to 463 meters
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.TwentyMeters">
+            <summary>
+                Five pairs, accurate to 19.2917 meters
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadPrecision.TwoMeters">
+            <summary>
+                Six pairs, accurate to 1.9292 meters
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.CoordinateSystem.MaidenheadStandard">
+            <summary>
+                Defines the available standards for converting the 5th pair of the Maidenhead Locator System
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadStandard.AaToXx">
+            <summary>
+                The standard where the 5th pair ranges from AA to XX
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.CoordinateSystem.MaidenheadStandard.AaToYy">
+            <summary>
+                The standard where the 5th pair ranges from AA to YY
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Exception.DecayedException">
+            <inheritdoc />
+            <summary>
+                Exception thrown by the propagator when a satellite decays
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Exception.DecayedException.Time">
+            <summary>
+                Time of the event
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Exception.DecayedException.Position">
+            <summary>
+                Position of the satellite at time
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Exception.DecayedException.Velocity">
+            <summary>
+                Velocity of the satellite at time
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Exception.DecayedException.#ctor(System.DateTime,SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="time">Time of the event</param>
+            <param name="position">Position of the satellite at time</param>
+            <param name="velocity">Velocity of the satellite at time</param>
+        </member>
+        <member name="T:SGPdotNET.Exception.SatellitePropagationException">
+            <inheritdoc />
+            <summary>
+                Exception thrown by the propagator when a satellite has erroneous values
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Exception.SatellitePropagationException.#ctor(System.String)">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="e">Message for the exception</param>
+        </member>
+        <member name="T:SGPdotNET.Exception.TleException">
+            <inheritdoc />
+            <summary>
+                Exception thrown by the TLE parser when a TLE has invalid values
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Exception.TleException.#ctor(System.String)">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="e">Message for the exception</param>
+        </member>
+        <member name="T:SGPdotNET.Observation.GroundStation">
+            <summary>
+                A representation of a ground station that can observe satellites
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.GroundStation.Location">
+            <summary>
+                The location of the ground station
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.#ctor(SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Creates a new ground station at the specified location
+            </summary>
+            <param name="location">The location of the ground station. Cannot be null</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.Observe(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,System.TimeSpan,System.Boolean)">
+            <summary>
+                Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
+                satellite from this ground station is seen at, after, or optionally before (see
+                <paramref name="includeIntrerrupted" />) the start parameter
+            </summary>
+            <param name="satellite">The satellite to observe</param>
+            <param name="start">The time to start observing</param>
+            <param name="end">The time to end observing</param>
+            <param name="deltaTime">The time step for the prediction simulation</param>
+            <param name="includeIntrerrupted">
+                Whether or not to include periods which may have started before the observation start
+                time
+            </param>
+            <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.Observe(SGPdotNET.Observation.Satellite,System.DateTime)">
+            <summary>
+                Observes a satellite at an instant in time, relative to this GroundStation
+            </summary>
+            <param name="satellite">The satellite to observe</param>
+            <param name="time">The time of observation</param>
+            <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.IsVisible(SGPdotNET.CoordinateSystem.Coordinate,SGPdotNET.Util.Angle,System.DateTime)">
+            <summary>
+                Tests whether or not a satellite is above a specified elevation
+            </summary>
+            <param name="pos">The position to check</param>
+            <param name="minElevation">The minimum elevation required to be "visible"</param>
+            <param name="time">The time the check is occurring</param>
+            <returns>True if the satellite is above the specified elevation, false otherwise</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.Equals(SGPdotNET.Observation.GroundStation)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.op_Equality(SGPdotNET.Observation.GroundStation,SGPdotNET.Observation.GroundStation)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.op_Inequality(SGPdotNET.Observation.GroundStation,SGPdotNET.Observation.GroundStation)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Observation.RelativeDirection">
+            <summary>
+                Defines a direction of movement relative to a ground station
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Observation.RelativeDirection.Approaching">
+            <summary>
+                Moving toward the ground station
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Observation.RelativeDirection.Fixed">
+            <summary>
+                Not moving relative to the ground station
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Observation.RelativeDirection.Receding">
+            <summary>
+                Moving away from the ground station
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Observation.Satellite">
+            <summary>
+                A representation of a satellite in orbit
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.Satellite.Tle">
+            <summary>
+                The two-line element representation of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.Satellite.Name">
+            <summary>
+                The name of this satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.Satellite.Orbit">
+            <summary>
+                The orbit information of the satellite
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.#ctor(System.String,System.String)">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="tle1">The first line of the set</param>
+            <param name="tle2">The second line of the set</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.#ctor(System.String,System.String,System.String)">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="name">The name of the satellite</param>
+            <param name="tle1">The first line of the set</param>
+            <param name="tle2">The second line of the set</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.#ctor(SGPdotNET.TLE.Tle)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="tle">The two-line representation of the satellite</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.Predict">
+            <summary>
+                Predicts the satellite's real-time location
+            </summary>
+            <returns>An ECI coordinate set representing the satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.Predict(System.DateTime)">
+            <summary>
+                Predicts the satellite's location at a specific time
+            </summary>
+            <param name="time">The time of observation</param>
+            <returns>An ECI coordinate set representing the satellite at the given time</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.Equals(SGPdotNET.Observation.Satellite)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.op_Equality(SGPdotNET.Observation.Satellite,SGPdotNET.Observation.Satellite)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.op_Inequality(SGPdotNET.Observation.Satellite,SGPdotNET.Observation.Satellite)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Observation.SatelliteVisibilityPeriod">
+            <summary>
+                Stores a period during which a satellite is visible to a ground station
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.SatelliteVisibilityPeriod.Satellite">
+            <summary>
+                The satellite that is being observed
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.SatelliteVisibilityPeriod.Start">
+            <summary>
+                The start time of the observation
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.SatelliteVisibilityPeriod.End">
+            <summary>
+                The end time of the observation
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.SatelliteVisibilityPeriod.MaxElevation">
+            <summary>
+                The max elevation reached during observation
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.SatelliteVisibilityPeriod.ReferencePosition">
+            <summary>
+                The position from which the satellite was observed to generate this observation
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.#ctor(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,SGPdotNET.Util.Angle,SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="satellite">The satellite that is being observed</param>
+            <param name="start">The start time of the observation</param>
+            <param name="end">The end time of the observation</param>
+            <param name="maxElevation">The max elevation reached during observation</param>
+            <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.Equals(SGPdotNET.Observation.SatelliteVisibilityPeriod)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.op_Equality(SGPdotNET.Observation.SatelliteVisibilityPeriod,SGPdotNET.Observation.SatelliteVisibilityPeriod)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.op_Inequality(SGPdotNET.Observation.SatelliteVisibilityPeriod,SGPdotNET.Observation.SatelliteVisibilityPeriod)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Observation.TopocentricObservation">
+            <summary>
+                Stores a topocentric location (azimuth, elevation, range and range rate).
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.Azimuth">
+            <summary>
+                Azimuth relative to the observer
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.Elevation">
+            <summary>
+                Elevation relative to the observer
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.Range">
+            <summary>
+                Range relative to the observer, in kilometers
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.RangeRate">
+            <summary>
+                Range rate relative to the observer, in kilometers/second
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.ReferencePosition">
+            <summary>
+                The position from which the satellite was observed to generate this observation
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.Direction">
+            <summary>
+                Direction relative to the observer
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.TopocentricObservation.SignalDelay">
+            <summary>
+                Time for an ideal radio signal to travel the distance between the observer and the satellite, in seconds
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.#ctor">
+            <summary>
+                Creates a new topocentric coordinate at the origin
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.#ctor(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle,System.Double,System.Double,SGPdotNET.CoordinateSystem.Coordinate)">
+            <summary>
+                Creates a new topocentric coordinate with the specified values
+            </summary>
+            <param name="azimuth">Azimuth</param>
+            <param name="elevation">Elevation</param>
+            <param name="range">Range in kilometers</param>
+            <param name="rangeRate">Range rate in kilometers/second</param>
+            <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.#ctor(SGPdotNET.Observation.TopocentricObservation)">
+            <summary>
+                Creates a new topocentric coordinate as a copy of the specified one
+            </summary>
+            <param name="topo">Object to copy from</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.GetDopplerShift(System.Double)">
+            <summary>
+                Predicts the doppler shift of the satellite relative to the observer, in Hz
+            </summary>
+            <param name="inputFrequency">The base RX/TX frequency, in Hz</param>
+            <returns>The doppler shift of the satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.Equals(SGPdotNET.Observation.TopocentricObservation)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.op_Equality(SGPdotNET.Observation.TopocentricObservation,SGPdotNET.Observation.TopocentricObservation)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.op_Inequality(SGPdotNET.Observation.TopocentricObservation,SGPdotNET.Observation.TopocentricObservation)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricObservation.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Propogation.Orbit">
+            <summary>
+                Container for the extracted orbital elements used by the SGP4 propagator.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.MeanAnomoly">
+            <summary>
+                The XMO mean anomoly
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.AscendingNode">
+            <summary>
+                The XNODEO right ascension of the ascending node
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.ArgumentPerigee">
+            <summary>
+                The OMEGAO argument of perigree
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.MeanMotion">
+            <summary>
+                The XNO mean motion, in revolutions per day
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.RecoveredSemiMajorAxis">
+            <summary>
+                The AODP recovered semi-major axis
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.SemiMajorAxis">
+            <summary>
+                The semi-major axis, in kilometers
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.RecoveredMeanMotion">
+            <summary>
+                The XNODP recovered mean motion
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Perigee">
+            <summary>
+                The perigree, in kilometers
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Apogee">
+            <summary>
+                The apogee, in kilometers
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Period">
+            <summary>
+                Time, in minutes, of revolution (recovered from 2pi / RecoveredMeanMotion)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Epoch">
+            <summary>
+                The epoch of the element
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.BStar">
+            <summary>
+                BSTAR drag term
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Eccentricity">
+            <summary>
+                Eccentricity
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Propogation.Orbit.Inclination">
+            <summary>
+                Inclination
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.#ctor(SGPdotNET.TLE.Tle)">
+            <summary>
+                Creates a new numerical orbital element descriptor set for the provided two-line element set
+            </summary>
+            <param name="tle">The set to extract numerical values from</param>
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.Equals(SGPdotNET.Propogation.Orbit)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.op_Equality(SGPdotNET.Propogation.Orbit,SGPdotNET.Propogation.Orbit)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Propogation.Orbit.op_Inequality(SGPdotNET.Propogation.Orbit,SGPdotNET.Propogation.Orbit)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Propogation.Sgp4">
+            <summary>
+                The Simplified General Perturbations (Model 4) propagater
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.Sgp4.Orbit">
+            <summary>
+                The orbit information of the satellite
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Propogation.Sgp4.#ctor(SGPdotNET.TLE.Tle)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="tle">The two-line element set to propogate</param>
+        </member>
+        <member name="M:SGPdotNET.Propogation.Sgp4.FindPosition(System.Double)">
+            <summary>
+                Predicts the ECI position of a satellite at a time relative to the satellite's epoch
+            </summary>
+            <param name="tsince">Time since the satellite's epoch</param>
+            <returns>The predicted position of the satellite at a time relative to the satellite's epoch</returns>
+        </member>
+        <member name="M:SGPdotNET.Propogation.Sgp4.FindPosition(System.DateTime)">
+            <summary>
+                Predicts the ECI position of a satellite at a specific date and time
+            </summary>
+            <param name="date">the date and time to predict</param>
+            <returns>The predicted position of the satellite at a specific date and time</returns>
+        </member>
+        <member name="T:SGPdotNET.Propogation.SgpConstants">
+            <summary>
+                Stores various numerical constants used in propogation
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.TwoPi">
+            <summary>
+                Twice the value of Pi
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.TwoThirds">
+            <summary>
+                Two divided by three (2/3)
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.SecondsPerDay">
+            <summary>
+                The number of seconds per day
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.MinutesPerDay">
+            <summary>
+                The number of minutes per day
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.HoursPerDay">
+            <summary>
+                The number of hours per day
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.MinutesPerDegree">
+            <summary>
+                The number of minutes per degree
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.SecondsPerMinute">
+            <summary>
+                The number of seconds per minute
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.SpeedOfLight">
+            <summary>
+                The speef of light, in meters/second
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.Ck2">
+            <summary>
+                CK2 propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.Ck4">
+            <summary>
+                CK4 propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.Q0">
+            <summary>
+                Q-zero propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.S0">
+            <summary>
+                S-zero propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.S">
+            <summary>
+                S propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.DistanceUnitsPerEarthRadii">
+            <summary>
+                Also called Ae
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EarthGravitation">
+            <summary>
+                Also called mu
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.ZonalHarmonicJ2">
+            <summary>
+                Also called XJ2
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.ZonalHarmonicJ3">
+            <summary>
+                Also called XJ3
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.ZonalHarmonicJ4">
+            <summary>
+                Also called XJ4
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EarthRotationPerMinRad">
+            <summary>
+                Also called THDT or rptim
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.KmPerAu">
+            <summary>
+                Also called Au
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EarthRadiusKm">
+            <summary>
+                Also called KmPer
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EarthFlatteningConstant">
+            <summary>
+                Also called kF
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EarthRotationPerSiderealDay">
+            <summary>
+                Also called OmegaE
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EpochJan100H1900">
+            <summary>
+                Jan 1.0 1900 = Jan 1 1900 00h UTC
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EpochJan112H1900">
+            <summary>
+                Jan 1.5 1900 = Jan 1 1900 12h UTC
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.EpochJan112H2000">
+            <summary>
+                Jan 1.5 2000 = Jan 1 2000 12h UTC
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.MetersPerKilometer">
+            <summary>
+                The number of meters in a kilometer
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.Qoms2T">
+            <summary>
+                QOMS2T propogation constant
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propogation.SgpConstants.ReciprocalOfMinutesPerTimeUnit">
+            <summary>
+                Also called XKE
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.TLE.CachingRemoteTleProvider">
+            <inheritdoc cref="T:SGPdotNET.TLE.RemoteTleProvider" />
+            <summary>
+                Provides a class to retrieve TLEs from a remote network resource
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.TLE.CachingRemoteTleProvider.#ctor(System.Boolean,System.String,System.Uri[])">
+            <inheritdoc />
+            <summary>
+                Constructor, defaulting to max-age of 24 hours
+            </summary>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <param name="localFilename">The file in which the TLEs will be locally cached</param>
+            <param name="sources">The sources that should be queried</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.CachingRemoteTleProvider.#ctor(System.Boolean,System.TimeSpan,System.String,System.Uri[])">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
+            <param name="localFilename">The file in which the TLEs will be locally cached</param>
+            <param name="sources">
+                The sources that should be queried. If the sources change after a cache has already been written,
+                the cached TLEs will take priority over the new sources. Consider having the filename reflect the source it's
+                caching.
+            </param>
+        </member>
+        <member name="T:SGPdotNET.TLE.ITleProvider">
+            <summary>
+                Provides a class to retrieve TLEs from a resource
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.TLE.ITleProvider.GetTle(System.Int32)">
+            <summary>
+                Queries the source and retrieves a two-line set for the specified satellite
+            </summary>
+            <param name="satelliteId">The satellite to retrieve</param>
+            <returns>The TLE for the specified satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.ITleProvider.GetTles">
+            <summary>
+                Queries the source and retrieves all two-line sets
+            </summary>
+            <returns>All known TLEs</returns>
+        </member>
+        <member name="T:SGPdotNET.TLE.LocalTleProvider">
+            <inheritdoc cref="T:SGPdotNET.TLE.ITleProvider" />
+            <summary>
+                Provides a class to retrieve TLEs from a local resource
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.TLE.LocalTleProvider.#ctor(System.Boolean,System.String[])">
+            <inheritdoc />
+            <summary>
+                Constructor
+            </summary>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <param name="sourceFilenames">The source that should be loaded</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.LocalTleProvider.GetTle(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.LocalTleProvider.GetTles">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.TLE.RemoteTleProvider">
+            <inheritdoc cref="T:SGPdotNET.TLE.ITleProvider" />
+            <summary>
+                Provides a class to retrieve TLEs from a remote network resource
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.#ctor(System.Boolean,System.Uri[])">
+            <inheritdoc />
+            <summary>
+                Constructor, defaulting to max-age of 24 hours
+            </summary>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <param name="sources">The sources that should be queried</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.#ctor(System.Boolean,System.TimeSpan,System.Uri[])">
+            <summary>
+                Constructor
+            </summary>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <param name="maxAge">The maximum time to keep TLEs cached before updating them from the remote</param>
+            <param name="sources">The sources that should be queried</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.GetTleAsync(System.Int32)">
+            <summary>
+                Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
+            </summary>
+            <param name="satelliteId">The satellite to retrieve</param>
+            <returns>The remote TLE for the specified satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.GetTlesAsync">
+            <summary>
+                Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
+            </summary>
+            <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.GetTle(System.Int32)">
+            <summary>
+                Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
+            </summary>
+            <param name="satelliteId">The satellite to retrieve</param>
+            <returns>The remote TLE for the specified satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.RemoteTleProvider.GetTles">
+            <summary>
+                Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
+            </summary>
+            <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+        </member>
+        <member name="T:SGPdotNET.TLE.Tle">
+            <summary>
+                Extracts OrbitalElements from a two-line or three-line element set
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Name">
+            <summary>
+                The name of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Line1">
+            <summary>
+                The first line of the TLE set
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Line2">
+            <summary>
+                The second line of the TLE set
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.NoradNumber">
+            <summary>
+                The identification number assigned to the satellite by NORAD
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.IntDesignator">
+            <summary>
+                The international designator of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Epoch">
+            <summary>
+                The epoch of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.MeanMotionDtOver2">
+            <summary>
+                The first time derivative of mean motion
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.MeanMotionDdtOver6">
+            <summary>
+                The second time derivative of mean motion
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.BStarDragTerm">
+            <summary>
+                The BSTAR drag term of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.MeanMotionRevPerDay">
+            <summary>
+                The mean motion, in revolutions per day
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.OrbitNumber">
+            <summary>
+                The number of orbits at the epoch
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Eccentricity">
+            <summary>
+                The eccentricity of the satellite
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.Inclination">
+            <summary>
+                Gets the inclination
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.RightAscendingNode">
+            <summary>
+                Gets the right ascension of the ascending node
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.ArgumentPerigee">
+            <summary>
+                Gets the argument of perigee
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:SGPdotNET.TLE.Tle.MeanAnomaly">
+            <summary>
+                Gets the mean anomaly
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.#ctor(System.String,System.String)">
+            <summary>
+                Initialise TLE with two lines
+            </summary>
+            <param name="lineOne">The first line of the set</param>
+            <param name="lineTwo">The second line of the set</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.#ctor(System.String,System.String,System.String)">
+            <summary>
+                Initialise 3LE with a name and two lines
+            </summary>
+            <param name="name">The 0th line (name) of the set</param>
+            <param name="lineOne">The first line of the set</param>
+            <param name="lineTwo">The second line of the set</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.#ctor(SGPdotNET.TLE.Tle)">
+            <summary>
+                Create a new Tle as a copy of the specified one
+            </summary>
+            <param name="tle">Object to copy from</param>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ParseElements(System.String[],System.Boolean)">
+            <summary>
+                Parses a list of TLEs from a list of TLE lines
+            </summary>
+            <param name="lines">Each line of the each element set, sequentially</param>
+            <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+            <returns>A list of the TLEs parsed from the lines</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.Equals(SGPdotNET.TLE.Tle)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.op_Equality(SGPdotNET.TLE.Tle,SGPdotNET.TLE.Tle)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.op_Inequality(SGPdotNET.TLE.Tle,SGPdotNET.TLE.Tle)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Util.Angle">
+            <summary>
+                Stores an angle
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Util.Angle.Zero">
+            <summary>
+                The Angle that represents zero radians/degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Angle.Degrees">
+            <summary>
+                The angle represented by this object, in degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Angle.Radians">
+            <summary>
+                The angle represented by this object, in radians
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.#ctor(System.Double)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="angle">The angle to be stored in the object, in radians</param>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_Equality(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Checks two angles for equality
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the supplied angles are exactly equal</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_Inequality(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Checks two angles for inequality
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the supplied angles are not exactly equal</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_GreaterThan(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Compares two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the first angle is greater than the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_LessThan(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Compares two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the first angle is less than the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_GreaterThanOrEqual(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Compares two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the first angle is greater than or equal to the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_LessThanOrEqual(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Compares two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>True if the first angle is less than or equal to the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_Addition(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Adds two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>The result of adding the first angle to the second angle</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_Subtraction(SGPdotNET.Util.Angle,SGPdotNET.Util.Angle)">
+            <summary>
+                Subtracts two angles
+            </summary>
+            <param name="angle1">The first angle</param>
+            <param name="angle2">The second angle</param>
+            <returns>The result of subtracting the second angle from the first angle</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.op_Implicit(System.Double)~SGPdotNET.Util.Angle">
+            <summary>
+                Implicit cast operator that assumes numbers that are found without a typecast are degrees
+            </summary>
+            <param name="d"></param>
+        </member>
+        <member name="M:SGPdotNET.Util.Angle.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Util.AngleDegrees">
+            <summary>
+                Stores an angle, specified in degrees but backed in radians
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.AngleDegrees.#ctor(System.Double)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="angle">The angle to be stored in the object, in degrees</param>
+        </member>
+        <member name="M:SGPdotNET.Util.AngleDegrees.op_Explicit(System.Double)~SGPdotNET.Util.AngleDegrees">
+            <summary>
+                Converts an explicit number to an angle in degrees via a cast
+            </summary>
+            <param name="d">The angle, in degrees</param>
+            <returns>An AngleDegrees object representing the angle</returns>
+        </member>
+        <member name="T:SGPdotNET.Util.AngleRadians">
+            <summary>
+                Stores an angle, specified in radians and backed in radians. Used for explicit casting.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.AngleRadians.#ctor(System.Double)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="angle">The angle to be stored in the object, in radians</param>
+        </member>
+        <member name="M:SGPdotNET.Util.AngleRadians.op_Explicit(System.Double)~SGPdotNET.Util.AngleRadians">
+            <summary>
+                Converts an explicit number to an angle in radians via a cast
+            </summary>
+            <param name="d">The angle, in radians</param>
+            <returns>An AngleRadians object representing the angle</returns>
+        </member>
+        <member name="T:SGPdotNET.Util.TimeExtensions">
+            <summary>
+                Adds extension methods to the <see cref="T:System.DateTime" /> class that are useful for astronomical calculations
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.TimeExtensions.ToJulian(System.DateTime)">
+            <summary>
+                Converts a DateTime to a Julian date
+            </summary>
+            <param name="dt">The time to convert</param>
+            <returns>The Julian representation the DateTime</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.TimeExtensions.ToGreenwichSiderealTime(System.DateTime)">
+            <summary>
+                Converts a DateTime to Greenwich Sidereal Time
+            </summary>
+            <param name="dt">The time to convert</param>
+            <returns>The Greenwich Sidereal Time representation the DateTime</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.TimeExtensions.ToLocalMeanSiderealTime(System.DateTime,SGPdotNET.Util.Angle)">
+            <summary>
+                Converts a DateTime to Local Mean Sidereal Time
+            </summary>
+            <param name="dt">The time to convert</param>
+            <param name="longitude">The longitude of observation</param>
+            <returns>The Local Mean Sidereal Time representation the DateTime</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.TimeExtensions.Round(System.DateTime,System.TimeSpan)">
+            <summary>
+                Rounds a DateTime to the nearest TimeSpan unit
+            </summary>
+            <param name="date">The time to round</param>
+            <param name="span">The unit to round towards</param>
+            <returns>The rounded DateTime</returns>
+        </member>
+        <member name="T:SGPdotNET.Util.Vector3">
+            <summary>
+                Generic 3-dimensional vector
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Vector3.X">
+            <summary>
+                The X component of this vector
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Vector3.Y">
+            <summary>
+                The Y component of this vector
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Vector3.Z">
+            <summary>
+                The Z component of this vector
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.Vector3.Length">
+            <summary>
+                The length of this vector
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.#ctor">
+            <inheritdoc />
+            <summary>
+                Create a new Vector3 at the origin
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+                Create a new Vector3 at the specified position
+            </summary>
+            <param name="x">The X component of the new vector</param>
+            <param name="y">The Y component of the new vector</param>
+            <param name="z">The Z component of the new vector</param>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.#ctor(SGPdotNET.Util.Vector3)">
+            <summary>
+                Create a new Vector3 as a copy of the specified one
+            </summary>
+            <param name="v">Object to copy from</param>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.Dot(SGPdotNET.Util.Vector3)">
+            <summary>
+                Calculates the dot product of this vector and another
+            </summary>
+            <param name="vec">The vector to calculate the dot with</param>
+            <returns>The double representing the dot product of the two vectors</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Subtraction(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <summary>
+                Subtracts one vector from another
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand vector</param>
+            <returns>The first vector minus the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Addition(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <summary>
+                Adds one vector to another
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand vector</param>
+            <returns>The first vector plus the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Multiply(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <summary>
+                Scales one vector by another
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand vector</param>
+            <returns>The first vector multiplied by the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Division(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <summary>
+                Scales one vector by another
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand vector</param>
+            <returns>The first vector divided by the second</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Multiply(SGPdotNET.Util.Vector3,System.Double)">
+            <summary>
+                Scales one vector by a scalar
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand scalar</param>
+            <returns>The first vector multiplied by the scalar</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Division(SGPdotNET.Util.Vector3,System.Double)">
+            <summary>
+                Scales one vector by a scalar
+            </summary>
+            <param name="v">The left-hand vector</param>
+            <param name="v2">The right-hand scalar</param>
+            <returns>The first vector divided by the scalar</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.Equals(SGPdotNET.Util.Vector3)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Equality(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Util.Vector3.op_Inequality(SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
