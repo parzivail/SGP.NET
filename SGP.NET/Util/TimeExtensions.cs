@@ -72,7 +72,7 @@ namespace SGPdotNET.Util
         internal static DateTime Round(this DateTime date, TimeSpan span)
         {
             var ticks = (date.Ticks + span.Ticks / 2 + 1) / span.Ticks;
-            return new DateTime(ticks * span.Ticks);
+            return new DateTime(ticks * span.Ticks, date.Kind);
         }
     }
 }
