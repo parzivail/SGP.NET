@@ -19,8 +19,8 @@
     <RootNamespace>SGPdotNET</RootNamespace>
     <PackageReleaseNotes>Fix infinte recursion when comparing coordinate equality,
 Fix coordinate observations when obsercing ECI coordinates at times other than the internal ECI time</PackageReleaseNotes>
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
-    <FileVersion>1.0.6.0</FileVersion>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <FileVersion>1.0.7.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.4|AnyCPU'">
@@ -30,8 +30,4 @@ Fix coordinate observations when obsercing ECI coordinates at times other than t
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.4|AnyCPU'">
     <DocumentationFile>obj\Release\netstandard1.4\SGP.NET.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
-  </ItemGroup>
 </Project>
