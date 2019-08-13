@@ -42,7 +42,8 @@ namespace SGPdotNET.Observation
         /// <param name="end">The end time of the observation</param>
         /// <param name="maxElevation">The max elevation reached during observation</param>
         /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
-        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation, Coordinate referencePosition = null)
+        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation,
+            Coordinate referencePosition = null)
         {
             Satellite = satellite;
             Start = start.ToStrictUtc();

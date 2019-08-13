@@ -153,7 +153,8 @@ namespace SGPdotNET.Propogation
         ///     Also called XKE
         /// </summary>
         public static readonly double ReciprocalOfMinutesPerTimeUnit = 60 /
-                                                                       Math.Sqrt(EarthRadiusKm * EarthRadiusKm * EarthRadiusKm /
+                                                                       Math.Sqrt(EarthRadiusKm * EarthRadiusKm *
+                                                                                 EarthRadiusKm /
                                                                                  EarthGravitation);
     }
 }

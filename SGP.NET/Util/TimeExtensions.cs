@@ -50,7 +50,7 @@ namespace SGPdotNET.Util
         }
 
         /// <summary>
-        /// Safely converts the time to UTC only if the Kind of the input is known
+        ///     Safely converts the time to UTC only if the Kind of the input is known
         /// </summary>
         /// <param name="time">The time to convert</param>
         /// <returns>The UTC representation the DateTime</returns>
@@ -58,7 +58,8 @@ namespace SGPdotNET.Util
         public static DateTime ToStrictUtc(this DateTime time)
         {
             if (time.Kind == DateTimeKind.Unspecified)
-                throw new ArgumentException($"{nameof(time)}: Kind is unspecified and cannot be converted safely to UTC.");
+                throw new ArgumentException(
+                    $"{nameof(time)}: Kind is unspecified and cannot be converted safely to UTC.");
             return time.ToUniversalTime();
         }
 

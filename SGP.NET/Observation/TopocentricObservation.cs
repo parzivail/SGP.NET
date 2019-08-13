@@ -60,7 +60,8 @@ namespace SGPdotNET.Observation
         /// <param name="range">Range in kilometers</param>
         /// <param name="rangeRate">Range rate in kilometers/second</param>
         /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
-        public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
+        public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate,
+            Coordinate referencePosition = null)
         {
             Azimuth = azimuth;
             Elevation = elevation;
