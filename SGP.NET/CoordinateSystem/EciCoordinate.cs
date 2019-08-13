@@ -52,22 +52,17 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="coord">The position top copy</param>
         public EciCoordinate(DateTime dt, Coordinate coord)
         {
+            dt = dt.ToStrictUtc();
             var eci = coord.ToEci(dt);
+
             Time = dt;
             Position = eci.Position;
             Velocity = eci.Velocity;
         }
 
-        /// <summary>
-        ///     Creates a new ECI coordinate with the specified values
-        /// </summary>
-        /// <param name="dt">The date to be used for this position</param>
-        /// <param name="position">The ECI vector position</param>
-        public EciCoordinate(DateTime dt, Vector3 position)
+        /// <inheritdoc />
+        public EciCoordinate(DateTime dt, Vector3 position) : this(dt, position, new Vector3())
         {
-            Time = dt;
-            Position = position;
-            Velocity = new Vector3();
         }
 
         /// <summary>
@@ -78,7 +73,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="velocity">The ECI velocity vector</param>
         public EciCoordinate(DateTime dt, Vector3 position, Vector3 velocity)
         {
-            Time = dt;
+            Time = dt.ToStrictUtc();
             Position = position;
             Velocity = velocity;
         }
@@ -114,12 +109,13 @@ namespace SGPdotNET.CoordinateSystem
 
             var alt = r / Math.Cos(lat) - SgpConstants.EarthRadiusKm * c;
 
-            return new GeodeticCoordinate(new Angle(lat), new Angle(lon), alt);
+            return new GeodeticCoordinate(new AngleRadians(lat), new AngleRadians(lon), alt);
         }
 
         /// <inheritdoc />
         public override EciCoordinate ToEci(DateTime dt)
         {
+            dt = dt.ToStrictUtc();
             return dt == Time ? this : ToGeodetic().ToEci(dt);
         }
 

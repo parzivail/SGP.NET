@@ -232,7 +232,7 @@ namespace SGPdotNET.CoordinateSystem
         {
             var t = DateTime.UtcNow;
             if (time.HasValue)
-                t = time.Value;
+                t = time.Value.ToStrictUtc();
 
             var geo = ToGeodetic();
             var eci = to.ToEci(t);

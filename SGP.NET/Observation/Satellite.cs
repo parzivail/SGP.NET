@@ -2,6 +2,7 @@
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propogation;
 using SGPdotNET.TLE;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation
 {
@@ -76,6 +77,8 @@ namespace SGPdotNET.Observation
         /// <returns>An ECI coordinate set representing the satellite at the given time</returns>
         public EciCoordinate Predict(DateTime time)
         {
+            time = time.ToStrictUtc();
+
             return _sgp4.FindPosition(time);
         }
 

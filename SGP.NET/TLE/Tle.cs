@@ -299,7 +299,7 @@ namespace SGPdotNET.TLE
                 year += 2000;
             else
                 year += 1900;
-            Epoch = new DateTime((int) year, 1, 1).AddDays(day - 1);
+            Epoch = new DateTime((int) year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(day - 1);
         }
 
         private static bool IsValidLineLength(string str)

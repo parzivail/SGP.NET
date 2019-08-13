@@ -57,6 +57,8 @@ namespace SGPdotNET.Propogation
         /// <returns>The predicted position of the satellite at a specific date and time</returns>
         public EciCoordinate FindPosition(DateTime date)
         {
+            date = date.ToStrictUtc();
+
             return FindPosition((date - Orbit.Epoch).TotalMinutes);
         }
 

@@ -65,7 +65,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <returns>The position in an ECI reference frame with the supplied time</returns>
         public override EciCoordinate ToEci(DateTime dt)
         {
-            var time = dt;
+            var time = dt.ToStrictUtc();
 
             const double mfactor =
                 SgpConstants.TwoPi * (SgpConstants.EarthRotationPerSiderealDay / SgpConstants.SecondsPerDay);
