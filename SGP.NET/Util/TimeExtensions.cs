@@ -55,7 +55,7 @@ namespace SGPdotNET.Util
         /// <param name="time">The time to convert</param>
         /// <returns>The UTC representation the DateTime</returns>
         /// <exception cref="ArgumentException">Thrown when the Kind property of the DateTime is Unspecified</exception>
-        public static DateTime ToStrictUtc(this DateTime time)
+        internal static DateTime ToStrictUtc(this DateTime time)
         {
             if (time.Kind == DateTimeKind.Unspecified)
                 throw new ArgumentException(
