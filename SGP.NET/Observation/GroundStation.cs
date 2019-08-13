@@ -41,6 +41,9 @@ namespace SGPdotNET.Observation
         public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end,
             TimeSpan deltaTime, bool includeIntrerrupted = false)
         {
+            start = start.ToStrictUtc();
+            end = end.ToStrictUtc();
+
             start = start.Round(deltaTime);
 
             var obs = new List<SatelliteVisibilityPeriod>();
@@ -93,6 +96,8 @@ namespace SGPdotNET.Observation
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
         public TopocentricObservation Observe(Satellite satellite, DateTime time)
         {
+            time = time.ToStrictUtc();
+
             var eciLocation = Location.ToEci(time);
             var posEci = satellite.Predict(time);
             return eciLocation.Observe(posEci, time);
@@ -107,6 +112,8 @@ namespace SGPdotNET.Observation
         /// <returns>True if the satellite is above the specified elevation, false otherwise</returns>
         public bool IsVisible(Coordinate pos, Angle minElevation, DateTime time)
         {
+            time = time.ToStrictUtc();
+
             var pGeo = pos.ToGeodetic();
             var footprint = pGeo.GetFootprintAngle();
 

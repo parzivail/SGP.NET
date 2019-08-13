@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using SGPdotNET.Propogation;
 using SGPdotNET.Util;
 
@@ -52,7 +53,9 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="coord">The position top copy</param>
         public EciCoordinate(DateTime dt, Coordinate coord)
         {
+            dt = dt.ToStrictUtc();
             var eci = coord.ToEci(dt);
+
             Time = dt;
             Position = eci.Position;
             Velocity = eci.Velocity;
@@ -63,11 +66,8 @@ namespace SGPdotNET.CoordinateSystem
         /// </summary>
         /// <param name="dt">The date to be used for this position</param>
         /// <param name="position">The ECI vector position</param>
-        public EciCoordinate(DateTime dt, Vector3 position)
+        public EciCoordinate(DateTime dt, Vector3 position) : this(dt, position, new Vector3())
         {
-            Time = dt;
-            Position = position;
-            Velocity = new Vector3();
         }
 
         /// <summary>
@@ -78,6 +78,8 @@ namespace SGPdotNET.CoordinateSystem
         /// <param name="velocity">The ECI velocity vector</param>
         public EciCoordinate(DateTime dt, Vector3 position, Vector3 velocity)
         {
+            dt = dt.ToStrictUtc();
+
             Time = dt;
             Position = position;
             Velocity = velocity;
@@ -120,6 +122,7 @@ namespace SGPdotNET.CoordinateSystem
         /// <inheritdoc />
         public override EciCoordinate ToEci(DateTime dt)
         {
+            dt = dt.ToStrictUtc();
             return dt == Time ? this : ToGeodetic().ToEci(dt);
         }
 

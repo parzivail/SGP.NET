@@ -45,8 +45,8 @@ namespace SGPdotNET.Observation
         public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation, Coordinate referencePosition = null)
         {
             Satellite = satellite;
-            Start = start;
-            End = end;
+            Start = start.ToStrictUtc();
+            End = end.ToStrictUtc();
             MaxElevation = maxElevation;
             ReferencePosition = referencePosition;
         }

@@ -33,7 +33,7 @@ namespace SGPdotNET.Exception
         /// <param name="velocity">Velocity of the satellite at time</param>
         public DecayedException(DateTime time, Vector3 position, Vector3 velocity) : base("Satellite decayed")
         {
-            Time = time;
+            Time = time.ToStrictUtc();
             Position = position;
             Velocity = velocity;
         }
