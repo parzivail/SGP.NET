@@ -80,24 +80,24 @@ namespace SGPdotNET.Propogation
         public const double DistanceUnitsPerEarthRadii = 1;
 
         /// <summary>
-        ///     Also called mu
+        ///     Also called mu (WGS84 datum)
         /// </summary>
-        public const double EarthGravitation = 398600.8;
+        public const double EarthGravitation = 398600.5;
 
         /// <summary>
-        ///     Also called XJ2
+        ///     Also called XJ2 (WGS84 datum)
         /// </summary>
-        public const double ZonalHarmonicJ2 = 1.082616e-3;
+        public const double ZonalHarmonicJ2 = 1.08262998905e-3;
 
         /// <summary>
-        ///     Also called XJ3
+        ///     Also called XJ3 (WGS84 datum)
         /// </summary>
-        public const double ZonalHarmonicJ3 = -2.53881e-6;
+        public const double ZonalHarmonicJ3 = -2.53215306e-6;
 
         /// <summary>
-        ///     Also called XJ4
+        ///     Also called XJ4 (WGS84 datum)
         /// </summary>
-        public const double ZonalHarmonicJ4 = -1.65597e-6;
+        public const double ZonalHarmonicJ4 = -1.61098761e-6;
 
         /// <summary>
         ///     Also called THDT or rptim
@@ -110,14 +110,14 @@ namespace SGPdotNET.Propogation
         public const double KmPerAu = 1.49597870691e8;
 
         /// <summary>
-        ///     Also called KmPer
+        ///     Also called KmPer (WGS84 datum)
         /// </summary>
-        public const double EarthRadiusKm = 6378.135;
+        public const double EarthRadiusKm = 6378.137;
 
         /// <summary>
-        ///     Also called kF
+        ///     Also called kF (WGS84 datum)
         /// </summary>
-        public const double EarthFlatteningConstant = 1 / 298.26;
+        public const double EarthFlatteningConstant = 1 / 298.257223563;
 
         /// <summary>
         ///     Also called OmegaE
