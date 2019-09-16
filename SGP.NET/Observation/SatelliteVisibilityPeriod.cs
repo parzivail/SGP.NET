@@ -28,6 +28,11 @@ namespace SGPdotNET.Observation
         ///     The max elevation reached during observation
         /// </summary>
         public Angle MaxElevation { get; }
+        
+        /// <summary>
+        ///     The time at which max elevation is reached during observation
+        /// </summary>
+        public DateTime MaxElevationTime { get; }
 
         /// <summary>
         ///     The position from which the satellite was observed to generate this observation
@@ -41,22 +46,28 @@ namespace SGPdotNET.Observation
         /// <param name="start">The start time of the observation</param>
         /// <param name="end">The end time of the observation</param>
         /// <param name="maxElevation">The max elevation reached during observation</param>
+        /// <param name="maxElevationTime">The time at which max elevation is reached during observation</param>
         /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
-        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation,
+        public SatelliteVisibilityPeriod(Satellite satellite, DateTime start, DateTime end, Angle maxElevation, DateTime maxElevationTime,
             Coordinate referencePosition = null)
         {
             Satellite = satellite;
             Start = start.ToStrictUtc();
             End = end.ToStrictUtc();
             MaxElevation = maxElevation;
+            MaxElevationTime = maxElevationTime;
             ReferencePosition = referencePosition;
         }
 
         /// <inheritdoc />
         protected bool Equals(SatelliteVisibilityPeriod other)
         {
-            return Satellite.Equals(other.Satellite) && Start.Equals(other.Start) && End.Equals(other.End) &&
-                   MaxElevation.Equals(other.MaxElevation) && ReferencePosition.Equals(other.ReferencePosition);
+            return Satellite.Equals(other.Satellite) 
+                   && Start.Equals(other.Start) 
+                   && End.Equals(other.End) 
+                   && MaxElevation.Equals(other.MaxElevation) 
+                   && MaxElevationTime.Equals(other.MaxElevationTime)
+                   && ReferencePosition.Equals(other.ReferencePosition);
         }
 
         /// <inheritdoc />
@@ -76,6 +87,7 @@ namespace SGPdotNET.Observation
                 hashCode = (hashCode * 397) ^ Start.GetHashCode();
                 hashCode = (hashCode * 397) ^ End.GetHashCode();
                 hashCode = (hashCode * 397) ^ MaxElevation.GetHashCode();
+                hashCode = (hashCode * 397) ^ MaxElevationTime.GetHashCode();
                 hashCode = (hashCode * 397) ^ ReferencePosition.GetHashCode();
                 return hashCode;
             }

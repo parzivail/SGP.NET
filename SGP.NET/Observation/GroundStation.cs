@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Util;
 
@@ -25,64 +29,95 @@ namespace SGPdotNET.Observation
         }
 
         /// <summary>
-        ///     Creates a list of all of the predicted observations within the specified time period, such that an AOS for the
-        ///     satellite from this ground station is seen at, after, or optionally before (see
-        ///     <paramref name="includeIntrerrupted" />) the start parameter
+        ///     Creates a list of all of the predicted observations within the specified time period for this GroundStation.
         /// </summary>
         /// <param name="satellite">The satellite to observe</param>
         /// <param name="start">The time to start observing</param>
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
-        /// <param name="includeIntrerrupted">
-        ///     Whether or not to include periods which may have started before the observation start
-        ///     time
-        /// </param>
+        /// <param name="minElevation">The minimum elevation</param>
+        /// <param name="clipToStartTime">Whether to clip the start time of the first satellite visibility period to start, if applicable. Default is true</param>
+        /// <param name="clipToEndTime">Whether to clip the end time of the last satellite visibility period to end, if applicable. Default is false</param>
+        /// <param name="resolution">The number of second decimal places to calculate for the start and end times. Cannot be greater than 7 (i.e. greater than tick resolution)</param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
-        public List<SatelliteVisibilityPeriod> Observe(Satellite satellite, DateTime start, DateTime end,
-            TimeSpan deltaTime, bool includeIntrerrupted = false)
+        public List<SatelliteVisibilityPeriod> Observe(
+            Satellite satellite, 
+            DateTime start, DateTime end,
+            TimeSpan deltaTime, 
+            Angle minElevation=null, // default is null - will be set to zero if null
+            bool clipToStartTime=true, // default is true as it is assumed typical use case will be for future propagation, not searching into the past
+            bool clipToEndTime=false, // default is false as it is assumed typical use case will be to capture entire future pass
+            int resolution=3)
         {
+            
+            // check input constraints
+            if (deltaTime.TotalSeconds <= 0) { throw new ArgumentException("deltaTime must be positive", "deltaTime"); }
+            if (resolution < 0) { throw new ArgumentException("resolution must be non-negative", "resolution"); }
+            if (resolution > 7) { throw new ArgumentException("resolution must be no more than 7 decimal places (no more than tick resolution)", "resolution");}
             start = start.ToStrictUtc();
             end = end.ToStrictUtc();
-
-            start = start.Round(deltaTime);
+            
+            if (minElevation==null) { minElevation = Angle.Zero; } // if no elevation is given, set it to Zero
+            start = start.Round(deltaTime); 
+            var clippedEnd = clipToEndTime ? (DateTime?)end : null; 
 
             var obs = new List<SatelliteVisibilityPeriod>();
 
-            var t = start - deltaTime;
-            var state = SatelliteObservationState.Init;
+            DateTime aosTime;
+            var t = start;
 
-            var startedObserving = start;
-            var maxEl = Angle.Zero;
-
-            while (t <= end || state == SatelliteObservationState.Observing)
+            do
             {
-                t += deltaTime;
-
-                var eciLocation = Location.ToEci(t);
-                var posEci = satellite.Predict(t);
-
-                if (IsVisible(posEci, Angle.Zero, posEci.Time))
+                // find the AOS Time of the next pass
+                aosTime = FindNextBelowToAboveCrossingPoint(satellite, t, deltaTime, minElevation, resolution);
+                if (aosTime > end) { break; } // if aosTime is greater than end, we're done
+                t = aosTime + deltaTime;
+                // find the LOS time and max elevation for the next pass
+                DateTime losTime;
+                DateTime maxElTime;
+                if (clippedEnd.HasValue && t > clippedEnd.Value)
                 {
-                    if (state == SatelliteObservationState.Init && !includeIntrerrupted)
-                        continue;
-
-                    var azEl = eciLocation.Observe(posEci, posEci.Time);
-
-                    if (azEl.Elevation > maxEl)
-                        maxEl = azEl.Elevation;
-
-                    if (state == SatelliteObservationState.NotObserving) startedObserving = t;
-
-                    state = SatelliteObservationState.Observing;
-                }
-                else
+                    losTime = clippedEnd.Value;
+                    maxElTime = clippedEnd.Value;
+                } 
+                else 
                 {
-                    if (state == SatelliteObservationState.Observing)
-                        obs.Add(new SatelliteVisibilityPeriod(satellite, startedObserving, t, maxEl, Location));
-
-                    maxEl = Angle.Zero;
-                    state = SatelliteObservationState.NotObserving;
+                    var tu = FindNextAboveToBelowCrossingPoint(satellite, t, deltaTime, minElevation, resolution, clippedEnd);
+                    losTime = tu.CrossingPointTime;
+                    maxElTime = tu.MaxElevationTime;
                 }
+                
+                var before = maxElTime - deltaTime;
+                if (clipToStartTime) // ensure before is clipped for max elevation search 
+                {
+                    before = start > before ? start : before;
+                }
+                var after = maxElTime + deltaTime;
+                if (clipToEndTime) // ensure after is clipped for max elevation search
+                {
+                    after = end < after ? end : after;
+                }
+
+                // add the visibility period for the pass
+                var refinedMaxElResult = FindMaxElevation(satellite, before, maxElTime, after, resolution); 
+                var maxEl = refinedMaxElResult.Item1;
+                maxElTime = refinedMaxElResult.Item2;
+                obs.Add(new SatelliteVisibilityPeriod(satellite, aosTime, losTime, maxEl, maxElTime, Location));
+                
+                t = losTime + deltaTime;
+            } while (t <= end);
+            
+            // if clipToStartTime is false and the start time has been clipped, walk back in time until previous AOS crossing point has been found
+            if (!clipToStartTime && obs.Count>0 && obs[0].Start==start)
+            {
+                var first = obs[0];
+                var tu = FindNextAboveToBelowCrossingPoint(satellite, first.Start, deltaTime.Negate(), minElevation, resolution);
+                var maxElTime = first.MaxElevation > tu.MaxElevation ? first.MaxElevationTime : tu.MaxElevationTime;
+                var refinedMaxElResult = FindMaxElevation(satellite, maxElTime - deltaTime, maxElTime,
+                    maxElTime + deltaTime, resolution);
+                var maxEl = refinedMaxElResult.Item1;
+                maxElTime = refinedMaxElResult.Item2;
+                obs[0] = new SatelliteVisibilityPeriod(satellite, tu.CrossingPointTime, first.End, maxEl, maxElTime, first.ReferencePosition);
             }
 
             return obs;
@@ -154,12 +189,209 @@ namespace SGPdotNET.Observation
         {
             return !Equals(left, right);
         }
-
-        private enum SatelliteObservationState
+        
+        
+        // convenience function to get a topocentric observation for a given satellite and time
+        private TopocentricObservation GetTopo(Satellite satellite, DateTime time)
         {
-            Init,
-            NotObserving,
-            Observing
+            var posEci = satellite.Predict(time);
+            return Location.ToEci(time).Observe(posEci, posEci.Time);
         }
+
+        // finds the next crossing point in time when the observer's elevation changes from below minElevation to above.
+        // if the observer's elevation at the start time is above or equal to minElevation, start is returned.
+        private DateTime FindNextBelowToAboveCrossingPoint(Satellite satellite, DateTime start, TimeSpan deltaTime, Angle minElevation, int resolution)
+        {
+            var eciLocation = Location.ToEci(start);
+            var posEci = satellite.Predict(start);
+
+            var t = start - deltaTime;
+            DateTime prev;
+            Angle el;
+
+            do
+            {
+                prev = t;
+                t += deltaTime;
+                el = GetTopo(satellite, t).Elevation;
+            } while (el < minElevation);
+
+            if (t == start) { return t; }
+            
+            // sort out tStart and tEnd
+            DateTime tStart, tEnd;
+            if (prev < t)
+            {
+                tStart = prev;
+                tEnd = t;
+            }
+            else
+            {
+                tStart = t;
+                tEnd = prev;
+            }
+            return FindCrossingTimeWithinInterval(satellite, tStart, tEnd, minElevation, resolution);
+        }
+        
+        // a POD structure that contains time of crossing point, max elevation, and time of max elevation
+        private struct CrossingPointInfo
+        {
+            public CrossingPointInfo(DateTime crossingPointTime, DateTime maxElevationTime, Angle maxElevation)
+            {
+                CrossingPointTime = crossingPointTime;
+                MaxElevationTime = maxElevationTime;
+                MaxElevation = maxElevation;
+            }
+            
+            public DateTime CrossingPointTime { get; }
+            public DateTime MaxElevationTime { get; }
+            public Angle MaxElevation { get; }
+        }
+        
+        // finds the next crossing point in time when the observer's elevation changes from above minElevation to below.
+        // if the observer's elevation at time start is below minElevation, the start time is returned.
+        // note that deltaTime may be negative, i.e. this function can walk backwards in time as well as forwards.
+        private CrossingPointInfo FindNextAboveToBelowCrossingPoint(Satellite satellite, DateTime start, TimeSpan deltaTime, Angle minElevation, int resolution, DateTime? end=null)
+        {
+            var eciLocation = Location.ToEci(start);
+            var posEci = satellite.Predict(start);
+
+            var t = start - deltaTime;
+            DateTime prev;
+            var maxEl = Angle.Zero;
+            var maxElTime = DateTime.MinValue;
+            Angle el;
+            
+            // we write two loops to make the check condition a little easier to read (and slightly more efficient)
+            if (end.HasValue) // if an definite end time is specified
+            {
+                do
+                {
+                    prev = t; 
+                    t += deltaTime;
+                    el = GetTopo(satellite, t).Elevation; 
+                    if (el > maxEl)
+                    {
+                        maxEl = el;
+                        maxElTime = t;
+                    }
+                } while (el >= minElevation && t <= end);
+            }
+            else // if no definite end time is specified
+            {
+                do
+                {
+                    prev = t; 
+                    t += deltaTime;
+                    el = GetTopo(satellite, t).Elevation; 
+                    if (el > maxEl)
+                    {
+                        maxEl = el;
+                        maxElTime = t;
+                    }
+                } while (el >= minElevation);
+            }
+            
+            if (t == start) { return new CrossingPointInfo(t, maxElTime, maxEl); } // bail out early if t==start
+            DateTime tStart, tEnd;
+            // sort out tStart and tEnd
+            if (prev < t)
+            {
+                tStart = prev;
+                tEnd = t;
+            }
+            else
+            {
+                tStart = t;
+                tEnd = prev;
+            }
+            
+            t = FindCrossingTimeWithinInterval(satellite, tStart, tEnd, minElevation, resolution);
+            return new CrossingPointInfo(t, maxElTime, maxEl);
+        }
+
+        // given a interval of time [start, end] with an crossing point within, determine the crossing point time 
+        // it is assumed that the crossing point exists and is singular.
+        private DateTime FindCrossingTimeWithinInterval(Satellite satellite, DateTime start, DateTime end, Angle minElevation, int resolution)
+        {
+            if (start==end) { throw new ArgumentException("start and end cannot be equal", "start"); }
+            
+            var startEl = GetTopo(satellite, start).Elevation;
+            var endEl = GetTopo(satellite, end).Elevation;
+            var isAscending = startEl < endEl;
+
+            var tBelow = start;
+            var tAbove = end;
+            if (!isAscending)
+            {
+                tBelow = end;
+                tAbove = start;
+            }
+
+            var minTicks = (long)(1e7 / Math.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
+
+            long dt;
+            DateTime t;
+
+            // continually halve the interval until the size of the interval is less than minTicks
+            do
+            {
+                dt = (tAbove - tBelow).Ticks / 2;
+                t = tBelow.AddTicks(dt);
+                var el = GetTopo(satellite, t).Elevation;
+                if (el < minElevation)
+                {
+                    tBelow = t;
+                }
+                else
+                {
+                    tAbove = t;
+                }
+            } while (Math.Abs(dt) > minTicks);
+            
+            return t.Round(TimeSpan.FromTicks(minTicks)); // remove the trailing decimals
+        }
+        
+        // finds the max elevation and time for max elevation, to a given temporal resolution
+        private Tuple<Angle, DateTime> FindMaxElevation(Satellite satellite, DateTime before, DateTime peakTime, DateTime after, int resolution)
+        {
+            var minTicks = (long)(1e7 / Math.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
+
+            do
+            {
+                var elBefore = GetTopo(satellite, before).Elevation;
+                var elAfter = GetTopo(satellite, after).Elevation;
+                var elPeakTime = GetTopo(satellite, peakTime).Elevation;
+                
+                var t1 = before + TimeSpan.FromTicks((peakTime - before).Ticks / 2);
+                var t2 = peakTime + TimeSpan.FromTicks((after - peakTime).Ticks / 2);
+                
+                var elT1 = GetTopo(satellite, t1).Elevation;
+                var elT2 = GetTopo(satellite, t2).Elevation;
+                
+                // temporal ordering is: before, t1, peakTime, t2, after
+                
+                // find max of {elT1, elPeakTime, elT2} and choose new (before, peakTime, after) appropriately
+                if (elT1 > elPeakTime && elT1 > elT2)
+                {
+                    after = peakTime;
+                    peakTime = t1;
+                } 
+                else if (elPeakTime > elT1 && elPeakTime > elT2)
+                {
+                    before = t1;
+                    after = t2;
+                }
+                else // elT2 is max
+                {
+                    before = peakTime;
+                    peakTime = t2;
+                }
+            } while ((after - before).Ticks > minTicks);
+
+            return Tuple.Create(GetTopo(satellite, peakTime).Elevation, peakTime.Round(TimeSpan.FromTicks(minTicks))); // remove the trailing decimals);
+        }
+
+        
     }
 }
