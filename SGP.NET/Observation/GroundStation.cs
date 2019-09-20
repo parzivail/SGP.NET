@@ -73,7 +73,7 @@ namespace SGPdotNET.Observation
             do
             {
                 // find the AOS Time of the next pass
-                aosTime = FindNextBelowToAboveCrossingPoint(satellite, t, deltaTime, minElevation, resolution);
+                aosTime = FindNextBelowToAboveCrossingPoint(satellite, t, end, deltaTime, minElevation, resolution);
                 if (aosTime > end) { break; } // if aosTime is greater than end, we're done
                 t = aosTime + deltaTime;
                 // find the LOS time and max elevation for the next pass
@@ -204,7 +204,7 @@ namespace SGPdotNET.Observation
 
         // finds the next crossing point in time when the observer's elevation changes from below minElevation to above.
         // if the observer's elevation at the start time is above or equal to minElevation, start is returned.
-        private DateTime FindNextBelowToAboveCrossingPoint(Satellite satellite, DateTime start, TimeSpan deltaTime, Angle minElevation, int resolution)
+        private DateTime FindNextBelowToAboveCrossingPoint(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime, Angle minElevation, int resolution)
         {
             var eciLocation = Location.ToEci(start);
             var posEci = satellite.Predict(start);
@@ -218,7 +218,7 @@ namespace SGPdotNET.Observation
                 prev = t;
                 t += deltaTime;
                 el = GetTopo(satellite, t).Elevation;
-            } while (el < minElevation);
+            } while (el < minElevation && t <= end);
 
             if (t == start) { return t; }
             
