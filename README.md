@@ -18,7 +18,7 @@ var tle3 = "2 25544  51.6436 304.9146 0005074 348.4622  36.8575 15.5322805515452
 var sat = new Satellite(tle1, tle2, tle3);
 
 // Set up our ground station location
-var location = new GeodeticCoordinate(new AngleDegrees(40.689236), new AngleDegrees(-74.044563), new Angle.Zero);
+var location = new GeodeticCoordinate(new AngleDegrees(40.689236), new AngleDegrees(-74.044563), Angle.Zero);
 
 // Create a ground station
 var groundStation = new GroundStation(location);
@@ -104,7 +104,7 @@ The default resolution is 3.
 
 The Observe method also provides a minElevation parameter, with a default of 0. E.g.
 ```csharp
-observations = groundstation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10), minElevation: Angle.FromDegrees(7.5));
+observations = groundstation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10), minElevation: new AngleDegrees(7.5));
 ```
 
 As well, the Observe method provides clipToStartTime and clipToEndTime parameters, which will clip the start time of the first observation to the start parameter and the end time of the last observation to the end parameter passed to Observe respectively. The default value for clipToStartTime is true (the assumption being that most users are generally concerned with future upcoming passes only) and the default value for clipToEndTime is false (the assumption being that most users do not want to truncate an overpass). Here we clip the observations to the provided time interval.
