@@ -267,7 +267,7 @@ namespace SGPdotNET.Propogation
              */
             if (xincl.Radians < 0.0)
             {
-                xincl = new Angle(-xincl.Radians);
+                xincl = Angle.FromRadians(-xincl.Radians);
                 xnode += Math.PI;
                 omgadf -= Math.PI;
             }
@@ -1042,7 +1042,7 @@ namespace SGPdotNET.Propogation
              */
             DeepSpaceCalculateLunarSolarTerms(tsince, ref pe, ref pinc, ref pl, ref pgh, ref ph);
 
-            xinc = new Angle(xinc.Radians + pinc);
+            xinc = Angle.FromRadians(xinc.Radians + pinc);
             em += pe;
 
             /* Spacetrack report #3 has sin/cos from before perturbations
@@ -1124,7 +1124,7 @@ namespace SGPdotNET.Propogation
             omgasm += _deepspaceConsts.Ssg * tsince;
             xnodes += _deepspaceConsts.Ssh * tsince;
             em += _deepspaceConsts.Sse * tsince;
-            xinc = new Angle(xinc.Radians + _deepspaceConsts.Ssi * tsince);
+            xinc = Angle.FromRadians(xinc.Radians + _deepspaceConsts.Ssi * tsince);
 
             if (_deepspaceConsts.ResonanceFlag)
             {

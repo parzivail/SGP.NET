@@ -35,17 +35,17 @@ namespace SGPdotNET.Observation
         /// <param name="start">The time to start observing</param>
         /// <param name="end">The time to end observing</param>
         /// <param name="deltaTime">The time step for the prediction simulation</param>
-        /// <param name="minElevation">The minimum elevation</param>
+        /// <param name="minElevation">The minimum elevation. Default is Angle.Zero.</param>
         /// <param name="clipToStartTime">Whether to clip the start time of the first satellite visibility period to start, if applicable. Default is true</param>
         /// <param name="clipToEndTime">Whether to clip the end time of the last satellite visibility period to end, if applicable. Default is false</param>
-        /// <param name="resolution">The number of second decimal places to calculate for the start and end times. Cannot be greater than 7 (i.e. greater than tick resolution)</param>
+        /// <param name="resolution">The number of second decimal places to calculate for the start and end times. Cannot be greater than 7 (i.e. greater than tick resolution). Default is 3.</param>
         /// <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
         /// <exception cref="ArgumentException">Thrown if start is greater than or equal to end, deltaTime is non-positive, resolution is not in range 0-7, or minElevation is greater than 90°</exception>
         public List<SatelliteVisibilityPeriod> Observe(
             Satellite satellite, 
             DateTime start, DateTime end,
             TimeSpan deltaTime, 
-            Angle minElevation=null, // default is null - will be set to zero if null
+            Angle minElevation=default(Angle), // default is Angle.Zero
             bool clipToStartTime=true, // default is true as it is assumed typical use case will be for future propagation, not searching into the past
             bool clipToEndTime=false, // default is false as it is assumed typical use case will be to capture entire future pass
             int resolution=3)
@@ -61,7 +61,6 @@ namespace SGPdotNET.Observation
             if (resolution > 7) { throw new ArgumentException("resolution must be no more than 7 decimal places (no more than tick resolution)", "resolution");}
             if (minElevation!=null && minElevation.Degrees > 90) { throw new ArgumentException("minElevation cannot be greater than 90°", "minElevation"); }
             
-            if (minElevation==null) { minElevation = Angle.Zero; } // if no elevation is given, set it to Zero
             start = start.Round(deltaTime); 
             var clippedEnd = clipToEndTime ? (DateTime?)end : null; 
 

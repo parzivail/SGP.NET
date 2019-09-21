@@ -17,12 +17,12 @@ namespace SGPdotNET.CoordinateSystem
         /// <summary>
         ///     A coordinate that represents the geographic North Pole
         /// </summary>
-        public static Coordinate NorthPole = new GeodeticCoordinate(new AngleDegrees(90), Angle.Zero, 0);
+        public static Coordinate NorthPole = new GeodeticCoordinate(Angle.FromDegrees(90), Angle.Zero, 0);
 
         /// <summary>
         ///     A coordinate that represents the geographic South Pole
         /// </summary>
-        public static Coordinate SouthPole = new GeodeticCoordinate(new AngleDegrees(-90), Angle.Zero, 0);
+        public static Coordinate SouthPole = new GeodeticCoordinate(Angle.FromDegrees(-90), Angle.Zero, 0);
 
         /// <summary>
         ///     Converts this coordinate to an ECI one
@@ -149,7 +149,7 @@ namespace SGPdotNET.CoordinateSystem
         public Angle GetFootprintAngle()
         {
             var geo = ToGeodetic();
-            return new Angle(Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude)));
+            return Angle.FromRadians(Math.Acos(SgpConstants.EarthRadiusKm / (SgpConstants.EarthRadiusKm + geo.Altitude)));
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace SGPdotNET.CoordinateSystem
 
                 lngRadians = MathUtil.WrapNegPosPi(lngRadians);
 
-                coords.Add(new GeodeticCoordinate(new Angle(latRadians), new Angle(lngRadians), 10));
+                coords.Add(new GeodeticCoordinate(Angle.FromRadians(latRadians), Angle.FromRadians(lngRadians), 10));
             }
 
             return coords;
@@ -208,7 +208,7 @@ namespace SGPdotNET.CoordinateSystem
                        Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
             dist = Math.Acos(dist);
 
-            return new Angle(dist);
+            return Angle.FromRadians(dist);
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace SGPdotNET.CoordinateSystem
             var el = Math.Asin(topZ / range.Length);
             var rate = range.Dot(rangeRate) / range.Length;
 
-            return new TopocentricObservation(new Angle(az), new Angle(el), range.Length, rate, this);
+            return new TopocentricObservation(Angle.FromRadians(az), Angle.FromRadians(el), range.Length, rate, this);
         }
 
         /// <inheritdoc />
