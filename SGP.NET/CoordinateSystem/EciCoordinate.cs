@@ -109,7 +109,7 @@ namespace SGPdotNET.CoordinateSystem
 
             var alt = r / Math.Cos(lat) - SgpConstants.EarthRadiusKm * c;
 
-            return new GeodeticCoordinate(new AngleRadians(lat), new AngleRadians(lon), alt);
+            return new GeodeticCoordinate(Angle.FromRadians(lat), Angle.FromRadians(lon), alt);
         }
 
         /// <inheritdoc />

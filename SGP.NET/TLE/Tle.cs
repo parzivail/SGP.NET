@@ -124,25 +124,25 @@ namespace SGPdotNET.TLE
         ///     Gets the inclination
         /// </summary>
         /// <returns></returns>
-        public Angle Inclination => new AngleDegrees(_inclination);
+        public Angle Inclination => Angle.FromDegrees(_inclination);
 
         /// <summary>
         ///     Gets the right ascension of the ascending node
         /// </summary>
         /// <returns></returns>
-        public Angle RightAscendingNode => new AngleDegrees(_rightAscendingNode);
+        public Angle RightAscendingNode => Angle.FromDegrees(_rightAscendingNode);
 
         /// <summary>
         ///     Gets the argument of perigee
         /// </summary>
         /// <returns></returns>
-        public Angle ArgumentPerigee => new AngleDegrees(_argumentPerigee);
+        public Angle ArgumentPerigee => Angle.FromDegrees(_argumentPerigee);
 
         /// <summary>
         ///     Gets the mean anomaly
         /// </summary>
         /// <returns></returns>
-        public Angle MeanAnomaly => new AngleDegrees(_meanAnomaly);
+        public Angle MeanAnomaly => Angle.FromDegrees(_meanAnomaly);
 
         /// <summary>
         ///     Initialise TLE with two lines

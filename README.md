@@ -18,7 +18,7 @@ var tle3 = "2 25544  51.6436 304.9146 0005074 348.4622  36.8575 15.5322805515452
 var sat = new Satellite(tle1, tle2, tle3);
 
 // Set up our ground station location
-var location = new GeodeticCoordinate(40.689236, -74.044563, 0);
+var location = new GeodeticCoordinate(Angle.FromDegrees(40.689236), Angle.FromDegrees(-74.044563), Angle.Zero);
 
 // Create a ground station
 var groundStation = new GroundStation(location);
@@ -88,6 +88,29 @@ var tles = provider.GetTles();
 
 // Alternatively get a specific satellite's TLE
 var issTle = provider.GetTle(25544);
+```
+## More details on Observe
+
+The Observe method of the Groundstation class may accept a time interval (in UTC) in which to find multiple possible visibility overpasses for a satellite. Here we determine passes for the next 24 hour period, using a time step of 10 seconds.
+```csharp
+var observations = groundStation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10));
+```
+
+The time step provided to use with groundstation.Observe is used to coarsely perform an initial search for the start, end, and time of max elevation of each overpass, which are then determined to a higher resolution using an interval halving approach. The resolution parameter sets the number of decimal places (in seconds) for determined the time above. This allows using a large time step to for finding the overpasses. Here we use a time step of 10 seconds, but determine the time to a resolution of a hundredth of a second.
+```csharp
+var observations = groundStation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10), resolution: 2);
+```
+The default resolution is 3.
+
+The Observe method also provides a minElevation parameter, with a default of 0. E.g.
+```csharp
+observations = groundstation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10), minElevation: Angle.FromDegrees(7.5));
+```
+
+As well, the Observe method provides clipToStartTime and clipToEndTime parameters, which will clip the start time of the first observation to the start parameter and the end time of the last observation to the end parameter passed to Observe respectively. The default value for clipToStartTime is true (the assumption being that most users are generally concerned with future upcoming passes only) and the default value for clipToEndTime is false (the assumption being that most users do not want to truncate an overpass). Here we clip the observations to the provided time interval.
+
+```csharp
+observations = groundstation.Observe(sat, DateTime.UtcNow, DateTime.UtcNow + TimeSpan.FromHours(24), TimeSpan.FromSeconds(10), clipToEndTime: true)
 ```
 
 # Further Reading

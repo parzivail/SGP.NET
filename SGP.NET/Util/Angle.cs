@@ -5,7 +5,7 @@ namespace SGPdotNET.Util
     /// <summary>
     ///     Stores an angle
     /// </summary>
-    public class Angle
+    public struct Angle
     {
         /// <summary>
         ///     The Angle that represents zero radians/degrees
@@ -26,7 +26,7 @@ namespace SGPdotNET.Util
         ///     Constructor
         /// </summary>
         /// <param name="angle">The angle to be stored in the object, in radians</param>
-        public Angle(double angle)
+        private Angle(double angle)
         {
             Radians = angle;
         }
@@ -42,6 +42,27 @@ namespace SGPdotNET.Util
         {
             return 1530437289 + Radians.GetHashCode();
         }
+        
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"Angle[{Degrees}°]";
+        }
+
+        /// <summary>
+        /// Creates a new angle from an angular value in radians
+        /// </summary>
+        /// <param name="radians">A angular value, in radians</param>
+        /// <returns>An angle with the value in radians</returns>
+        public static Angle FromRadians(double radians) => new Angle(radians);
+        
+        /// <summary>
+        /// Creates a new angle from an angular value in degrees
+        /// </summary>
+        /// <param name="degrees">A angular value, in degrees</param>
+        /// <returns>An angle created with the given value in degrees</returns>
+        public static Angle FromDegrees(double degrees) => new Angle(MathUtil.DegreesToRadians(degrees));
+
 
         /// <summary>
         ///     Checks two angles for equality
@@ -137,13 +158,8 @@ namespace SGPdotNET.Util
         /// <param name="d"></param>
         public static implicit operator Angle(double d)
         {
-            return new AngleDegrees(d);
+            return Angle.FromDegrees(d);
         }
 
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return $"Angle[{Degrees}°]";
-        }
     }
 }
