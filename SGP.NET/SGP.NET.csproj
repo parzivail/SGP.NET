@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.4</TargetFrameworks>
     <PackageId>SGP.NET</PackageId>
-    <Version>1.0.7</Version>
+    <Version>1.1.0</Version>
     <Authors>parzivail</Authors>
     <Company>parzivail</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,11 +17,12 @@
     <Description>C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.</Description>
     <GenerateDocumentationFile Condition="'$(Configuration)'=='Release'">true</GenerateDocumentationFile>
     <RootNamespace>SGPdotNET</RootNamespace>
-    <PackageReleaseNotes>Throw exception when DateTimes are found to have an unspecified Kind (i.e. neither UTC nor Local) (thanks davidtgillard  and bretcope!),
-ensure that DateTime.Round returns a date with the same Kind as input DateTime (thanks davidtgillard!),
-Remove Microsoft.SourceLink.Github dependency (thanks davidtgillard!)</PackageReleaseNotes>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
+    <PackageReleaseNotes>Changed parameters from WGS72 to WGS84 coordinate system (thanks davidtgillard!)
+Additional parameters and optimizations made in GroundStation.Observe (thanks davidtgillard!)
+In Observe, make sure that if no initial crossing point is to be found (perhaps due to minElevation near zenith), we don't keep searching past the end time (thanks davidtgillard!)
+Angle changed to struct, removed AngleDegrees and AngleRadians (thanks davidtgillard!)</PackageReleaseNotes>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.4|AnyCPU'">
