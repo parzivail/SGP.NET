@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -65,15 +66,16 @@ namespace SGPdotNET.Observation
             var clippedEnd = clipToEndTime ? (DateTime?)end : null; 
 
             var obs = new List<SatelliteVisibilityPeriod>();
-
+            
             DateTime aosTime;
             var t = start;
 
             do
             {
                 // find the AOS Time of the next pass
-                aosTime = FindNextBelowToAboveCrossingPoint(satellite, t, end, deltaTime, minElevation, resolution);
-                if (aosTime > end) { break; } // if aosTime is greater than end, we're done
+                var aosCrossingPoint = FindNextBelowToAboveCrossingPoint(satellite, t, end, deltaTime, minElevation, resolution);
+                if (!aosCrossingPoint.HasValue) { break; }// we're done if no crossing point was found 
+                aosTime = aosCrossingPoint.Value;
                 t = aosTime + deltaTime;
                 // find the LOS time and max elevation for the next pass
                 DateTime losTime;
@@ -89,8 +91,9 @@ namespace SGPdotNET.Observation
                     losTime = tu.CrossingPointTime;
                     maxElTime = tu.MaxElevationTime;
                 }
-                
+
                 var before = maxElTime - deltaTime;
+
                 if (clipToStartTime) // ensure before is clipped for max elevation search 
                 {
                     before = start > before ? start : before;
@@ -203,7 +206,7 @@ namespace SGPdotNET.Observation
 
         // finds the next crossing point in time when the observer's elevation changes from below minElevation to above.
         // if the observer's elevation at the start time is above or equal to minElevation, start is returned.
-        private DateTime FindNextBelowToAboveCrossingPoint(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime, Angle minElevation, int resolution)
+        private DateTime? FindNextBelowToAboveCrossingPoint(Satellite satellite, DateTime start, DateTime end, TimeSpan deltaTime, Angle minElevation, int resolution)
         {
             var eciLocation = Location.ToEci(start);
             var posEci = satellite.Predict(start);
@@ -215,11 +218,14 @@ namespace SGPdotNET.Observation
             do
             {
                 prev = t;
-                t += deltaTime;
+                var next = t + deltaTime;
+                t = next <= end ? next : end; // clamp t to end
                 el = GetTopo(satellite, t).Elevation;
-            } while (el < minElevation && t <= end);
+            } while (el < minElevation && t < end);
 
-            if (t == start) { return t; }
+            if (prev == start) { return t; }
+
+            if (el < minElevation) { return null; } // if we haven't found a crossing point
             
             // sort out tStart and tEnd
             DateTime tStart, tEnd;
@@ -233,6 +239,7 @@ namespace SGPdotNET.Observation
                 tStart = t;
                 tEnd = prev;
             }
+            
             return FindCrossingTimeWithinInterval(satellite, tStart, tEnd, minElevation, resolution);
         }
         
