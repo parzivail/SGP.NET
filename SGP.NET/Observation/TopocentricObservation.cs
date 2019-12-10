@@ -1,6 +1,6 @@
 using System;
 using SGPdotNET.CoordinateSystem;
-using SGPdotNET.Propogation;
+using SGPdotNET.Propagation;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Observation

@@ -2,7 +2,7 @@ using System;
 using SGPdotNET.TLE;
 using SGPdotNET.Util;
 
-namespace SGPdotNET.Propogation
+namespace SGPdotNET.Propagation
 {
     /// <summary>
     ///     Container for the extracted orbital elements used by the SGP4 propagator.
