@@ -1,5 +1,5 @@
 using System;
-using SGPdotNET.Propogation;
+using SGPdotNET.Propagation;
 
 namespace SGPdotNET.Util
 {

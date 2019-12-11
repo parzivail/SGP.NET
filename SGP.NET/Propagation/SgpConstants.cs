@@ -1,6 +1,6 @@
 using System;
 
-namespace SGPdotNET.Propogation
+namespace SGPdotNET.Propagation
 {
     /// <summary>
     ///     Stores various numerical constants used in propogation

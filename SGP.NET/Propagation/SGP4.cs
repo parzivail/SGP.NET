@@ -4,7 +4,7 @@ using SGPdotNET.Exception;
 using SGPdotNET.TLE;
 using SGPdotNET.Util;
 
-namespace SGPdotNET.Propogation
+namespace SGPdotNET.Propagation
 {
     /// <summary>
     ///     The Simplified General Perturbations (Model 4) propagater

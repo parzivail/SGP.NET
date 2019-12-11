@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SGPdotNET.Observation;
-using SGPdotNET.Propogation;
+using SGPdotNET.Propagation;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.CoordinateSystem
