@@ -40,6 +40,9 @@ namespace SGPSandbox
                             if (comPort.IsOpen)
                                 comPort.Close();
                             comPort.Open();
+
+                            comPort.WriteLine("$G");
+                            comPort.WriteLine("G10P0L20X0Y0Z0");
                         }
                         state = TrackingState.ListingVisible;
                         break;
@@ -58,7 +61,7 @@ namespace SGPSandbox
                         Console.WriteLine(tracking.Name);
                         Console.WriteLine($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
 
-                        comPort?.Write($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
+                        comPort?.WriteLine($"G1X{-observation.Elevation.Degrees:F2}Y{observation.Azimuth.Degrees:F2}F1000");
 
                         Thread.Sleep(250);
                         break;
