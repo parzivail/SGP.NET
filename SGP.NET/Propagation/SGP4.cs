@@ -7,7 +7,7 @@ using SGPdotNET.Util;
 namespace SGPdotNET.Propagation
 {
     /// <summary>
-    ///     The Simplified General Perturbations (Model 4) propagater
+    ///     The Simplified General Perturbations (Model 4) propagator
     /// </summary>
     public class Sgp4
     {

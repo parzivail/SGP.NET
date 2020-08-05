@@ -44,17 +44,42 @@ namespace SGPdotNET.TLE
             MaxAge = maxAge;
         }
 
-        private async Task CacheRemoteTles()
+        private void CacheRemoteTles()
         {
             if (DateTime.UtcNow < LastRefresh + MaxAge)
                 return;
 
-            _cachedTles = await FetchNewTles();
+            _cachedTles = FetchNewTles();
 
             LastRefresh = DateTime.UtcNow;
         }
 
-        internal virtual async Task<Dictionary<int, Tle>> FetchNewTles()
+        private async Task CacheRemoteTlesAsync()
+        {
+            if (DateTime.UtcNow < LastRefresh + MaxAge)
+                return;
+
+            _cachedTles = await FetchNewTlesAsync();
+
+            LastRefresh = DateTime.UtcNow;
+        }
+
+        internal virtual Dictionary<int, Tle> FetchNewTles()
+        {
+            var tles = new Dictionary<int, Tle>();
+            using (var wc = new HttpClient())
+            {
+                foreach (var source in _sources)
+                {
+                    var str = wc.GetStringAsync(source).Result;
+                    PopulateTleTable(str, tles);
+                }
+            }
+
+            return tles;
+        }
+
+        internal virtual async Task<Dictionary<int, Tle>> FetchNewTlesAsync()
         {
             var tles = new Dictionary<int, Tle>();
             using (var wc = new HttpClient())
@@ -62,38 +87,43 @@ namespace SGPdotNET.TLE
                 foreach (var source in _sources)
                 {
                     var str = await wc.GetStringAsync(source);
-                    var file = str
-                        .Replace("\r\n", "\n") // normalize line endings
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
-
-                    var elementSets = Tle.ParseElements(file, true);
-
-                    foreach (var elementSet in elementSets)
-                        tles.Add((int) elementSet.NoradNumber, elementSet);
+                    PopulateTleTable(str, tles);
                 }
             }
 
             return tles;
         }
 
+        protected static void PopulateTleTable(string str, Dictionary<int, Tle> tles)
+        {
+            var file = str
+                .Replace("\r\n", "\n") // normalize line endings
+                .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+
+            var elementSets = Tle.ParseElements(file, true);
+
+            foreach (var elementSet in elementSets)
+                tles.Add((int)elementSet.NoradNumber, elementSet);
+        }
+
         /// <summary>
-        ///     Queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
+        ///     Asynchronously queries the cache (updating if needed) and retrieves a two-line set for the specified satellite
         /// </summary>
         /// <param name="satelliteId">The satellite to retrieve</param>
         /// <returns>The remote TLE for the specified satellite</returns>
         public async Task<Tle> GetTleAsync(int satelliteId)
         {
-            await CacheRemoteTles();
+            await CacheRemoteTlesAsync();
             return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
         /// <summary>
-        ///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
+        ///     Asynchronously queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
         /// </summary>
         /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
         public async Task<Dictionary<int, Tle>> GetTlesAsync()
         {
-            await CacheRemoteTles();
+            await CacheRemoteTlesAsync();
             return _cachedTles;
         }
 
@@ -104,7 +134,7 @@ namespace SGPdotNET.TLE
         /// <returns>The remote TLE for the specified satellite</returns>
         public Tle GetTle(int satelliteId)
         {
-            CacheRemoteTles().Wait();
+            CacheRemoteTles();
             return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
@@ -114,7 +144,7 @@ namespace SGPdotNET.TLE
         /// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
         public Dictionary<int, Tle> GetTles()
         {
-            CacheRemoteTles().Wait();
+            CacheRemoteTles();
             return _cachedTles;
         }
     }

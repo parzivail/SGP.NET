@@ -47,7 +47,7 @@ namespace SGPdotNET.TLE
             _localFilename = localFilename;
         }
 
-        internal override async Task<Dictionary<int, Tle>> FetchNewTles()
+        internal override Dictionary<int, Tle> FetchNewTles()
         {
             if (File.Exists(_localFilename))
                 using (var file = File.OpenRead(_localFilename))
@@ -60,18 +60,42 @@ namespace SGPdotNET.TLE
                                 out var date) && DateTime.UtcNow - date < MaxAge)
                         {
                             LastRefresh = date;
-                            var restOfFile = sr.ReadToEnd()
-                                .Replace("\r\n", "\n") // normalize line endings
-                                .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                            var elementSets = Tle.ParseElements(restOfFile, ThreeLine);
-
-                            return elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+                            var dict = new Dictionary<int, Tle>();
+                            PopulateTleTable(sr.ReadToEnd(), dict);
+                            return dict;
                         }
                     }
                 }
 
-            var tles = await base.FetchNewTles();
+            var tles = base.FetchNewTles();
+            WriteOutNewTles(tles);
+
+            return tles;
+        }
+
+        internal override async Task<Dictionary<int, Tle>> FetchNewTlesAsync()
+        {
+            if (File.Exists(_localFilename))
+                using (var file = File.OpenRead(_localFilename))
+                {
+                    using (var sr = new StreamReader(file))
+                    {
+                        var dateLine = sr.ReadLine();
+
+                        if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
+                                out var date) && DateTime.UtcNow - date < MaxAge)
+                        {
+                            LastRefresh = date;
+
+                            var dict = new Dictionary<int, Tle>();
+                            PopulateTleTable(await sr.ReadToEndAsync(), dict);
+                            return dict;
+                        }
+                    }
+                }
+
+            var tles = await base.FetchNewTlesAsync();
             WriteOutNewTles(tles);
 
             return tles;
