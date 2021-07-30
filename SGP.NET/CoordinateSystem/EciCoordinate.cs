@@ -116,7 +116,10 @@ namespace SGPdotNET.CoordinateSystem
         public override EciCoordinate ToEci(DateTime dt)
         {
             dt = dt.ToStrictUtc();
-            return dt == Time ? this : ToGeodetic().ToEci(dt);
+            // Can't directly compare dates here because the round-trip conversion from
+            // the observation DateTime to total seconds since the epoch back to
+            // the DateTime given to this EciCoordinate is lossy by about 10 microseconds
+            return Math.Abs((dt - Time).TotalMilliseconds) < 1 ? this : ToGeodetic().ToEci(dt);
         }
 
         /// <inheritdoc />

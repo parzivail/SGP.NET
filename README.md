@@ -18,7 +18,7 @@ var tle3 = "2 25544  51.6436 304.9146 0005074 348.4622  36.8575 15.5322805515452
 var sat = new Satellite(tle1, tle2, tle3);
 
 // Set up our ground station location
-var location = new GeodeticCoordinate(Angle.FromDegrees(40.689236), Angle.FromDegrees(-74.044563), Angle.Zero);
+var location = new GeodeticCoordinate(Angle.FromDegrees(40.689236), Angle.FromDegrees(-74.044563), 0);
 
 // Create a ground station
 var groundStation = new GroundStation(location);

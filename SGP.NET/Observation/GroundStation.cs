@@ -139,9 +139,8 @@ namespace SGPdotNET.Observation
         {
             time = time.ToStrictUtc();
 
-            var eciLocation = Location.ToEci(time);
             var posEci = satellite.Predict(time);
-            return eciLocation.Observe(posEci, time);
+            return Location.Observe(posEci, time);
         }
 
         /// <summary>

@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Observation;
 using SGPdotNET.TLE;
@@ -17,6 +14,27 @@ namespace SGPSandbox
     {
         static void Main(string[] args)
         {
+            // Create a set of TLE strings
+            var tle1 = "NOAA 18";
+            var tle2 = "1 28654U 05018A   21211.15637809  .00000079  00000-0  67126-4 0  9997";
+            var tle3 = "2 28654  98.9915 276.1858 0014784 158.1505 202.0300 14.12625913834561";
+
+// Create a satellite from the TLEs
+            var sat = new Satellite(tle1, tle2, tle3);
+
+// Set up our ground station location
+            var location = new GeodeticCoordinate(Angle.FromDegrees(50.74), Angle.FromDegrees(-1.31), 0);
+
+// Create a ground station
+            var groundStation = new GroundStation(location);
+
+// Observe the satellite
+            // var observation = groundStation.Observe(sat, new DateTime(2019, 3, 5, 3, 45, 12, DateTimeKind.Utc));
+            var observation = groundStation.Observe(sat, DateTime.UtcNow);
+
+            Console.WriteLine(observation);
+            
+            /*
             var tleUrl = new Uri("https://celestrak.com/NORAD/elements/visual.txt");
             var provider = new RemoteTleProvider(true, tleUrl);
             var tles = provider.GetTles();
@@ -72,6 +90,7 @@ namespace SGPSandbox
             }
 
             comPort?.Close();
+            */
         }
 
         private static SerialPort SelectComPort()
