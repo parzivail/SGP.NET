@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Authors>parzivail</Authors>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\SGP.NET\SGP.NET.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SGP.NET\SGP.NET.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="System.IO.Ports" Version="6.0.0-preview.6.21352.12" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="6.0.2-mauipre.1.22054.8" />
+  </ItemGroup>
 
 </Project>

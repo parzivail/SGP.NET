@@ -46,7 +46,7 @@ namespace SGPdotNET.Util
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"Angle[{Degrees}°]";
+            return $"Angle[{Degrees}Â°]";
         }
 
         /// <summary>

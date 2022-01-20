@@ -111,7 +111,7 @@ namespace SGPdotNET.CoordinateSystem
             var lonS = (lonDd - lonD - lonM / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree *
                        SgpConstants.SecondsPerMinute;
 
-            return $"{latD}°{latM}'{latS}\"{(north ? "N" : "S")} {lonD}°{lonM}'{lonS}\"{(east ? "E" : "W")}";
+            return $"{latD}Â°{latM}'{latS}\"{(north ? "N" : "S")} {lonD}Â°{lonM}'{lonS}\"{(east ? "E" : "W")}";
         }
 
         /// <summary>

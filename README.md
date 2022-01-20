@@ -27,7 +27,7 @@ var groundStation = new GroundStation(location);
 var observation = groundStation.Observe(sat, new DateTime(2019, 3, 5, 3, 45, 12, DateTimeKind.Utc));
 
 Console.WriteLine(observation);
-// -> TopocentricObservation[Azimuth=Angle[17.7964900382581°], Elevation=Angle[-54.1738348534288°], Range=10962.2688992742km, RangeRate=3.29677171042301km/s]
+// -> TopocentricObservation[Azimuth=Angle[17.7964900382581Â°], Elevation=Angle[-54.1738348534288Â°], Range=10962.2688992742km, RangeRate=3.29677171042301km/s]
 ```
 
 # Creating TLEs
