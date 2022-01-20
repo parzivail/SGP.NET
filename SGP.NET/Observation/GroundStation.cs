@@ -146,9 +146,9 @@ namespace SGPdotNET.Observation
 		{
 			time = time.ToStrictUtc();
 
-            var posEci = satellite.Predict(time);
-            return Location.Observe(posEci, time);
-        }
+			var posEci = satellite.Predict(time);
+			return Location.Observe(posEci, time);
+		}
 
 		/// <summary>
 		///     Tests whether or not a satellite is above a specified elevation
