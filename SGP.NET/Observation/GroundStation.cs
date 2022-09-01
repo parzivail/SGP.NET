@@ -128,7 +128,10 @@ namespace SGPdotNET.Observation
 				var first = obs[0];
 				var tu = FindNextAboveToBelowCrossingPoint(satellite, first.Start, deltaTime.Negate(), minElevation, resolution);
 				var maxElTime = first.MaxElevation > tu.MaxElevation ? first.MaxElevationTime : tu.MaxElevationTime;
-				var (maxEl, nextMaxElTime) = FindMaxElevation(satellite, maxElTime - deltaTime, maxElTime, maxElTime + deltaTime, resolution);
+				var tuple = FindMaxElevation(satellite, maxElTime - deltaTime, maxElTime, maxElTime + deltaTime, resolution);
+
+				var maxEl = tuple.Item1;
+				var nextMaxElTime = tuple.Item2;
 				maxElTime = nextMaxElTime;
 				obs[0] = new SatelliteVisibilityPeriod(satellite, tu.CrossingPointTime, first.End, maxEl, maxElTime, first.ReferencePosition);
 			}

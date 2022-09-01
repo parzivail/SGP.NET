@@ -8,13 +8,31 @@ namespace SGPdotNET.Observation
 	/// <summary>
 	///     Stores a topocentric location (azimuth, elevation, range and range rate).
 	/// </summary>
-	/// <param name="Azimuth">Azimuth relative to the observer</param>
-	/// <param name="Elevation">Elevation relative to the observer</param>
-	/// <param name="Range">Range relative to the observer, in kilometers</param>
-	/// <param name="RangeRate">Range rate relative to the observer, in kilometers/second</param>
-	/// <param name="ReferencePosition">The position from which the satellite was observed to generate this observation</param>
-	public record TopocentricObservation(Angle Azimuth, Angle Elevation, double Range, double RangeRate, Coordinate ReferencePosition = null)
+	public class TopocentricObservation
 	{
+		public Angle Azimuth { get; }
+		public Angle Elevation { get; }
+		public double Range { get; }
+		public double RangeRate { get; }
+		public Coordinate ReferencePosition { get; }
+
+		/// <summary>
+		///     Stores a topocentric location (azimuth, elevation, range and range rate).
+		/// </summary>
+		/// <param name="azimuth">Azimuth relative to the observer</param>
+		/// <param name="elevation">Elevation relative to the observer</param>
+		/// <param name="range">Range relative to the observer, in kilometers</param>
+		/// <param name="rangeRate">Range rate relative to the observer, in kilometers/second</param>
+		/// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
+		public TopocentricObservation(Angle azimuth, Angle elevation, double range, double rangeRate, Coordinate referencePosition = null)
+		{
+			this.Azimuth = azimuth;
+			this.Elevation = elevation;
+			this.Range = range;
+			this.RangeRate = rangeRate;
+			this.ReferencePosition = referencePosition;
+		}
+
 		/// <summary>
 		///     Direction relative to the observer
 		/// </summary>
@@ -65,6 +83,45 @@ namespace SGPdotNET.Observation
 		{
 			var rr = RangeRate * SgpConstants.MetersPerKilometer;
 			return -rr / SgpConstants.SpeedOfLight * inputFrequency;
+		}
+
+		protected bool Equals(TopocentricObservation other)
+		{
+			return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) && RangeRate.Equals(other.RangeRate) &&
+			       Equals(ReferencePosition, other.ReferencePosition);
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((TopocentricObservation)obj);
+		}
+
+		/// <inheritdoc />
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				var hashCode = Azimuth.GetHashCode();
+				hashCode = (hashCode * 397) ^ Elevation.GetHashCode();
+				hashCode = (hashCode * 397) ^ Range.GetHashCode();
+				hashCode = (hashCode * 397) ^ RangeRate.GetHashCode();
+				hashCode = (hashCode * 397) ^ (ReferencePosition != null ? ReferencePosition.GetHashCode() : 0);
+				return hashCode;
+			}
+		}
+
+		public static bool operator ==(TopocentricObservation left, TopocentricObservation right)
+		{
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(TopocentricObservation left, TopocentricObservation right)
+		{
+			return !Equals(left, right);
 		}
 
 		/// <inheritdoc />

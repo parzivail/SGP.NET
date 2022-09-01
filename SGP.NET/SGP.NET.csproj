@@ -15,10 +15,12 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb;.xml</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <Description>C# SGP4 Satellite Prediction Library. Multi-function library with support for loading satellites from TLEs, converting between coordinate systems and reference frames, observing satellites from ground stations, and creating schedules of observations over periods of time.</Description>
     <RootNamespace>SGPdotNET</RootNamespace>
-    <PackageReleaseNotes>Added netstandard2.0 target</PackageReleaseNotes>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
-    <TargetFramework>net6.0</TargetFramework>
+    <PackageReleaseNotes>* Replace equality members of previously-record types</PackageReleaseNotes>
+    <AssemblyVersion>1.3.2.0</AssemblyVersion>
+    <FileVersion>1.3.2.0</FileVersion>
     <LangVersion>10</LangVersion>
+    <AssemblyOriginatorKeyFile>parzivail nuget.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworks>net6.0;netstandard1.4;netstandard2.0</TargetFrameworks>
+    <PackageVersion>1.3.2</PackageVersion>
   </PropertyGroup>
 </Project>
