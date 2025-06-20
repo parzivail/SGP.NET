@@ -82,6 +82,37 @@ namespace SGPdotNET.Observation
             return _sgp4.FindPosition(time);
         }
 
+        /// <summary>
+        /// Determines if the satellite is geostationary, based on the given
+        /// thresholds
+        /// </summary>
+        /// <param name="maxInclination">
+        ///     The maximum inclination the orbit may have before it is
+        ///     no longer considered geostationary
+        /// </param>
+        /// <param name="maxEccentricity">
+        ///     The maximum eccentricity the orbit may have before it is
+        ///     no longer considered geostationary
+        /// </param>
+        /// <param name="maxMeanMotion">
+        ///     The maximum mean motion deviation from 1 revolution per
+        ///     sidereal day the orbit may have before it is no longer
+        ///     considered geostationary
+        /// </param>
+        /// <returns></returns>
+        public bool IsGeostationary(
+            Angle? maxInclination = null,
+            double maxEccentricity = 0.01,
+            double maxMeanMotion = 0.01
+        )
+        {
+            maxInclination ??= Angle.FromDegrees(1);
+            
+            return Math.Abs(Tle.Inclination.Degrees) < maxInclination.Value.Degrees &&
+                   Tle.Eccentricity < maxEccentricity &&
+                   Math.Abs(Tle.MeanMotionRevPerDay - SgpConstants.EarthRotationPerSiderealDay) < maxMeanMotion;
+        }
+
         /// <inheritdoc />
         protected bool Equals(Satellite other)
         {

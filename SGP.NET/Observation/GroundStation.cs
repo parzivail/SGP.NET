@@ -44,7 +44,8 @@ namespace SGPdotNET.Observation
 			Angle minElevation = default, // default is Angle.Zero
 			bool clipToStartTime = true, // default is true as it is assumed typical use case will be for future propagation, not searching into the past
 			bool clipToEndTime = false, // default is false as it is assumed typical use case will be to capture entire future pass
-			int resolution = 3)
+			int resolution = 3
+		)
 		{
 			// check input constraints
 			if (deltaTime.TotalSeconds <= 0)
@@ -85,6 +86,7 @@ namespace SGPdotNET.Observation
 
 				aosTime = aosCrossingPoint.Value;
 				t = aosTime + deltaTime;
+				
 				// find the LOS time and max elevation for the next pass
 				DateTime losTime;
 				DateTime maxElTime;
