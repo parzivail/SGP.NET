@@ -100,7 +100,13 @@ namespace SGPdotNET.Observation
 					maxElTime = tu.MaxElevationTime;
 				}
 
-				var before = maxElTime - deltaTime;
+        if (maxElTime == DateTime.MinValue)
+        {
+          t = losTime + deltaTime;
+          continue;
+        }
+
+        var before = maxElTime - deltaTime;
 
 				if (clipToStartTime) // ensure before is clipped for max elevation search 
 				{
@@ -122,8 +128,8 @@ namespace SGPdotNET.Observation
 				t = losTime + deltaTime;
 			} while (t <= end);
 
-			// if clipToStartTime is false and the start time has been clipped, walk back in time until previous AOS crossing point has been found
-			if (!clipToStartTime && obs.Count > 0 && obs[0].Start == start)
+      // if clipToStartTime is false and the start time has been clipped, walk back in time until previous AOS crossing point has been found
+      if (!clipToStartTime && obs.Count > 0 && obs[0].Start <= start)
 			{
 				var first = obs[0];
 				var tu = FindNextAboveToBelowCrossingPoint(satellite, first.Start, deltaTime.Negate(), minElevation, resolution);
