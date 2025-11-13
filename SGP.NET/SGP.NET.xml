@@ -1281,6 +1281,129 @@
             </summary>
             <param name="d"></param>
         </member>
+<<<<<<< HEAD
+=======
+        <member name="T:SGPdotNET.Util.FeatureFlags">
+            <summary>
+            Feature flags for enabling/disabling performance optimizations and bug fixes.
+            These flags allow A/B testing and gradual rollout of improvements.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseOptimizedPowerOperations">
+            <summary>
+            Enable optimized Math.Pow replacements with direct multiplication.
+            When enabled, replaces Math.Pow(x, n) for small integer powers with faster multiplication.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseTrigonometricCaching">
+            <summary>
+            Enable caching of trigonometric values in hot paths.
+            When enabled, caches sin/cos values that are recalculated frequently.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseFastPathCircularOrbits">
+            <summary>
+            Enable fast path for circular orbits in Kepler solver.
+            When enabled, uses direct solution for near-circular orbits instead of Newton-Raphson.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseEciConversionCaching">
+            <summary>
+            Enable caching of ECI coordinate conversions.
+            When enabled, caches ground station ECI positions for repeated calculations.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseGeodeticCaching">
+            <summary>
+            Enable caching of geodetic conversion values.
+            When enabled, caches prime vertical radius and other geodetic constants.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseOptimizedDictionaryLookups">
+            <summary>
+            Use optimized dictionary lookups (TryGetValue instead of ContainsKey + indexer).
+            When enabled, uses more efficient dictionary access patterns.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseFixedJulianDate">
+            <summary>
+            Enable fixed Julian date calculation.
+            When enabled, uses corrected Julian date algorithm instead of the buggy implementation.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseFixedSignalDelay">
+            <summary>
+            Enable fixed signal delay calculation.
+            When enabled, uses corrected signal delay formula.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Util.FeatureFlags.UseAtan2ForAzimuth">
+            <summary>
+            Use Atan2 for azimuth calculations instead of Atan.
+            When enabled, handles edge cases better (division by zero, etc.).
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.FeatureFlags.EnableAllOptimizations">
+            <summary>
+            Enable all optimizations (for testing/benchmarking).
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.FeatureFlags.EnableAllBugFixes">
+            <summary>
+            Enable all bug fixes.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.FeatureFlags.EnableAll">
+            <summary>
+            Enable all features (optimizations + bug fixes).
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.FeatureFlags.DisableAll">
+            <summary>
+            Disable all features (revert to original behavior).
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Util.OptimizedMath">
+            <summary>
+            Optimized math operations that can be toggled via feature flags
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow2(System.Double)">
+            <summary>
+            Optimized power operation: x^2
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow3(System.Double)">
+            <summary>
+            Optimized power operation: x^3
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow4(System.Double)">
+            <summary>
+            Optimized power operation: x^4
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow1_5(System.Double)">
+            <summary>
+            Optimized power operation: x^1.5 (x * sqrt(x))
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow2_3(System.Double)">
+            <summary>
+            Optimized power operation: x^(2/3)
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow3_5(System.Double)">
+            <summary>
+            Optimized power operation: x^3.5 (x^3 * sqrt(x))
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.OptimizedMath.Pow(System.Double,System.Double)">
+            <summary>
+            Optimized power operation: x^n where n is a small integer
+            </summary>
+        </member>
+>>>>>>> 4ff8758 (Performance optimizations and correctness bug fixes)
         <member name="T:SGPdotNET.Util.TimeExtensions">
             <summary>
                 Adds extension methods to the <see cref="T:System.DateTime" /> class that are useful for astronomical calculations

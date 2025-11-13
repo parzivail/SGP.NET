@@ -72,11 +72,13 @@ namespace SGPdotNET.CoordinateSystem
 
             var theta = time.ToLocalMeanSiderealTime(Longitude);
 
+            var sinLat = Math.Sin(Latitude.Radians);
+            var sinLat2 = OptimizedMath.Pow2(sinLat);
             var c = 1.0 /
                     Math.Sqrt(1.0 +
                               SgpConstants.EarthFlatteningConstant * (SgpConstants.EarthFlatteningConstant - 2.0) *
-                              Math.Pow(Math.Sin(Latitude.Radians), 2.0));
-            var s = Math.Pow(1.0 - SgpConstants.EarthFlatteningConstant, 2.0) * c;
+                              sinLat2);
+            var s = OptimizedMath.Pow2(1.0 - SgpConstants.EarthFlatteningConstant) * c;
             var achcp = (SgpConstants.EarthRadiusKm * c + Altitude) * Math.Cos(Latitude.Radians);
 
             var position = new Vector3(achcp * Math.Cos(theta), achcp * Math.Sin(theta),

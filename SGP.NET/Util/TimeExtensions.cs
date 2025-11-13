@@ -1,4 +1,5 @@
 ﻿using System;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.Util
 {
@@ -14,8 +15,46 @@ namespace SGPdotNET.Util
         /// <returns>The Julian representation the DateTime</returns>
         public static double ToJulian(this DateTime dt)
         {
-            var ts = new TimeSpan(dt.Ticks);
-            return ts.TotalDays + 1721425.5;
+            if (FeatureFlags.FixJulianDateCalculation)
+            {
+                // Correct Julian date calculation (Meeus, Astronomical Algorithms, Chapter 7)
+                // Convert to UTC if needed
+                var utc = dt.Kind == DateTimeKind.Utc ? dt : dt.ToUniversalTime();
+                
+                int year = utc.Year;
+                int month = utc.Month;
+                double day = utc.Day + utc.Hour / 24.0 + utc.Minute / 1440.0 + utc.Second / 86400.0 + utc.Millisecond / 86400000.0;
+
+                // Adjust for January and February (treat as previous year's 13th/14th month)
+                int adjustedYear = year;
+                int adjustedMonth = month;
+                if (month <= 2)
+                {
+                    adjustedYear = year - 1;
+                    adjustedMonth = month + 12;
+                }
+
+                int a = adjustedYear / 100;
+                // For Gregorian calendar (after 1582-10-15)
+                // For Julian calendar (before 1582-10-15), b = 0
+                int b = (adjustedYear > 1582 || (adjustedYear == 1582 && adjustedMonth > 10) || 
+                         (adjustedYear == 1582 && adjustedMonth == 10 && day >= 15.0)) 
+                    ? (2 - a + a / 4) 
+                    : 0;
+
+                // Julian Day Number (Meeus formula)
+                double jdn = Math.Floor(365.25 * (adjustedYear + 4716)) + 
+                            Math.Floor(30.6001 * (adjustedMonth + 1)) + 
+                            day + b - 1524.5;
+
+                return jdn;
+            }
+            else
+            {
+                // Original (buggy) implementation
+                var ts = new TimeSpan(dt.Ticks);
+                return ts.TotalDays + 1721425.5;
+            }
         }
 
         /// <summary>

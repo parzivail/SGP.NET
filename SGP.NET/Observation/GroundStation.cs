@@ -368,7 +368,7 @@ namespace SGPdotNET.Observation
 				tAbove = start;
 			}
 
-			var minTicks = (long)(1e7 / Math.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
+			var minTicks = (long)(1e7 / OptimizedMath.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
 
 			long dt;
 			DateTime t;
@@ -395,7 +395,7 @@ namespace SGPdotNET.Observation
 		// finds the max elevation and time for max elevation, to a given temporal resolution
 		private Tuple<Angle, DateTime> FindMaxElevation(Satellite satellite, DateTime before, DateTime peakTime, DateTime after, int resolution)
 		{
-			var minTicks = (long)(1e7 / Math.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
+			var minTicks = (long)(1e7 / OptimizedMath.Pow(10, resolution)); // convert resolution (num decimals) to minimum ticks
 
 			do
 			{

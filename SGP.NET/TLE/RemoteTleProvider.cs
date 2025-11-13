@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.TLE
 {
@@ -114,6 +115,8 @@ namespace SGPdotNET.TLE
         public async Task<Tle> GetTleAsync(int satelliteId)
         {
             await CacheRemoteTlesAsync();
+            if (FeatureFlags.UseOptimizedDictionaryLookups)
+                return _cachedTles.TryGetValue(satelliteId, out var tle) ? tle : null;
             return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 
@@ -135,6 +138,8 @@ namespace SGPdotNET.TLE
         public Tle GetTle(int satelliteId)
         {
             CacheRemoteTles();
+            if (FeatureFlags.UseOptimizedDictionaryLookups)
+                return _cachedTles.TryGetValue(satelliteId, out var tle) ? tle : null;
             return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
         }
 

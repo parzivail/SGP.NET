@@ -245,13 +245,22 @@ namespace SGPdotNET.CoordinateSystem
 			           + cosTheta * range.Y;
 			var topZ = cosLat * cosTheta * range.X
 			           + cosLat * sinTheta * range.Y + sinLat * range.Z;
-			var az = Math.Atan(-topE / topS);
-
-			if (topS > 0.0)
-				az += Math.PI;
-
-			if (az < 0.0)
-				az += 2.0 * Math.PI;
+			
+			double az;
+			if (FeatureFlags.UseAtan2ForAzimuth)
+			{
+				az = Math.Atan2(-topE, topS);
+				if (az < 0.0)
+					az += 2.0 * Math.PI;
+			}
+			else
+			{
+				az = Math.Atan(-topE / topS);
+				if (topS > 0.0)
+					az += Math.PI;
+				if (az < 0.0)
+					az += 2.0 * Math.PI;
+			}
 
 			var el = Math.Asin(topZ / range.Length);
 			var rate = range.Dot(rangeRate) / range.Length;

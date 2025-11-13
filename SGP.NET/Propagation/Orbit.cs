@@ -1,6 +1,7 @@
 using System;
 using SGPdotNET.TLE;
 using SGPdotNET.Util;
+using SGPdotNET.Propagation;
 
 namespace SGPdotNET.Propagation
 {
@@ -96,7 +97,7 @@ namespace SGPdotNET.Propagation
             Epoch = tle.Epoch;
 
             // recover original mean motion (xnodp) and semimajor axis (aodp) from input elements
-            var a1 = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / MeanMotion, SgpConstants.TwoThirds);
+            var a1 = OptimizedMath.Pow2_3(SgpConstants.ReciprocalOfMinutesPerTimeUnit / MeanMotion);
             var cosio = Math.Cos(Inclination.Radians);
             var theta2 = cosio * cosio;
             var x3Thm1 = 3.0 * theta2 - 1.0;

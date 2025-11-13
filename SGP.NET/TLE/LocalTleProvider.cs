@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SGPdotNET.Util;
 
 namespace SGPdotNET.TLE
 {
@@ -49,6 +50,8 @@ namespace SGPdotNET.TLE
         /// <inheritdoc />
         public Tle GetTle(int satelliteId)
         {
+            if (FeatureFlags.UseOptimizedDictionaryLookups)
+                return _tles.TryGetValue(satelliteId, out var tle) ? tle : null;
             return !_tles.ContainsKey(satelliteId) ? null : _tles[satelliteId];
         }
 

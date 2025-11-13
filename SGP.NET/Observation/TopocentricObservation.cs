@@ -65,6 +65,8 @@ namespace SGPdotNET.Observation
 
 		private double GetSignalDelay()
 		{
+			if (FeatureFlags.UseFixedSignalDelay)
+				return (Range * SgpConstants.MetersPerKilometer) / SgpConstants.SpeedOfLight;
 			return SgpConstants.SpeedOfLight / (Range * SgpConstants.MetersPerKilometer);
 		}
 

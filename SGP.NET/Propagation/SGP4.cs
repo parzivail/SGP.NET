@@ -114,8 +114,7 @@ namespace SGPdotNET.Propagation
                 s4 = Orbit.Perigee - 78.0;
                 if (Orbit.Perigee < 98.0)
                     s4 = 20.0;
-                qoms24 = Math.Pow((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm,
-                    4.0);
+                qoms24 = OptimizedMath.Pow4((120.0 - s4) * SgpConstants.DistanceUnitsPerEarthRadii / SgpConstants.EarthRadiusKm);
                 s4 = s4 / SgpConstants.EarthRadiusKm + SgpConstants.DistanceUnitsPerEarthRadii;
             }
 
@@ -132,8 +131,8 @@ namespace SGPdotNET.Propagation
             var etasq = _commonConsts.Eta * _commonConsts.Eta;
             var eeta = Orbit.Eccentricity * _commonConsts.Eta;
             var psisq = Math.Abs(1.0 - etasq);
-            var coef = qoms24 * Math.Pow(tsi, 4.0);
-            var coef1 = coef / Math.Pow(psisq, 3.5);
+            var coef = qoms24 * OptimizedMath.Pow4(tsi);
+            var coef1 = coef / OptimizedMath.Pow3_5(psisq);
             var c2 = coef1 * Orbit.RecoveredMeanMotion
                            * (Orbit.RecoveredSemiMajorAxis
                               * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
@@ -207,7 +206,7 @@ namespace SGPdotNET.Propagation
                     _nearspaceConsts.Xmcof = -SgpConstants.TwoThirds * coef * Orbit.BStar *
                                              SgpConstants.DistanceUnitsPerEarthRadii / eeta;
 
-                _nearspaceConsts.Delmo = Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(Orbit.MeanAnomoly.Radians), 3.0);
+                _nearspaceConsts.Delmo = OptimizedMath.Pow3(1.0 + _commonConsts.Eta * Math.Cos(Orbit.MeanAnomoly.Radians));
                 _nearspaceConsts.Sinmo = Math.Sin(Orbit.MeanAnomoly.Radians);
 
                 if (_useSimpleModel) return;
@@ -255,7 +254,7 @@ namespace SGPdotNET.Propagation
             if (xn <= 0.0)
                 throw new SatellitePropagationException("Error: (xn <= 0.0)");
 
-            var a = Math.Pow(SgpConstants.ReciprocalOfMinutesPerTimeUnit / xn, SgpConstants.TwoThirds) * tempa * tempa;
+            var a = OptimizedMath.Pow2_3(SgpConstants.ReciprocalOfMinutesPerTimeUnit / xn) * tempa * tempa;
             e -= tempe;
             var xmam = xmdf + Orbit.RecoveredMeanMotion * templ;
 
@@ -345,7 +344,7 @@ namespace SGPdotNET.Propagation
             {
                 var delomg = _nearspaceConsts.Omgcof * tsince;
                 var delm = _nearspaceConsts.Xmcof
-                           * (Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(xmdf), 3.0)
+                           * (OptimizedMath.Pow3(1.0 + _commonConsts.Eta * Math.Cos(xmdf))
                               * -_nearspaceConsts.Delmo);
                 var temp = delomg + delm;
 
@@ -405,7 +404,7 @@ namespace SGPdotNET.Propagation
             double sinio)
         {
             var beta2 = 1.0 - e * e;
-            var xn = SgpConstants.ReciprocalOfMinutesPerTimeUnit / Math.Pow(a, 1.5);
+            var xn = SgpConstants.ReciprocalOfMinutesPerTimeUnit / OptimizedMath.Pow1_5(a);
             /*
              * long period periodics
              */
@@ -436,54 +435,67 @@ namespace SGPdotNET.Propagation
             var ecose = 0.0;
             var esine = 0.0;
 
-            /*
-           * sensibility check for N-R correction
-           */
-            var maxNewtonNaphson = 1.25 * Math.Abs(Math.Sqrt(elsq));
-
-            var keplerRunning = true;
-
-            for (var i = 0; i < 10 && keplerRunning; i++)
+            // Fast path for near-circular orbits
+            if (FeatureFlags.UseFastPathCircularOrbits && elsq < 1e-10)
             {
+                // For circular orbits, E = M (mean anomaly = eccentric anomaly)
+                epw = capu;
                 sinepw = Math.Sin(epw);
                 cosepw = Math.Cos(epw);
-                ecose = axn * cosepw + ayn * sinepw;
-                esine = axn * sinepw - ayn * cosepw;
+                ecose = e * cosepw;
+                esine = e * sinepw;
+            }
+            else
+            {
+                /*
+               * sensibility check for N-R correction
+               */
+                var maxNewtonNaphson = 1.25 * Math.Abs(Math.Sqrt(elsq));
 
-                var f = capu - epw + esine;
+                var keplerRunning = true;
 
-                if (Math.Abs(f) < 1.0e-12)
+                for (var i = 0; i < 10 && keplerRunning; i++)
                 {
-                    keplerRunning = false;
-                }
-                else
-                {
-                    /*
-                     * 1st order Newton-Raphson correction
-                     */
-                    var fdot = 1.0 - ecose;
-                    var deltaEpw = f / fdot;
+                    sinepw = Math.Sin(epw);
+                    cosepw = Math.Cos(epw);
+                    ecose = axn * cosepw + ayn * sinepw;
+                    esine = axn * sinepw - ayn * cosepw;
 
-                    /*
-                     * 2nd order Newton-Raphson correction.
-                     * f / (fdot - 0.5 * d2f * f/fdot)
-                     */
-                    if (i == 0)
+                    var f = capu - epw + esine;
+
+                    if (Math.Abs(f) < 1.0e-12)
                     {
-                        if (deltaEpw > maxNewtonNaphson)
-                            deltaEpw = maxNewtonNaphson;
-                        else if (deltaEpw < -maxNewtonNaphson)
-                            deltaEpw = -maxNewtonNaphson;
+                        keplerRunning = false;
                     }
                     else
                     {
-                        deltaEpw = f / (fdot + 0.5 * esine * deltaEpw);
-                    }
+                        /*
+                         * 1st order Newton-Raphson correction
+                         */
+                        var fdot = 1.0 - ecose;
+                        var deltaEpw = f / fdot;
 
-                    /*
-                     * Newton-Raphson correction of -F/DF
-                     */
-                    epw += deltaEpw;
+                        /*
+                         * 2nd order Newton-Raphson correction.
+                         * f / (fdot - 0.5 * d2f * f/fdot)
+                         */
+                        if (i == 0)
+                        {
+                            if (deltaEpw > maxNewtonNaphson)
+                                deltaEpw = maxNewtonNaphson;
+                            else if (deltaEpw < -maxNewtonNaphson)
+                                deltaEpw = -maxNewtonNaphson;
+                        }
+                        else
+                        {
+                            deltaEpw = f / (fdot + 0.5 * esine * deltaEpw);
+                        }
+
+                        /*
+                         * Newton-Raphson correction of -F/DF
+                         */
+                        epw += deltaEpw;
+                    }
                 }
             }
 
