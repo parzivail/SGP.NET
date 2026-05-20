@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGP.NET", "SGP.NET\SGP.NET.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGPSandbox", "SGPSandbox\SGPSandbox.csproj", "{1055AB09-3CAE-4BAC-A746-7511EFA4AB3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP.NET.Tests", "SGP.NET.Tests\SGP.NET.Tests.csproj", "{5DFD48C3-306C-477A-90F0-3435116C035E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1055AB09-3CAE-4BAC-A746-7511EFA4AB3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1055AB09-3CAE-4BAC-A746-7511EFA4AB3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1055AB09-3CAE-4BAC-A746-7511EFA4AB3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DFD48C3-306C-477A-90F0-3435116C035E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DFD48C3-306C-477A-90F0-3435116C035E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DFD48C3-306C-477A-90F0-3435116C035E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DFD48C3-306C-477A-90F0-3435116C035E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

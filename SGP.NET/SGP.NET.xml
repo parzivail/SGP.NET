@@ -506,6 +506,12 @@
             </summary>
             <param name="tle">The two-line representation of the satellite</param>
         </member>
+        <member name="M:SGPdotNET.Observation.Satellite.#ctor(SGPdotNET.Parsers.OmmData)">
+            <summary>
+                Constructor from OMM (Orbit Mean-Elements Message) data
+            </summary>
+            <param name="omm">The OMM data containing orbital elements</param>
+        </member>
         <member name="M:SGPdotNET.Observation.Satellite.Predict">
             <summary>
                 Predicts the satellite's real-time location
@@ -538,6 +544,34 @@
                 considered geostationary
             </param>
             <returns></returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.LoadFromOmmCsv(System.String)">
+            <summary>
+                Loads a list of satellites from an OMM CSV file
+            </summary>
+            <param name="path">Path to the OMM CSV file</param>
+            <returns>List of Satellite objects</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.LoadFromOmmJson(System.String)">
+            <summary>
+                Loads a list of satellites from an OMM JSON file
+            </summary>
+            <param name="path">Path to the OMM JSON file</param>
+            <returns>List of Satellite objects</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.LoadFromOmmKvn(System.String)">
+            <summary>
+                Loads a list of satellites from an OMM KVN file
+            </summary>
+            <param name="path">Path to the OMM KVN file</param>
+            <returns>List of Satellite objects</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.Satellite.LoadFromOmmXml(System.String)">
+            <summary>
+                Loads a list of satellites from an OMM XML file
+            </summary>
+            <param name="path">Path to the OMM XML file</param>
+            <returns>List of Satellite objects</returns>
         </member>
         <member name="M:SGPdotNET.Observation.Satellite.Equals(SGPdotNET.Observation.Satellite)">
             <inheritdoc />
@@ -626,6 +660,247 @@
             <inheritdoc />
         </member>
         <member name="M:SGPdotNET.Observation.TopocentricObservation.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Parsers.IOmmParser">
+            <summary>
+            Interface for parsers that read OMM data from various formats.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.IOmmParser.Parse(System.String)">
+            <summary>
+            Parses OMM data from a string.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.IOmmParser.Parse(System.IO.TextReader)">
+            <summary>
+            Parses OMM data from a text reader.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.IOmmParser.ParseFile(System.String)">
+            <summary>
+            Parses OMM data from a file path.
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmCsvParser">
+            <summary>
+            Parses OMM data from CSV format.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmCsvParser.Parse(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmCsvParser.Parse(System.IO.TextReader)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmCsvParser.ParseFile(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmData">
+            <summary>
+            Model for CCSDS OMM data
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.OmmVersion">
+            <summary>
+            CCSDS OMM version (e.g., "2.0")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.ObjectName">
+            <summary>
+            Name of the object (e.g., "ISS (ZARYA)")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.ObjectID">
+            <summary>
+            International designator (e.g., "1998-067A")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.NoradCatID">
+            <summary>
+            NORAD catalog ID
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.ClassificationType">
+            <summary>
+            Classification type (e.g., "U" for unclassified)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.ElementSetNo">
+            <summary>
+            Element set number
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.Epoch">
+            <summary>
+            Epoch of the mean elements (UTC)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.MeanMotion">
+            <summary>
+            Mean motion in revolutions per day
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.Eccentricity">
+            <summary>
+            Eccentricity (dimensionless)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.Inclination">
+            <summary>
+            Inclination in degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.RAOfAscNode">
+            <summary>
+            Right ascension of ascending node in degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.ArgOfPericenter">
+            <summary>
+            Argument of pericenter in degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.MeanAnomaly">
+            <summary>
+            Mean anomaly in degrees
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.EphemerisType">
+            <summary>
+            Ephemeris type (0 = SGP4)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.BStar">
+            <summary>
+            BSTAR drag term
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.MeanMotionDot">
+            <summary>
+            First derivative of mean motion (rev/day^2)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.MeanMotionDDot">
+            <summary>
+            Second derivative of mean motion (rev/day^3)
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.RevAtEpoch">
+            <summary>
+            Revolution number at epoch
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.CenterName">
+            <summary>
+            Name of the central body (e.g., "EARTH")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.RefFrame">
+            <summary>
+            Reference frame (e.g., "TEME")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.TimeSystem">
+            <summary>
+            Time system (e.g., "UTC")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.MeanElementTheory">
+            <summary>
+            Mean element theory (e.g., "SGP4")
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.CreationDate">
+            <summary>
+            Creation date of the OMM file
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Parsers.OmmData.Originator">
+            <summary>
+            Originator of the OMM data
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmJsonParser">
+            <summary>
+            Parses OMM data from JSON format
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmJsonParser.Parse(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmJsonParser.Parse(System.IO.TextReader)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmJsonParser.ParseFile(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmKvnParser">
+            <summary>
+            Parses OMM data from KVN format. Blocks are separated by blank lines.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmKvnParser.Parse(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmKvnParser.Parse(System.IO.TextReader)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmKvnParser.ParseFile(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmParserBase">
+            <summary>
+            Base class providing shared parsing utilities for all OMM format parsers.
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Parsers.OmmParserBase.KnownFields">
+            <summary>
+            Canonical OMM field names used across all formats.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.PopulateFromDictionary(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Populates an OmmData instance from a dictionary of key-value pairs.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.ParseDouble(System.String)">
+            <summary>
+            Parses a double value, handling leading dots (e.g., ".5" -> 0.5) and scientific notation.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.ParseUInt(System.String)">
+            <summary>
+            Parses an unsigned integer value.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.ParseInt(System.String)">
+            <summary>
+            Parses a signed integer value.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.ParseDateTime(System.String)">
+            <summary>
+            Parses an ISO 8601 date-time string to UTC DateTime.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.IsValidForPropagation(SGPdotNET.Parsers.OmmData)">
+            <summary>
+            Checks if an OmmData instance has the minimum required fields for SGP4 propagation.
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Parsers.OmmXmlParser">
+            <summary>
+            Parses OMM data from CCSDS NDM/XML
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmXmlParser.Parse(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmXmlParser.Parse(System.IO.TextReader)">
+            <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmXmlParser.ParseFile(System.String)">
             <inheritdoc />
         </member>
         <member name="M:SGPdotNET.Propagation.CelestialBodies.PredictSun(System.DateTime)">
@@ -1136,6 +1411,12 @@
             </summary>
             <param name="tle">Object to copy from</param>
         </member>
+        <member name="M:SGPdotNET.TLE.Tle.#ctor(SGPdotNET.Parsers.OmmData)">
+            <summary>
+                Initialise TLE from OMM (Orbit Mean-Elements Message) data
+            </summary>
+            <param name="omm">The OMM data containing orbital elements</param>
+        </member>
         <member name="M:SGPdotNET.TLE.Tle.ParseElements(System.String[],System.Boolean)">
             <summary>
                 Parses a list of TLEs from a list of TLE lines
@@ -1143,6 +1424,34 @@
             <param name="lines">Each line of the each element set, sequentially</param>
             <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
             <returns>A list of the TLEs parsed from the lines</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ParseOmmCsv(System.String)">
+            <summary>
+                Parses OMM data from a CSV file and returns a list of Tle objects
+            </summary>
+            <param name="path">Path to the CSV file</param>
+            <returns>List of Tle objects parsed from the OMM CSV data</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ParseOmmJson(System.String)">
+            <summary>
+                Parses OMM data from a JSON file and returns a list of Tle objects
+            </summary>
+            <param name="path">Path to the JSON file</param>
+            <returns>List of Tle objects parsed from the OMM JSON data</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ParseOmmKvn(System.String)">
+            <summary>
+                Parses OMM data from a KVN file and returns a list of Tle objects
+            </summary>
+            <param name="path">Path to the KVN file</param>
+            <returns>List of Tle objects parsed from the OMM KVN data</returns>
+        </member>
+        <member name="M:SGPdotNET.TLE.Tle.ParseOmmXml(System.String)">
+            <summary>
+                Parses OMM data from an XML file and returns a list of Tle objects
+            </summary>
+            <param name="path">Path to the XML file</param>
+            <returns>List of Tle objects parsed from the OMM XML data</returns>
         </member>
         <member name="M:SGPdotNET.TLE.Tle.ToString">
             <inheritdoc />
