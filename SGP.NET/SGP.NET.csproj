@@ -20,11 +20,15 @@
 * Introduce new method to determine if a satellite is geostationary</PackageReleaseNotes>
     <AssemblyVersion>1.4.0.0</AssemblyVersion>
     <FileVersion>1.4.0.0</FileVersion>
-    <LangVersion>10</LangVersion>
+    <LangVersion>default</LangVersion>
     <AssemblyOriginatorKeyFile>parzivail nuget.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworks>net6.0;netstandard1.4;netstandard2.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net9.0;netstandard2.0;net10.0</TargetFrameworks>
     <PackageVersion>1.4.0</PackageVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+  </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>SGP.NET.xml</DocumentationFile>
