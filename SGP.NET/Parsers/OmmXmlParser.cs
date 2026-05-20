@@ -11,12 +11,14 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public class OmmXmlParser : OmmParserBase, IOmmParser
 {
+    /// <inheritdoc />
     public List<OmmData> Parse(string content)
     {
         using var reader = new StringReader(content);
         return Parse(reader);
     }
 
+    /// <inheritdoc />
     public List<OmmData> Parse(TextReader reader)
     {
         var results = new List<OmmData>();
@@ -44,6 +46,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         return results;
     }
 
+    /// <inheritdoc />
     public List<OmmData> ParseFile(string path)
     {
         using var reader = File.OpenText(path);
@@ -90,7 +93,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         return dict;
     }
 
-    private void ParseHeaderElement(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseHeaderElement(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -114,7 +117,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseBodyElement(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseBodyElement(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -132,7 +135,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseSegmentElement(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseSegmentElement(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -161,7 +164,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseMetadataElement(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseMetadataElement(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -185,7 +188,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseDataElement(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseDataElement(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -214,7 +217,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseMeanElements(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseMeanElements(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;
@@ -238,7 +241,7 @@ public class OmmXmlParser : OmmParserBase, IOmmParser
         }
     }
 
-    private void ParseTleParameters(XmlReader reader, Dictionary<string, string> dict)
+    private static void ParseTleParameters(XmlReader reader, Dictionary<string, string> dict)
     {
         if (!reader.Read())
             return;

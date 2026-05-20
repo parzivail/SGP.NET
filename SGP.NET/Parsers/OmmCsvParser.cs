@@ -10,12 +10,14 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public class OmmCsvParser : OmmParserBase, IOmmParser
 {
+    /// <inheritdoc />
     public List<OmmData> Parse(string content)
     {
         using var reader = new StringReader(content);
         return Parse(reader);
     }
 
+    /// <inheritdoc />
     public List<OmmData> Parse(TextReader reader)
     {
         var results = new List<OmmData>();
@@ -61,6 +63,7 @@ public class OmmCsvParser : OmmParserBase, IOmmParser
         return results;
     }
 
+    /// <inheritdoc />
     public List<OmmData> ParseFile(string path)
     {
         using var reader = File.OpenText(path);

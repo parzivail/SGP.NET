@@ -9,17 +9,20 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public class OmmJsonParser : OmmParserBase, IOmmParser
 {
+    /// <inheritdoc />
     public List<OmmData> Parse(string content)
     {
         return Parse(JsonDocument.Parse(content));
     }
 
+    /// <inheritdoc />
     public List<OmmData> Parse(TextReader reader)
     {
         using var doc = JsonDocument.Parse(reader.ReadToEnd());
         return Parse(doc);
     }
 
+    /// <inheritdoc />
     public List<OmmData> ParseFile(string path)
     {
         using var stream = File.OpenRead(path);
@@ -27,7 +30,7 @@ public class OmmJsonParser : OmmParserBase, IOmmParser
         return Parse(doc);
     }
 
-    private List<OmmData> Parse(JsonDocument doc)
+    private static List<OmmData> Parse(JsonDocument doc)
     {
         var results = new List<OmmData>();
 

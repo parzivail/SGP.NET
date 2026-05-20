@@ -10,19 +10,20 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public class OmmKvnParser : OmmParserBase, IOmmParser
 {
+    /// <inheritdoc />
     public List<OmmData> Parse(string content)
     {
         using var reader = new StringReader(content);
         return Parse(reader);
     }
 
+    /// <inheritdoc />
     public List<OmmData> Parse(TextReader reader)
     {
         var results = new List<OmmData>();
         var currentDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        string line;
-        while ((line = reader.ReadLine()) != null)
+        while (reader.ReadLine() is { } line)
         {
             line = line.Trim();
 
@@ -66,6 +67,7 @@ public class OmmKvnParser : OmmParserBase, IOmmParser
         return results;
     }
 
+    /// <inheritdoc />
     public List<OmmData> ParseFile(string path)
     {
         using var reader = File.OpenText(path);

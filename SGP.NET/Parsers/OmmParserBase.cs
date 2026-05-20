@@ -14,12 +14,30 @@ public abstract class OmmParserBase
     /// </summary>
     protected static readonly HashSet<string> KnownFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
-        "CCSDS_OMM_VERS", "CREATION_DATE", "ORIGINATOR",
-        "OBJECT_NAME", "OBJECT_ID", "CENTER_NAME", "REF_FRAME", "TIME_SYSTEM", "MEAN_ELEMENT_THEORY",
-        "EPOCH", "MEAN_MOTION", "ECCENTRICITY", "INCLINATION", "RA_OF_ASC_NODE",
-        "ARG_OF_PERICENTER", "MEAN_ANOMALY",
-        "EPHEMERIS_TYPE", "CLASSIFICATION_TYPE", "NORAD_CAT_ID", "ELEMENT_SET_NO",
-        "REV_AT_EPOCH", "BSTAR", "MEAN_MOTION_DOT", "MEAN_MOTION_DDOT"
+        "ARG_OF_PERICENTER",
+        "BSTAR", 
+        "CCSDS_OMM_VERS", 
+        "CENTER_NAME",
+        "CLASSIFICATION_TYPE",
+        "CREATION_DATE", 
+        "ECCENTRICITY",
+        "ELEMENT_SET_NO",
+        "EPHEMERIS_TYPE", 
+        "EPOCH", 
+        "INCLINATION", 
+        "MEAN_ANOMALY",
+        "MEAN_ELEMENT_THEORY",
+        "MEAN_MOTION",
+        "MEAN_MOTION_DDOT",
+        "MEAN_MOTION_DOT", 
+        "NORAD_CAT_ID",
+        "OBJECT_ID", 
+        "OBJECT_NAME", 
+        "ORIGINATOR",
+        "RA_OF_ASC_NODE",
+        "REF_FRAME", 
+        "REV_AT_EPOCH", 
+        "TIME_SYSTEM"
     };
 
     /// <summary>
