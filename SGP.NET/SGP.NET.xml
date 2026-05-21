@@ -903,12 +903,37 @@
         <member name="M:SGPdotNET.Parsers.OmmXmlParser.ParseFile(System.String)">
             <inheritdoc />
         </member>
+        <member name="T:SGPdotNET.Propagation.CelestialBodies">
+            <summary>
+                Provides methods to calculate the positions of celestial bodies.
+            </summary>
+        </member>
         <member name="M:SGPdotNET.Propagation.CelestialBodies.PredictSun(System.DateTime)">
             <summary>
-                Predicts the sun's location at a specific time
+                Calculates the Sun's position in Earth-Centered Inertial (ECI) coordinates
+                using the Astronomical Almanac approximate algorithm.
             </summary>
-            <param name="time">The time of observation</param>
-            <returns>A coordinate set representing the body's position at the given time</returns>
+            <param name="time">The time of observation (UTC).</param>
+            <returns>
+                An EciCoordinate representing the Sun's position. The Position vector is in kilometers
+                relative to Earth's center. Velocity is zero (not computed by this algorithm).
+            </returns>
+            <remarks>
+                <para>
+                    This implementation follows the "Approximate position" equations from the
+                    Astronomical Almanac, as documented at
+                    https://en.wikipedia.org/wiki/Position_of_the_Sun
+                </para>
+                <para>
+                    Accuracy is approximately 0.01° (36 arcseconds) for dates between 1950 and 2050.
+                </para>
+                <para>
+                    The returned ECI coordinate can be converted to geodetic coordinates via
+                    <c>eci.ToGeodetic()</c> to obtain the subsolar point (latitude/longitude where
+                    the Sun is directly overhead), or used with <c>GroundStation.Observe()</c> for
+                    sunrise/sunset and solar track calculations.
+                </para>
+            </remarks>
         </member>
         <member name="T:SGPdotNET.Propagation.Orbit">
             <summary>

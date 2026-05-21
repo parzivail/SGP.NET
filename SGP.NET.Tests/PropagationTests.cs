@@ -16,7 +16,7 @@ public sealed class OrbitTests
     private const double Tolerance = 1e-5;
     private const double DistanceToleranceKm = 1.0;
 
-    // ISS TLE — known ~400 km LEO
+    // ISS TLE -- known ~400 km LEO
     private const string IssLine1 = "1 25544U 98067A   26140.52007259  .00005164  00000-0  10084-3 0  9995";
     private const string IssLine2 = "2 25544  51.6328  77.0641 0007497  79.3410 280.8422 15.49283153567468";
 
@@ -226,7 +226,7 @@ public sealed class TopocentricObservationTests
         var delayNear = near.SignalDelay;
         var delayFar = far.SignalDelay;
 
-        // Assert — formula is c / (Range * 1000), so larger range → smaller delay
+        // Assert -- formula is c / (Range * 1000), so larger range → smaller delay
         Assert.IsTrue(delayFar < delayNear);
     }
 
@@ -505,7 +505,7 @@ public sealed class GroundStationTests
         var start = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Utc);
         var end = start.AddHours(1);
 
-        // Act & Assert — resolution > 7
+        // Act & Assert -- resolution > 7
         try
         {
             _ = station.Observe(sat, start, end, TimeSpan.FromSeconds(10), resolution: 8);
