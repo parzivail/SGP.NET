@@ -165,129 +165,214 @@ public static class Moon
 		new(4, -1, 0, -1, 115),
 		new(2, -2, 0, 1, 107),
 	];
-	
-    /// <summary>
-    ///     Calculates the Moon's position in Earth-Centered Inertial (ECI) coordinates
-    ///     using the truncated ELP 2000/82 lunar theory.
-    /// </summary>
-    /// <param name="time">The time of observation (UTC).</param>
-    /// <returns>
-    ///     An EciCoordinate representing the Moon's position. The Position vector is in kilometers
-    ///     relative to Earth's center. Velocity is zero (not computed by this algorithm).
-    /// </returns>
-    /// <remarks>
-    ///     <para>
-    ///         This implementation follows Jean Meeus, "Astronomical Algorithms", 2nd Edition,
-    ///         Chapter 47 "Position of the Moon" (pp. 337–342). The algorithm is a truncated
-    ///         version of the ELP 2000/82 lunar theory by Chapront-Touzé and Chapront.
-    ///     </para>
-    ///     <para>
-    ///         Accuracy is approximately 10 arcseconds in latitude and 4 arcseconds in longitude
-    ///         for dates between 1900 and 2100. This does not account for nutation or the
-    ///         conversion from Terrestrial Time (TT) to Universal Time (UT1), which introduces
-    ///         an additional error of ~30 arcseconds when using UTC directly.
-    ///     </para>
-    ///     <para>
-    ///         The returned ECI coordinate can be converted to geodetic coordinates via
-    ///         <c>eci.ToGeodetic()</c> to obtain the sublunar point, or used with
-    ///         <c>GroundStation.Observe()</c> for moonrise/moonset and lunar track calculations.
-    ///     </para>
-    /// </remarks>
-    public static EciCoordinate Predict(DateTime time)
-    {
-        var jde = time.ToJulian();
-        var t = (jde - 2451545.0) / 36525.0;
 
-        var degToRad = Math.PI / 180.0;
+	/// <summary>
+	///     Calculates the Moon's geocentric position using the truncated ELP 2000/82
+	///     lunar theory as presented by Meeus, "Astronomical Algorithms" 2nd Ed., Chapter 47.
+	/// </summary>
+	/// <param name="time">The time of observation (UTC).</param>
+	/// <returns>
+	///     An EciCoordinate representing the Moon's position as a geocentric equatorial
+	///     Cartesian vector in the mean equator and mean equinox of date, in kilometers.
+	///     Velocity is zero (not computed by this algorithm).
+	/// </returns>
+	/// <remarks>
+	///     <para>
+	///         The periodic lunar series returns geocentric ecliptic longitude, latitude,
+	///         and distance referred to the mean equinox/ecliptic of date. This method
+	///         converts those to a geocentric equatorial Cartesian vector of date.
+	///     </para>
+	///     <para>
+	///         This is not a J2000/GCRF/TEME state vector. Feeding this into observation
+	///         code that assumes a different ECI frame may produce plausible-looking but
+	///         incorrect results.
+	///     </para>
+	///     <para>
+	///         Input UTC is converted to TT (Terrestrial Time) using the IERS leap second
+	///         table before evaluating the lunar series. Using UTC directly would introduce
+	///         a date-dependent error of tens of arcseconds for modern dates (~69s offset
+	///         as of 2026, or ~40 arcseconds in lunar position).
+	///     </para>
+	///     <para>
+	///         Nutation, topocentric parallax, light-time, and frame transformations to
+	///         Earth-fixed coordinates are not included. Meeus quotes approximate accuracy
+	///         of about 10 arcseconds in longitude and 4 arcseconds in latitude for the
+	///         truncated lunar series.
+	///     </para>
+	/// </remarks>
+	public static EciCoordinate Predict(DateTime time)
+	{
+		// Convert UTC to TT for the ephemeris argument.
+		// TT = UTC + (TAI - UTC) + 32.184s
+		var jdUtc = time.ToJulian();
+		var jdTt = LeapSeconds.UtcToTt(jdUtc);
+		var t = (jdTt - 2451545.0) / 36525.0;
 
-        var lPrimeDeg = Horner(t, 218.3164477, 481267.88123421, -0.0015786, 1.0 / 538841.0, -1.0 / 65194000.0);
-        var dDeg = Horner(t, 297.8501921, 445267.1114034, -0.0018819, 1.0 / 545868.0, -1.0 / 113065000.0);
-        var mDeg = Horner(t, 357.5291092, 35999.0502909, -0.0001535, 1.0 / 24490000.0);
-        var mPrimeDeg = Horner(t, 134.9633964, 477198.8675055, 0.0087414, 1.0 / 69699.0, -1.0 / 14712000.0);
-        var fDeg = Horner(t, 93.2720950, 483202.0175233, -0.0036539, -1.0 / 3526000.0, 1.0 / 863310000.0);
+		var degToRad = Math.PI / 180.0;
 
-        var lPrime = MathUtil.Wrap360(lPrimeDeg) * degToRad;
-        var d = MathUtil.Wrap360(dDeg) * degToRad;
-        var m = MathUtil.Wrap360(mDeg) * degToRad;
-        var mPrime = MathUtil.Wrap360(mPrimeDeg) * degToRad;
-        var f = MathUtil.Wrap360(fDeg) * degToRad;
+		var lPrimeDeg = Horner(t, 218.3164477, 481267.88123421, -0.0015786, 1.0 / 538841.0, -1.0 / 65194000.0);
+		var dDeg = Horner(t, 297.8501921, 445267.1114034, -0.0018819, 1.0 / 545868.0, -1.0 / 113065000.0);
+		var mDeg = Horner(t, 357.5291092, 35999.0502909, -0.0001536, 1.0 / 24490000.0);
+		var mPrimeDeg = Horner(t, 134.9633964, 477198.8675055, 0.0087414, 1.0 / 69699.0, -1.0 / 14712000.0);
+		var fDeg = Horner(t, 93.2720950, 483202.0175233, -0.0036539, -1.0 / 3526000.0, 1.0 / 863310000.0);
 
-        var a1 = (119.75 + 131.849 * t) * degToRad;
-        var a2 = (53.09 + 479264.29 * t) * degToRad;
-        var a3 = (313.45 + 481266.484 * t) * degToRad;
+		var lPrime = MathUtil.Wrap360(lPrimeDeg) * degToRad;
+		var d = MathUtil.Wrap360(dDeg) * degToRad;
+		var m = MathUtil.Wrap360(mDeg) * degToRad;
+		var mPrime = MathUtil.Wrap360(mPrimeDeg) * degToRad;
+		var f = MathUtil.Wrap360(fDeg) * degToRad;
 
-        var e = 1.0 - 0.002516 * t - 0.0000074 * t * t;
-        var e2 = e * e;
+		var a1 = (119.75 + 131.849 * t) * degToRad;
+		var a2 = (53.09 + 479264.29 * t) * degToRad;
+		var a3 = (313.45 + 481266.484 * t) * degToRad;
 
-        var sigmaL = 3958.0 * Math.Sin(a1)
-                     + 1962.0 * Math.Sin(lPrime - f)
-                     + 318.0 * Math.Sin(a2);
-        var sigmaR = 0.0;
-        var sigmaB = -2235.0 * Math.Sin(lPrime)
-                     + 382.0 * Math.Sin(a3)
-                     + 175.0 * Math.Sin(a1 - f)
-                     + 175.0 * Math.Sin(a1 + f)
-                     + 127.0 * Math.Sin(lPrime - mPrime)
-                     - 115.0 * Math.Sin(lPrime + mPrime);
+		var e = 1.0 - 0.002516 * t - 0.0000074 * t * t;
+		var e2 = e * e;
 
-        for (var i = 0; i < LongitudeTerms.Length; i++)
-        {
-            ref var term = ref LongitudeTerms[i];
-            var arg = d * term.D + m * term.M + mPrime * term.MP + f * term.F;
-            var sa = Math.Sin(arg);
-            var ca = Math.Cos(arg);
+		var sigmaL = 3958.0 * Math.Sin(a1)
+		             + 1962.0 * Math.Sin(lPrime - f)
+		             + 318.0 * Math.Sin(a2);
+		var sigmaR = 0.0;
+		var sigmaB = -2235.0 * Math.Sin(lPrime)
+		             + 382.0 * Math.Sin(a3)
+		             + 175.0 * Math.Sin(a1 - f)
+		             + 175.0 * Math.Sin(a1 + f)
+		             + 127.0 * Math.Sin(lPrime - mPrime)
+		             - 115.0 * Math.Sin(lPrime + mPrime);
 
-            var factor = term.M switch
-            {
-                0 => 1.0,
-                1 or -1 => e,
-                2 or -2 => e2,
-                _ => 1.0
-            };
+		for (var i = 0; i < LongitudeTerms.Length; i++)
+		{
+			ref var term = ref LongitudeTerms[i];
+			var arg = d * term.D + m * term.M + mPrime * term.MP + f * term.F;
+			var sa = Math.Sin(arg);
+			var ca = Math.Cos(arg);
 
-            sigmaL += term.SigmaL * sa * factor;
-            sigmaR += term.SigmaR * ca * factor;
-        }
+			var factor = term.M switch
+			{
+				0 => 1.0,
+				1 or -1 => e,
+				2 or -2 => e2,
+				_ => 1.0
+			};
 
-        for (var i = 0; i < LatitudeTerms.Length; i++)
-        {
-            ref var term = ref LatitudeTerms[i];
-            var arg = d * term.D + m * term.M + mPrime * term.MP + f * term.F;
-            var sb = Math.Sin(arg);
+			sigmaL += term.SigmaL * sa * factor;
+			sigmaR += term.SigmaR * ca * factor;
+		}
 
-            var factor = term.M switch
-            {
-                0 => 1.0,
-                1 or -1 => e,
-                2 or -2 => e2,
-                _ => 1.0
-            };
+		for (var i = 0; i < LatitudeTerms.Length; i++)
+		{
+			ref var term = ref LatitudeTerms[i];
+			var arg = d * term.D + m * term.M + mPrime * term.MP + f * term.F;
+			var sb = Math.Sin(arg);
 
-            sigmaB += term.SigmaB * sb * factor;
-        }
+			var factor = term.M switch
+			{
+				0 => 1.0,
+				1 or -1 => e,
+				2 or -2 => e2,
+				_ => 1.0
+			};
 
-        var lambdaRad = WrapPi(lPrime + sigmaL * 1e-6 * degToRad);
-        var betaRad = sigmaB * 1e-6 * degToRad;
-        var distanceKm = 385000.56 + sigmaR * 1e-3;
+			sigmaB += term.SigmaB * sb * factor;
+		}
 
-        var cosLambda = Math.Cos(lambdaRad);
-        var sinLambda = Math.Sin(lambdaRad);
-        var cosBeta = Math.Cos(betaRad);
-        var sinBeta = Math.Sin(betaRad);
+		// Geocentric ecliptic longitude, latitude, and distance (mean of date).
+		var lambdaRad = WrapPi(lPrime + sigmaL * 1e-6 * degToRad);
+		var betaRad = sigmaB * 1e-6 * degToRad;
+		var distanceKm = 385000.56 + sigmaR * 1e-3;
 
-        var epsilonDeg = 23.439 - 0.0000004 * (jde - 2451545.0);
-        var epsilon = epsilonDeg * degToRad;
-        var cosEpsilon = Math.Cos(epsilon);
-        var sinEpsilon = Math.Sin(epsilon);
+		// Use Meeus mean obliquity polynomial (not the rough linear approximation).
+		var epsilonRad = MathUtil.DegreesToRadians(Obliquity.MeanObliquityDeg(jdTt));
+		var cosEpsilon = Math.Cos(epsilonRad);
+		var sinEpsilon = Math.Sin(epsilonRad);
 
-        var xKm = distanceKm * cosBeta * cosLambda;
-        var yKm = distanceKm * (cosEpsilon * cosBeta * sinLambda - sinEpsilon * sinBeta);
-        var zKm = distanceKm * (sinEpsilon * cosBeta * sinLambda + cosEpsilon * sinBeta);
+		var cosLambda = Math.Cos(lambdaRad);
+		var sinLambda = Math.Sin(lambdaRad);
+		var cosBeta = Math.Cos(betaRad);
+		var sinBeta = Math.Sin(betaRad);
 
-        return new EciCoordinate(time, new Vector3(xKm, yKm, zKm));
-    }
+		// Rotate from ecliptic to equatorial (mean of date).
+		var xKm = distanceKm * cosBeta * cosLambda;
+		var yKm = distanceKm * (cosEpsilon * cosBeta * sinLambda - sinEpsilon * sinBeta);
+		var zKm = distanceKm * (sinEpsilon * cosBeta * sinLambda + cosEpsilon * sinBeta);
 
-    private static double Horner(double t, params double[] coeffs)
+		return new EciCoordinate(time, new Vector3(xKm, yKm, zKm));
+	}
+
+	/// <summary>
+	///     Calculates the Moon's apparent geocentric position, including nutation corrections.
+	///     This produces coordinates closer to what would be observed visually or compared
+	///     against JPL Horizons (excluding light-time and topocentric parallax).
+	/// </summary>
+	/// <param name="time">The time of observation (UTC).</param>
+	/// <returns>
+	///     An EciCoordinate representing the Moon's apparent position as a geocentric
+	///     equatorial Cartesian vector in the true equator and true equinox of date,
+	///     in kilometers. Velocity is zero.
+	/// </returns>
+	/// <remarks>
+	///     <para>
+	///         This method first computes the mean position via <see cref="Predict" />,
+	///         then applies nutation in longitude and true obliquity (mean + nutation in
+	///         obliquity) to produce apparent equatorial coordinates.
+	///     </para>
+	///     <para>
+	///         This is still not a J2000/GCRF/TEME state vector. Light-time correction
+	///         and topocentric parallax are not included.
+	///     </para>
+	/// </remarks>
+	public static EciCoordinate PredictApparent(DateTime time)
+	{
+		var jdUtc = time.ToJulian();
+		var jdTt = LeapSeconds.UtcToTt(jdUtc);
+
+		// Get the mean position first.
+		var mean = Predict(time);
+		var pos = mean.Position;
+
+		// Convert the mean equatorial vector back to ecliptic using mean obliquity.
+		var epsilonMeanRad = MathUtil.DegreesToRadians(Obliquity.MeanObliquityDeg(jdTt));
+		var cosEpsM = Math.Cos(epsilonMeanRad);
+		var sinEpsM = Math.Sin(epsilonMeanRad);
+
+		var x = pos.X;
+		var y = pos.Y;
+		var z = pos.Z;
+
+		// Equatorial to ecliptic (mean of date).
+		var xEcl = x;
+		var yEcl = y * cosEpsM + z * sinEpsM;
+		var zEcl = -y * sinEpsM + z * cosEpsM;
+
+		var rho = Math.Sqrt(xEcl * xEcl + yEcl * yEcl);
+		var lambdaRad = Math.Atan2(yEcl, xEcl);
+		var betaRad = Math.Atan2(zEcl, rho);
+		var distance = pos.Length;
+
+		// Apply nutation in longitude.
+		var deltaPsiRad = MathUtil.DegreesToRadians(Nutation.LongitudeDeg(jdTt));
+		var lambdaApparent = lambdaRad + deltaPsiRad;
+
+		// Use true obliquity (mean + nutation in obliquity) for apparent coordinates.
+		var deltaEpsilonRad = MathUtil.DegreesToRadians(Nutation.ObliquityDeg(jdTt));
+		var epsilonTrueRad = epsilonMeanRad + deltaEpsilonRad;
+		var cosEpsT = Math.Cos(epsilonTrueRad);
+		var sinEpsT = Math.Sin(epsilonTrueRad);
+
+		var cosLambdaA = Math.Cos(lambdaApparent);
+		var sinLambdaA = Math.Sin(lambdaApparent);
+		var cosBeta = Math.Cos(betaRad);
+		var sinBeta = Math.Sin(betaRad);
+
+		// Rotate apparent ecliptic to apparent equatorial.
+		var xApp = distance * cosBeta * cosLambdaA;
+		var yApp = distance * (cosEpsT * cosBeta * sinLambdaA - sinEpsT * sinBeta);
+		var zApp = distance * (sinEpsT * cosBeta * sinLambdaA + cosEpsT * sinBeta);
+
+		return new EciCoordinate(time, new Vector3(xApp, yApp, zApp));
+	}
+
+	private static double Horner(double t, params double[] coeffs)
 	{
 		var result = 0.0;
 		for (var i = coeffs.Length - 1; i >= 0; i--)

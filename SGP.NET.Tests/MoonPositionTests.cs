@@ -63,7 +63,7 @@ public sealed class MoonPositionTests
         var distance = moon.Position.Length;
 
         // Assert mean position matches reference implementation
-        // Longitude matches PyMeeus geocentric_ecliptical_pos: 133.162655°
+        // Longitude matches geocentric ecliptical: 133.162655°
         Assert.AreEqual(133.163, lambdaDeg, 0.01, "Ecliptic longitude mismatch");
         // Latitude is ~-3.23° for mean position (apparent is +13.77° with nutation)
         Assert.AreEqual(-3.23, betaDeg, 0.01, "Ecliptic latitude mismatch");
