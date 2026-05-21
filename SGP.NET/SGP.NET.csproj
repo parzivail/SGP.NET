@@ -21,8 +21,6 @@
         - Add Moon.PredictApparent with nutation corrections (IAU 1980 theory)
         - Add TopocentricCalculator for ECI-to-SEZ conversion
         - Refactor GroundStation to cache observer params and use TopocentricCalculator
-        - Add UTC-to-TT conversion via IERS leap second table for lunar ephemeris
-        - Replace rough obliquity approximation with Meeus Ch. 22 polynomial
     </PackageReleaseNotes>
     <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <FileVersion>1.5.0.0</FileVersion>

@@ -1047,32 +1047,68 @@
         </member>
         <member name="M:SGPdotNET.Propagation.Bodies.Moon.Predict(System.DateTime)">
             <summary>
-                Calculates the Moon's position in Earth-Centered Inertial (ECI) coordinates
-                using the truncated ELP 2000/82 lunar theory.
+                Calculates the Moon's geocentric position using the truncated ELP 2000/82
+                lunar theory as presented by Meeus, "Astronomical Algorithms" 2nd Ed., Chapter 47.
             </summary>
             <param name="time">The time of observation (UTC).</param>
             <returns>
-                An EciCoordinate representing the Moon's position. The Position vector is in kilometers
-                relative to Earth's center. Velocity is zero (not computed by this algorithm).
+                An EciCoordinate representing the Moon's position as a geocentric equatorial
+                Cartesian vector in the mean equator and mean equinox of date, in kilometers.
+                Velocity is zero (not computed by this algorithm).
             </returns>
             <remarks>
                 <para>
-                    This implementation follows Jean Meeus, "Astronomical Algorithms", 2nd Edition,
-                    Chapter 47 "Position of the Moon" (pp. 337–342). The algorithm is a truncated
-                    version of the ELP 2000/82 lunar theory by Chapront-Touzé and Chapront.
+                    The periodic lunar series returns geocentric ecliptic longitude, latitude,
+                    and distance referred to the mean equinox/ecliptic of date. This method
+                    converts those to a geocentric equatorial Cartesian vector of date.
                 </para>
                 <para>
-                    Accuracy is approximately 10 arcseconds in latitude and 4 arcseconds in longitude
-                    for dates between 1900 and 2100. This does not account for nutation or the
-                    conversion from Terrestrial Time (TT) to Universal Time (UT1), which introduces
-                    an additional error of ~30 arcseconds when using UTC directly.
+                    This is not a J2000/GCRF/TEME state vector. Feeding this into observation
+                    code that assumes a different ECI frame may produce plausible-looking but
+                    incorrect results.
                 </para>
                 <para>
-                    The returned ECI coordinate can be converted to geodetic coordinates via
-                    <c>eci.ToGeodetic()</c> to obtain the sublunar point, or used with
-                    <c>GroundStation.Observe()</c> for moonrise/moonset and lunar track calculations.
+                    Input UTC is converted to TT (Terrestrial Time) using the IERS leap second
+                    table before evaluating the lunar series. Using UTC directly would introduce
+                    a date-dependent error of tens of arcseconds for modern dates (~69s offset
+                    as of 2026, or ~40 arcseconds in lunar position).
+                </para>
+                <para>
+                    Nutation, topocentric parallax, light-time, and frame transformations to
+                    Earth-fixed coordinates are not included. Meeus quotes approximate accuracy
+                    of about 10 arcseconds in longitude and 4 arcseconds in latitude for the
+                    truncated lunar series.
                 </para>
             </remarks>
+        </member>
+        <member name="M:SGPdotNET.Propagation.Bodies.Moon.PredictApparent(System.DateTime)">
+            <summary>
+                Calculates the Moon's apparent geocentric position, including nutation corrections.
+                This produces coordinates closer to what would be observed visually or compared
+                against JPL Horizons (excluding light-time and topocentric parallax).
+            </summary>
+            <param name="time">The time of observation (UTC).</param>
+            <returns>
+                An EciCoordinate representing the Moon's apparent position as a geocentric
+                equatorial Cartesian vector in the true equator and true equinox of date,
+                in kilometers. Velocity is zero.
+            </returns>
+            <remarks>
+                <para>
+                    This method first computes the mean position via <see cref="M:SGPdotNET.Propagation.Bodies.Moon.Predict(System.DateTime)" />,
+                    then applies nutation in longitude and true obliquity (mean + nutation in
+                    obliquity) to produce apparent equatorial coordinates.
+                </para>
+                <para>
+                    This is still not a J2000/GCRF/TEME state vector. Light-time correction
+                    and topocentric parallax are not included.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:SGPdotNET.Propagation.Bodies.Sun">
+            <summary>
+                Provides methods to calculate the position of the Sun.
+            </summary>
         </member>
         <member name="M:SGPdotNET.Propagation.Bodies.Sun.Predict(System.DateTime)">
             <summary>
@@ -1092,6 +1128,11 @@
                 </para>
                 <para>
                     Accuracy is approximately 0.01° (36 arcseconds) for dates between 1950 and 2050.
+                </para>
+                <para>
+                    The returned vector is in the mean equator and mean equinox of date frame,
+                    not J2000/GCRF/TEME. The mean obliquity of the ecliptic is computed using
+                    the Meeus polynomial (Ch. 22) rather than a linear approximation.
                 </para>
                 <para>
                     The returned ECI coordinate can be converted to geodetic coordinates via
@@ -1780,6 +1821,103 @@
                 Implicit cast operator that assumes numbers that are found without a typecast are degrees
             </summary>
             <param name="d"></param>
+        </member>
+        <member name="T:SGPdotNET.Util.LeapSeconds">
+            <summary>
+                Provides conversion from UTC to Terrestrial Time (TT) using the IERS leap second table.
+                TT = TAI + 32.184 s, and TAI - UTC is the cumulative leap second offset for a given date.
+            </summary>
+            <remarks>
+                <para>
+                    The leap second table is sourced from IERS Bulletin C and NIST.
+                    As of January 2017, TAI - UTC = 37 seconds. No leap seconds have been added since.
+                </para>
+                <para>
+                    See: https://www.nist.gov/pml/time-and-frequency-division/time-realization/leap-seconds
+                    See: https://aa.usno.navy.mil/faq/TT
+                </para>
+            </remarks>
+        </member>
+        <member name="F:SGPdotNET.Util.LeapSeconds.TtMinusTai">
+            <summary>
+                TT offset from TAI in seconds. This is a fixed definition: TT = TAI + 32.184 s.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.LeapSeconds.GetTaiMinusUtc(System.DateTime)">
+            <summary>
+                Returns the cumulative leap second offset (TAI - UTC) for a given UTC date.
+                The offset increases by 1 second each time a leap second is inserted.
+            </summary>
+            <param name="utc">The UTC date/time.</param>
+            <returns>The number of leap seconds (TAI - UTC) applicable at the given UTC instant.</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.LeapSeconds.UtcToTt(System.Double)">
+            <summary>
+                Converts a UTC Julian Date to a TT (Terrestrial Time) Julian Date.
+                TT = UTC + (TAI - UTC) / 86400 + 32.184 / 86400
+            </summary>
+            <param name="jdUtc">The Julian Date in UTC.</param>
+            <returns>The Julian Date in Terrestrial Time (TT).</returns>
+        </member>
+        <member name="T:SGPdotNET.Util.Nutation">
+            <summary>
+                Computes nutation in longitude and obliquity using the IAU 1980 theory,
+                as presented in Meeus, "Astronomical Algorithms" 2nd Ed., Chapter 22.
+            </summary>
+            <remarks>
+                <para>
+                    Nutation is the short-period oscillation of the Earth's axis caused by
+                    gravitational perturbations from the Moon and Sun. It affects the apparent
+                    position of celestial bodies by up to ~18 arcseconds.
+                </para>
+                <para>
+                    The input Julian Date should be in TT (Terrestrial Time) for correct results.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:SGPdotNET.Util.Nutation.Terms">
+            <summary>
+                Nutation terms from Meeus Ch. 22, Table 22.A (p. 145-146).
+                Sine coefficients are in 0.0001" for DeltaPsi, cosine coefficients in 0.0001" for DeltaEpsilon.
+                Rate terms are in 0.0001"/century.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Util.Nutation.LongitudeDeg(System.Double)">
+            <summary>
+                Computes the nutation in longitude (DeltaPsi) in degrees.
+            </summary>
+            <param name="jdeTt">The Julian Date in Terrestrial Time (TT).</param>
+            <returns>The nutation in longitude in degrees (typically a few arcseconds).</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.Nutation.ObliquityDeg(System.Double)">
+            <summary>
+                Computes the nutation in obliquity (DeltaEpsilon) in degrees.
+            </summary>
+            <param name="jdeTt">The Julian Date in Terrestrial Time (TT).</param>
+            <returns>The nutation in obliquity in degrees (typically a few arcseconds).</returns>
+        </member>
+        <member name="T:SGPdotNET.Util.Obliquity">
+            <summary>
+                Computes the obliquity of the ecliptic using the IAU polynomial from Meeus,
+                "Astronomical Algorithms" 2nd Ed., Chapter 22.
+            </summary>
+            <remarks>
+                <para>
+                    The mean obliquity is the angle between the Earth's equatorial plane and the
+                    ecliptic plane, excluding the short-period nutation corrections.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:SGPdotNET.Util.Obliquity.MeanObliquityDeg(System.Double)">
+            <summary>
+                Computes the mean obliquity of the ecliptic in degrees for a given Julian Date.
+            </summary>
+            <param name="jde">The Julian Date (typically in TT for ephemeris calculations).</param>
+            <returns>The mean obliquity in degrees.</returns>
+            <remarks>
+                Polynomial from Meeus Ch. 22, p. 143. Valid for several millennia around J2000.
+                At J2000.0 (JDE 2451545.0), the mean obliquity is 23°26'21.448" = 23.4392911°.
+            </remarks>
         </member>
         <member name="T:SGPdotNET.Util.TimeExtensions">
             <summary>
