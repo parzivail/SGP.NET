@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore SGP.NET.sln
+
+      - name: Build
+        run: dotnet build SGP.NET.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test SGP.NET.sln --no-build --configuration Release --verbosity normal
