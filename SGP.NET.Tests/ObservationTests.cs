@@ -1,21 +1,16 @@
-using System;
-using System.IO;
-using System.Linq;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Observation;
 using SGPdotNET.Parsers;
-using SGPdotNET.Propagation;
 using SGPdotNET.TLE;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Tests;
 
 /// <summary>
-/// Tests for GroundStation.Observe and Coordinate.Observe numerical accuracy,
-/// consistency, and edge cases. These serve as regression guards for refactoring.
+/// Tests for GroundStation.Observe and Coordinate.Observe
 /// </summary>
 [TestClass]
-public sealed class ObservationAccuracyTests
+public sealed class ObservationTests
 {
 	private static readonly DateTime TestTime = new(2026, 5, 20, 22, 30, 0, DateTimeKind.Utc);
 

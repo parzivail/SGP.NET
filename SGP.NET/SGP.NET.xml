@@ -385,9 +385,36 @@
                 A representation of a ground station that can observe satellites
             </summary>
         </member>
+        <member name="T:SGPdotNET.Observation.GroundStation.CrossingPointInfo">
+            <summary>
+                Holds the time of an elevation crossing point, the maximum elevation observed
+                during the search, and the time at which that maximum occurred.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.CrossingPointInfo.#ctor(System.DateTime,System.DateTime,SGPdotNET.Util.Angle)">
+            <summary>
+                Holds the time of an elevation crossing point, the maximum elevation observed
+                during the search, and the time at which that maximum occurred.
+            </summary>
+        </member>
         <member name="P:SGPdotNET.Observation.GroundStation.Location">
             <summary>
                 The location of the ground station
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.GroundStation.ObserverLatRad">
+            <summary>
+                Precomputed observer latitude in radians for fast topocentric calculations.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.GroundStation.ObserverLonRad">
+            <summary>
+                Precomputed observer longitude in radians for fast topocentric calculations.
+            </summary>
+        </member>
+        <member name="P:SGPdotNET.Observation.GroundStation.ObserverAltKm">
+            <summary>
+                Precomputed observer altitude in km for fast topocentric calculations.
             </summary>
         </member>
         <member name="M:SGPdotNET.Observation.GroundStation.#ctor(SGPdotNET.CoordinateSystem.Coordinate)">
@@ -398,7 +425,7 @@
         </member>
         <member name="M:SGPdotNET.Observation.GroundStation.Observe(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,System.TimeSpan,SGPdotNET.Util.Angle,System.Boolean,System.Boolean,System.Int32)">
             <summary>
-                Creates a list of all of the predicted observations within the specified time period for this GroundStation.
+                Creates a list of all the predicted observations within the specified time period for this GroundStation.
             </summary>
             <param name="satellite">The satellite to observe</param>
             <param name="start">The time to start observing</param>
@@ -417,11 +444,19 @@
             </summary>
             <param name="satellite">The satellite to observe</param>
             <param name="time">The time of observation</param>
-            <returns>A list of observations where an AOS is seen at or after the start parameter</returns>
+            <returns>The topocentric observation of the satellite</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.Observe(SGPdotNET.CoordinateSystem.EciCoordinate,System.DateTime)">
+            <summary>
+                Observes an ECI coordinate at an instant in time, relative to this GroundStation
+            </summary>
+            <param name="target">The ECI coordinate to observe</param>
+            <param name="time">The time of observation</param>
+            <returns>The topocentric observation of the target</returns>
         </member>
         <member name="M:SGPdotNET.Observation.GroundStation.IsVisible(SGPdotNET.CoordinateSystem.Coordinate,SGPdotNET.Util.Angle,System.DateTime)">
             <summary>
-                Tests whether or not a satellite is above a specified elevation
+                Tests whether a satellite is above a specified elevation
             </summary>
             <param name="pos">The position to check</param>
             <param name="minElevation">The minimum elevation required to be "visible"</param>
@@ -442,6 +477,68 @@
         </member>
         <member name="M:SGPdotNET.Observation.GroundStation.op_Inequality(SGPdotNET.Observation.GroundStation,SGPdotNET.Observation.GroundStation)">
             <inheritdoc />
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.GetElevation(SGPdotNET.Observation.Satellite,System.DateTime)">
+            <summary>
+                Computes the elevation of a satellite at a given time
+            </summary>
+            <param name="satellite">The satellite to observe.</param>
+            <param name="time">The time of observation (UTC).</param>
+            <returns>The elevation angle in radians.</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.FindNextBelowToAboveCrossingPoint(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,System.TimeSpan,SGPdotNET.Util.Angle,System.Int32)">
+            <summary>
+                Finds the next time when the satellite's elevation crosses from below the
+                minimum elevation threshold to above it (acquisition of signal).
+                If the satellite is already above the threshold at the start time, start is returned.
+            </summary>
+            <param name="satellite">The satellite to observe.</param>
+            <param name="start">The time to begin searching from.</param>
+            <param name="end">The latest time to search until.</param>
+            <param name="deltaTime">The time step for the initial scan.</param>
+            <param name="minElevation">The minimum elevation threshold.</param>
+            <param name="resolution">The temporal resolution for binary search refinement.</param>
+            <returns>The crossing time, or null if no crossing was found before end.</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.FindNextAboveToBelowCrossingPoint(SGPdotNET.Observation.Satellite,System.DateTime,System.TimeSpan,SGPdotNET.Util.Angle,System.Int32,System.Nullable{System.DateTime})">
+            <summary>
+                Finds the next time when the satellite's elevation crosses from above the
+                minimum elevation threshold to below it (loss of signal).
+                If the satellite is already below the threshold at the start time, start is returned.
+                Also tracks the maximum elevation and its time during the search.
+            </summary>
+            <param name="satellite">The satellite to observe.</param>
+            <param name="start">The time to begin searching from.</param>
+            <param name="deltaTime">The time step for the scan (may be negative for backward search).</param>
+            <param name="minElevation">The minimum elevation threshold.</param>
+            <param name="resolution">The temporal resolution for binary search refinement.</param>
+            <param name="end">Optional end time to clamp the search. If null, search continues until below threshold.</param>
+            <returns>A CrossingPointInfo with the crossing time, max elevation, and max elevation time.</returns>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.FindCrossingTimeWithinInterval(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,SGPdotNET.Util.Angle,System.Int32)">
+            <summary>
+                Refines an elevation crossing point to the requested temporal resolution using
+                binary search within a known interval that contains exactly one crossing.
+            </summary>
+            <param name="satellite">The satellite to observe.</param>
+            <param name="start">The start of the interval.</param>
+            <param name="end">The end of the interval.</param>
+            <param name="minElevation">The minimum elevation threshold.</param>
+            <param name="resolution">The number of decimal places for the result time.</param>
+            <returns>The refined crossing time.</returns>
+            <exception cref="T:System.ArgumentException">Thrown if start equals end.</exception>
+        </member>
+        <member name="M:SGPdotNET.Observation.GroundStation.FindMaxElevation(SGPdotNET.Observation.Satellite,System.DateTime,System.DateTime,System.DateTime,System.Int32)">
+            <summary>
+                Refines the time of maximum elevation using ternary search within the interval
+                [before, after], centered around an initial peak estimate.
+            </summary>
+            <param name="satellite">The satellite to observe.</param>
+            <param name="before">The lower bound of the search interval.</param>
+            <param name="peakTime">The initial estimate of the peak time.</param>
+            <param name="after">The upper bound of the search interval.</param>
+            <param name="resolution">The number of decimal places for the result time.</param>
+            <returns>A tuple of the maximum elevation angle and the time at which it occurs.</returns>
         </member>
         <member name="T:SGPdotNET.Observation.RelativeDirection">
             <summary>
@@ -609,6 +706,32 @@
         </member>
         <member name="M:SGPdotNET.Observation.SatelliteVisibilityPeriod.GetHashCode">
             <inheritdoc />
+        </member>
+        <member name="T:SGPdotNET.Observation.TopocentricCalculator">
+            <summary>
+                Computes azimuth, elevation, range, and range-rate directly from
+                geodetic observer parameters and an ECI target position
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricCalculator.ComputeTopocentric(System.Double,System.Double,System.Double,SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3,System.Double,System.Double@,System.Double@,System.Double@,System.Double@)">
+            <summary>
+                Computes topocentric angles for a target given observer geodetic parameters and ECI target state.
+            </summary>
+            <param name="observerLatRad">Observer geodetic latitude in radians.</param>
+            <param name="observerLonRad">Observer geodetic longitude in radians.</param>
+            <param name="observerAltKm">Observer altitude in km.</param>
+            <param name="targetEciPos">Target position in ECI frame (km).</param>
+            <param name="targetEciVel">Target velocity in ECI frame (km/s).</param>
+            <param name="gstRad">Greenwich sidereal time at observation epoch (radians).</param>
+            <param name="azimuth">Output: azimuth in radians [0, 2π).</param>
+            <param name="elevation">Output: elevation in radians [-π/2, π/2].</param>
+            <param name="rangeKm">Output: slant range in km.</param>
+            <param name="rangeRateKmPerSec">Output: range rate in km/s.</param>
+        </member>
+        <member name="M:SGPdotNET.Observation.TopocentricCalculator.ComputeTopocentricStatic(System.Double,System.Double,System.Double,SGPdotNET.Util.Vector3,System.Double,System.Double@,System.Double@,System.Double@)">
+            <summary>
+                Computes topocentric angles for a target given observer geodetic parameters and ECI target position (zero velocity).
+            </summary>
         </member>
         <member name="T:SGPdotNET.Observation.TopocentricObservation">
             <summary>

@@ -227,36 +227,14 @@ public abstract class Coordinate
 
 		var geo = ToGeodetic();
 		var eci = to.ToEci(t);
-		var self = ToEci(t);
+		var gst = t.ToGreenwichSiderealTime();
 
-		var rangeRate = eci.Velocity - self.Velocity;
-		var range = eci.Position - self.Position;
+		Observation.TopocentricCalculator.ComputeTopocentric(
+			geo.Latitude.Radians, geo.Longitude.Radians, geo.Altitude,
+			eci.Position, eci.Velocity, gst,
+			out var az, out var el, out var range, out var rate);
 
-		var theta = eci.Time.ToLocalMeanSiderealTime(geo.Longitude);
-
-		var sinLat = Math.Sin(geo.Latitude.Radians);
-		var cosLat = Math.Cos(geo.Latitude.Radians);
-		var sinTheta = Math.Sin(theta);
-		var cosTheta = Math.Cos(theta);
-
-		var topS = sinLat * cosTheta * range.X
-			+ sinLat * sinTheta * range.Y - cosLat * range.Z;
-		var topE = -sinTheta * range.X
-		           + cosTheta * range.Y;
-		var topZ = cosLat * cosTheta * range.X
-		           + cosLat * sinTheta * range.Y + sinLat * range.Z;
-		var az = Math.Atan(-topE / topS);
-
-		if (topS > 0.0)
-			az += Math.PI;
-
-		if (az < 0.0)
-			az += 2.0 * Math.PI;
-
-		var el = Math.Asin(topZ / range.Length);
-		var rate = range.Dot(rangeRate) / range.Length;
-
-		return new TopocentricObservation(Angle.FromRadians(az), Angle.FromRadians(el), range.Length, rate, this);
+		return new TopocentricObservation(Angle.FromRadians(az), Angle.FromRadians(el), range, rate, this);
 	}
 
 	/// <inheritdoc />
