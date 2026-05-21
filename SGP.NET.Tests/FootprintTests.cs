@@ -22,7 +22,7 @@ public sealed class FootprintTests
 		var angle = coord.GetFootprintAngle();
 
 		// Assert
-		Assert.AreEqual(0, angle.Radians, 1e-10);
+		Assert.AreEqual(0, angle.Radians, TestConstants.AngleTolerance);
 	}
 
 	/// <summary>

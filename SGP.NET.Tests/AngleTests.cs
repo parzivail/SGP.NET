@@ -9,8 +9,6 @@ namespace SGPdotNET.Tests;
 [TestClass]
 public sealed class AngleTests
 {
-    private const double Tolerance = 1e-10;
-
     /// <summary>
     /// Verifies degree↔radian round-trip for common angles.
     /// </summary>
@@ -30,7 +28,7 @@ public sealed class AngleTests
         var roundTrip = angle.Degrees;
 
         // Assert
-        Assert.AreEqual(degrees, roundTrip, Tolerance);
+        Assert.AreEqual(degrees, roundTrip, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -51,7 +49,7 @@ public sealed class AngleTests
         var roundTrip = Angle.FromDegrees(angle.Degrees).Radians;
 
         // Assert
-        Assert.AreEqual(radians, roundTrip, Tolerance);
+        Assert.AreEqual(radians, roundTrip, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -89,8 +87,8 @@ public sealed class AngleTests
         var diff = a - b;
 
         // Assert
-        Assert.AreEqual(45, sum.Degrees, Tolerance);
-        Assert.AreEqual(15, diff.Degrees, Tolerance);
+        Assert.AreEqual(45, sum.Degrees, TestConstants.AngleTolerance);
+        Assert.AreEqual(15, diff.Degrees, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -126,7 +124,7 @@ public sealed class AngleTests
         var degrees = angle.Degrees;
 
         // Assert
-        Assert.AreEqual(45.0, degrees, Tolerance);
+        Assert.AreEqual(45.0, degrees, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -140,8 +138,8 @@ public sealed class AngleTests
         var degrees = Angle.Zero.Degrees;
 
         // Assert
-        Assert.AreEqual(0, radians, Tolerance);
-        Assert.AreEqual(0, degrees, Tolerance);
+        Assert.AreEqual(0, radians, TestConstants.AngleTolerance);
+        Assert.AreEqual(0, degrees, TestConstants.AngleTolerance);
     }
 
     /// <summary>

@@ -10,8 +10,6 @@ namespace SGPdotNET.Tests;
 [TestClass]
 public sealed class CoordinateConversionTests
 {
-	private const double PositionToleranceKm = 1e-5;
-
 	/// <summary>
 	/// Verifies Geodetic → ECI → Geodetic round-trip preserves position.
 	/// </summary>
@@ -29,7 +27,7 @@ public sealed class CoordinateConversionTests
 		// Assert
 		Assert.AreEqual(geo.Latitude.Degrees, roundTrip.Latitude.Degrees, 0.001);
 		Assert.AreEqual(geo.Longitude.Degrees, roundTrip.Longitude.Degrees, 0.001);
-		Assert.AreEqual(geo.Altitude, roundTrip.Altitude, PositionToleranceKm);
+		Assert.AreEqual(geo.Altitude, roundTrip.Altitude, TestConstants.SmallDistanceToleranceKm);
 	}
 
 	/// <summary>

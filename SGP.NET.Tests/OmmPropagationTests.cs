@@ -15,7 +15,6 @@ namespace SGPdotNET.Tests;
 public sealed class OmmPropagationTests
 {
     private static readonly DateTime TestTime = new(2026, 5, 20, 22, 30, 0, DateTimeKind.Utc);
-    private const double PositionToleranceKm = 1e-3;
 
     private static string ExampleDir => Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "example_inputs");
 
@@ -38,9 +37,9 @@ public sealed class OmmPropagationTests
         var dy = Math.Abs(actual.Position.Y - expected.Position.Y);
         var dz = Math.Abs(actual.Position.Z - expected.Position.Z);
 
-        Assert.IsLessThan(PositionToleranceKm, dx, $"{label} X delta {dx:E4} km exceeds tolerance");
-        Assert.IsLessThan(PositionToleranceKm, dy, $"{label} Y delta {dy:E4} km exceeds tolerance");
-        Assert.IsLessThan(PositionToleranceKm, dz, $"{label} Z delta {dz:E4} km exceeds tolerance");
+        Assert.IsLessThan(TestConstants.SmallDistanceToleranceKm, dx, $"{label} X delta {dx:E4} km exceeds tolerance");
+        Assert.IsLessThan(TestConstants.SmallDistanceToleranceKm, dy, $"{label} Y delta {dy:E4} km exceeds tolerance");
+        Assert.IsLessThan(TestConstants.SmallDistanceToleranceKm, dz, $"{label} Z delta {dz:E4} km exceeds tolerance");
     }
 
     /// <summary>
@@ -58,9 +57,9 @@ public sealed class OmmPropagationTests
         var z = baseline.Position.Z;
 
         // Assert
-        Assert.AreEqual(-2435.710411, x, 1e-3);
-        Assert.AreEqual(-6278.309905, y, 1e-3);
-        Assert.AreEqual(918.205704, z, 1e-3);
+        Assert.AreEqual(-2435.710411, x, TestConstants.SmallDistanceToleranceKm);
+        Assert.AreEqual(-6278.309905, y, TestConstants.SmallDistanceToleranceKm);
+        Assert.AreEqual(918.205704, z, TestConstants.SmallDistanceToleranceKm);
     }
 
     /// <summary>

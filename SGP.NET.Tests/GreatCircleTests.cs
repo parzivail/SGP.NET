@@ -10,15 +10,13 @@ namespace SGPdotNET.Tests;
 [TestClass]
 public sealed class GreatCircleTests
 {
-	private const double DistanceToleranceKm = 1.0;
-
 	/// <summary>
 	/// Verifies DistanceTo between known city pairs.
 	/// </summary>
 	[TestMethod]
-	[DataRow(40.7050, -74.0152, 33.8147, -117.9211, 3923)] // NYC → LA
-	[DataRow(51.5074, -0.1278, 48.8673, 2.7810, 359)] // London → Paris
-	[DataRow(35.6619, 139.6976, 37.5516, 126.9879, 1154)] // Tokyo → Seoul
+	[DataRow(40.7050, -74.0152, 33.8147, -117.9211, 3923.1)] // NYC → LA
+	[DataRow(51.5074, -0.1278, 48.8673, 2.7810, 359.6)] // London → Paris
+	[DataRow(35.6619, 139.6976, 37.5516, 126.9879, 1154.1)] // Tokyo → Seoul
 	public void DistanceTo_MatchesKnownDistances(double lat1, double lon1, double lat2, double lon2, double expectedKm)
 	{
 		// Arrange
@@ -29,7 +27,7 @@ public sealed class GreatCircleTests
 		var distance = a.DistanceTo(b);
 
 		// Assert
-		Assert.AreEqual(expectedKm, distance, DistanceToleranceKm);
+		Assert.AreEqual(expectedKm, distance, TestConstants.BigDistanceToleranceKm);
 	}
 
 	/// <summary>
@@ -47,7 +45,7 @@ public sealed class GreatCircleTests
 		var ba = b.AngleTo(a);
 
 		// Assert
-		Assert.AreEqual(ab.Radians, ba.Radians, 1e-10);
+		Assert.AreEqual(ab.Radians, ba.Radians, TestConstants.AngleTolerance);
 	}
 
 	/// <summary>
@@ -81,6 +79,6 @@ public sealed class GreatCircleTests
 		var expected = Math.PI * SgpConstants.EarthRadiusKm;
 
 		// Assert
-		Assert.AreEqual(expected, distance, 1e-5);
+		Assert.AreEqual(expected, distance, TestConstants.SmallDistanceToleranceKm);
 	}
 }

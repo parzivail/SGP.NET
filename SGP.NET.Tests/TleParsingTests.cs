@@ -11,12 +11,6 @@ namespace SGPdotNET.Tests;
 [TestClass]
 public sealed class TleParsingTests
 {
-    private const double Tolerance = 1e-10;
-
-    // Known-good ISS TLE for baseline
-    private const string IssLine1 = "1 25544U 98067A   26140.52007259  .00005164  00000-0  10084-3 0  9995";
-    private const string IssLine2 = "2 25544  51.6328  77.0641 0007497  79.3410 280.8422 15.49283153567468";
-
     /// <summary>
     /// Verifies year wrapping: two-digit year 56 → 2056, 57 → 1957.
     /// </summary>
@@ -27,7 +21,7 @@ public sealed class TleParsingTests
         var line1 = "1 25544U 98067A   56140.52007259  .00005164  00000-0  10084-3 0  9995";
 
         // Act
-        var tle = new Tle(line1, IssLine2);
+        var tle = new Tle(line1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual(2056, tle.Epoch.Year);
@@ -40,7 +34,7 @@ public sealed class TleParsingTests
         var line1 = "1 25544U 98067A   57140.52007259  .00005164  00000-0  10084-3 0  9995";
 
         // Act
-        var tle = new Tle(line1, IssLine2);
+        var tle = new Tle(line1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual(1957, tle.Epoch.Year);
@@ -53,10 +47,10 @@ public sealed class TleParsingTests
     public void Eccentricity_LeadingDot_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
-        Assert.AreEqual(0.0007497, tle.Eccentricity, Tolerance);
+        Assert.AreEqual(0.0007497, tle.Eccentricity, 1e-10);
     }
 
     /// <summary>
@@ -67,13 +61,12 @@ public sealed class TleParsingTests
     {
         // Arrange — BStar field "-12345-4" means -0.12345e-4 = -1.2345e-5
         var line1 = "1 25544U 98067A   26140.52007259  .00005164  00000-0 -12345-4 0  9995";
-        var line2 = "2 25544  51.6328  77.0641 0007497  79.3410 280.8422 15.49283153567468";
 
         // Act
-        var tle = new Tle(line1, line2);
+        var tle = new Tle(line1, TestConstants.IssLine2);
 
         // Assert
-        Assert.AreEqual(-1.2345e-5, tle.BStarDragTerm, 1e-10);
+        Assert.AreEqual(-1.2345e-5, tle.BStarDragTerm, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -83,13 +76,13 @@ public sealed class TleParsingTests
     public void Angles_ZeroPadded_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
-        Assert.AreEqual(51.6328, tle.Inclination.Degrees, Tolerance);
-        Assert.AreEqual(77.0641, tle.RightAscendingNode.Degrees, Tolerance);
-        Assert.AreEqual(79.3410, tle.ArgumentPerigee.Degrees, Tolerance);
-        Assert.AreEqual(280.8422, tle.MeanAnomaly.Degrees, Tolerance);
+        Assert.AreEqual(51.6328, tle.Inclination.Degrees, TestConstants.AngleTolerance);
+        Assert.AreEqual(77.0641, tle.RightAscendingNode.Degrees, TestConstants.AngleTolerance);
+        Assert.AreEqual(79.3410, tle.ArgumentPerigee.Degrees, TestConstants.AngleTolerance);
+        Assert.AreEqual(280.8422, tle.MeanAnomaly.Degrees, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -99,10 +92,10 @@ public sealed class TleParsingTests
     public void MeanMotion_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
-        Assert.AreEqual(15.49283153, tle.MeanMotionRevPerDay, Tolerance);
+        Assert.AreEqual(15.49283153, tle.MeanMotionRevPerDay, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -112,7 +105,7 @@ public sealed class TleParsingTests
     public void NoradNumber_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual(25544u, tle.NoradNumber);
@@ -125,7 +118,7 @@ public sealed class TleParsingTests
     public void IntDesignator_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual("98067A  ", tle.IntDesignator);
@@ -138,7 +131,7 @@ public sealed class TleParsingTests
     public void Epoch_DayOfYear_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert day 140.52007259 of 2026
         Assert.AreEqual(2026, tle.Epoch.Year);
@@ -153,7 +146,7 @@ public sealed class TleParsingTests
     public void Name_WithZeroPrefix_PassedThrough()
     {
         // Arrange & Act
-        var tle = new Tle("0 ISS (ZARYA)", IssLine1, IssLine2);
+        var tle = new Tle("0 ISS (ZARYA)", TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual("0 ISS (ZARYA)", tle.Name);
@@ -166,7 +159,7 @@ public sealed class TleParsingTests
     public void Name_WithoutZeroPrefix_UsedAsIs()
     {
         // Arrange & Act
-        var tle = new Tle("ISS (ZARYA)", IssLine1, IssLine2);
+        var tle = new Tle("ISS (ZARYA)", TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual("ISS (ZARYA)", tle.Name);
@@ -179,7 +172,7 @@ public sealed class TleParsingTests
     public void Name_Default_IsNull()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.IsNull(tle.Name);
@@ -192,7 +185,6 @@ public sealed class TleParsingTests
     public void SatelliteNumberMismatch_ThrowsTleException()
     {
         // Arrange
-        const string line1 = "1 25544U 98067A   26140.52007259  .00005164  00000-0  10084-3 0  9995";
         
         // Invalid NORAD number
         const string line2 = "2 99999  51.6328  77.0641 0007497  79.3410 280.8422 15.49283153567468";
@@ -200,7 +192,7 @@ public sealed class TleParsingTests
         // Act & Assert
         try
         {
-            _ = new Tle(line1, line2);
+            _ = new Tle(TestConstants.IssLine1, line2);
             Assert.Fail("Expected TleException");
         }
         catch (TleException)
@@ -221,7 +213,7 @@ public sealed class TleParsingTests
         // Act & Assert
         try
         {
-            _ = new Tle(shortLine, IssLine2);
+            _ = new Tle(shortLine, TestConstants.IssLine2);
             Assert.Fail("Expected TleException");
         }
         catch (TleException)
@@ -231,7 +223,7 @@ public sealed class TleParsingTests
 
         try
         {
-            _ = new Tle(IssLine1, shortLine);
+            _ = new Tle(TestConstants.IssLine1, shortLine);
             Assert.Fail("Expected TleException");
         }
         catch (TleException)
@@ -253,7 +245,7 @@ public sealed class TleParsingTests
         // Act & Assert
         try
         {
-            _ = new Tle(badLine1, IssLine2);
+            _ = new Tle(badLine1, TestConstants.IssLine2);
             Assert.Fail("Expected TleException");
         }
         catch (TleException)
@@ -263,7 +255,7 @@ public sealed class TleParsingTests
 
         try
         {
-            _ = new Tle(IssLine1, badLine2);
+            _ = new Tle(TestConstants.IssLine1, badLine2);
             Assert.Fail("Expected TleException");
         }
         catch (TleException)
@@ -279,7 +271,7 @@ public sealed class TleParsingTests
     public void CopyConstructor_ProducesIdenticalValues()
     {
         // Arrange
-        var original = new Tle("ISS (ZARYA)", IssLine1, IssLine2);
+        var original = new Tle("ISS (ZARYA)", TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Act
         var copy = new Tle(original);
@@ -291,15 +283,15 @@ public sealed class TleParsingTests
         Assert.AreEqual(original.NoradNumber, copy.NoradNumber);
         Assert.AreEqual(original.IntDesignator, copy.IntDesignator);
         Assert.AreEqual(original.Epoch, copy.Epoch);
-        Assert.AreEqual(original.MeanMotionDtOver2, copy.MeanMotionDtOver2, Tolerance);
-        Assert.AreEqual(original.MeanMotionDdtOver6, copy.MeanMotionDdtOver6, Tolerance);
-        Assert.AreEqual(original.BStarDragTerm, copy.BStarDragTerm, Tolerance);
+        Assert.AreEqual(original.MeanMotionDtOver2, copy.MeanMotionDtOver2, TestConstants.AngleTolerance);
+        Assert.AreEqual(original.MeanMotionDdtOver6, copy.MeanMotionDdtOver6, TestConstants.AngleTolerance);
+        Assert.AreEqual(original.BStarDragTerm, copy.BStarDragTerm, TestConstants.AngleTolerance);
         Assert.AreEqual(original.Inclination, copy.Inclination);
         Assert.AreEqual(original.RightAscendingNode, copy.RightAscendingNode);
-        Assert.AreEqual(original.Eccentricity, copy.Eccentricity, Tolerance);
+        Assert.AreEqual(original.Eccentricity, copy.Eccentricity, 1e-10);
         Assert.AreEqual(original.ArgumentPerigee, copy.ArgumentPerigee);
         Assert.AreEqual(original.MeanAnomaly, copy.MeanAnomaly);
-        Assert.AreEqual(original.MeanMotionRevPerDay, copy.MeanMotionRevPerDay, Tolerance);
+        Assert.AreEqual(original.MeanMotionRevPerDay, copy.MeanMotionRevPerDay, TestConstants.AngleTolerance);
         Assert.AreEqual(original.OrbitNumber, copy.OrbitNumber);
     }
 
@@ -313,8 +305,8 @@ public sealed class TleParsingTests
         var lines = new[]
         {
             "0 ISS (ZARYA)",
-            IssLine1,
-            IssLine2
+            TestConstants.IssLine1,
+            TestConstants.IssLine2
         };
 
         // Act
@@ -335,8 +327,8 @@ public sealed class TleParsingTests
         // Arrange
         var lines = new[]
         {
-            IssLine1,
-            IssLine2
+            TestConstants.IssLine1,
+            TestConstants.IssLine2
         };
 
         // Act
@@ -355,7 +347,7 @@ public sealed class TleParsingTests
     public void OrbitNumber_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert
         Assert.AreEqual(56746u, tle.OrbitNumber);
@@ -368,10 +360,10 @@ public sealed class TleParsingTests
     public void MeanMotionDt2_ParsedCorrectly()
     {
         // Arrange & Act
-        var tle = new Tle(IssLine1, IssLine2);
+        var tle = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Assert the TLE field value IS MeanMotionDt/2
-        Assert.AreEqual(0.00005164, tle.MeanMotionDtOver2, 1e-10);
+        Assert.AreEqual(0.00005164, tle.MeanMotionDtOver2, TestConstants.AngleTolerance);
     }
 
     /// <summary>
@@ -381,8 +373,8 @@ public sealed class TleParsingTests
     public void EqualityAndHashCode_Consistent()
     {
         // Arrange
-        var tle1 = new Tle(IssLine1, IssLine2);
-        var tle2 = new Tle(IssLine1, IssLine2);
+        var tle1 = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
+        var tle2 = new Tle(TestConstants.IssLine1, TestConstants.IssLine2);
 
         // Act & Assert
         Assert.IsTrue(tle1 == tle2);
