@@ -1026,12 +1026,55 @@
         <member name="M:SGPdotNET.Parsers.OmmXmlParser.ParseFile(System.String)">
             <inheritdoc />
         </member>
-        <member name="T:SGPdotNET.Propagation.CelestialBodies">
+        <member name="T:SGPdotNET.Propagation.Bodies.Moon">
             <summary>
-                Provides methods to calculate the positions of celestial bodies.
+                Provides methods to calculate the position of the Moon.
             </summary>
         </member>
-        <member name="M:SGPdotNET.Propagation.CelestialBodies.PredictSun(System.DateTime)">
+        <member name="F:SGPdotNET.Propagation.Bodies.Moon.LongitudeTerms">
+            <summary>
+                Perturbation terms for lunar longitude and distance.
+                Source: Meeus, "Astronomical Algorithms" 2nd Ed., Chapter 47, Table 47.A (p. 340).
+                Coefficients are in 0.000001° for longitude and 0.001 km for distance.
+            </summary>
+        </member>
+        <member name="F:SGPdotNET.Propagation.Bodies.Moon.LatitudeTerms">
+            <summary>
+                Perturbation terms for lunar latitude.
+                Source: Meeus, "Astronomical Algorithms" 2nd Ed., Chapter 47, Table 47.B (p. 341).
+                Coefficients are in 0.000001°.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Propagation.Bodies.Moon.Predict(System.DateTime)">
+            <summary>
+                Calculates the Moon's position in Earth-Centered Inertial (ECI) coordinates
+                using the truncated ELP 2000/82 lunar theory.
+            </summary>
+            <param name="time">The time of observation (UTC).</param>
+            <returns>
+                An EciCoordinate representing the Moon's position. The Position vector is in kilometers
+                relative to Earth's center. Velocity is zero (not computed by this algorithm).
+            </returns>
+            <remarks>
+                <para>
+                    This implementation follows Jean Meeus, "Astronomical Algorithms", 2nd Edition,
+                    Chapter 47 "Position of the Moon" (pp. 337–342). The algorithm is a truncated
+                    version of the ELP 2000/82 lunar theory by Chapront-Touzé and Chapront.
+                </para>
+                <para>
+                    Accuracy is approximately 10 arcseconds in latitude and 4 arcseconds in longitude
+                    for dates between 1900 and 2100. This does not account for nutation or the
+                    conversion from Terrestrial Time (TT) to Universal Time (UT1), which introduces
+                    an additional error of ~30 arcseconds when using UTC directly.
+                </para>
+                <para>
+                    The returned ECI coordinate can be converted to geodetic coordinates via
+                    <c>eci.ToGeodetic()</c> to obtain the sublunar point, or used with
+                    <c>GroundStation.Observe()</c> for moonrise/moonset and lunar track calculations.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:SGPdotNET.Propagation.Bodies.Sun.Predict(System.DateTime)">
             <summary>
                 Calculates the Sun's position in Earth-Centered Inertial (ECI) coordinates
                 using the Astronomical Almanac approximate algorithm.

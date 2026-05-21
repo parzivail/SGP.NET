@@ -1,12 +1,13 @@
 using System;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propagation;
+using SGPdotNET.Propagation.Bodies;
 using SGPdotNET.Util;
 
 namespace SGPdotNET.Tests;
 
 /// <summary>
-/// Tests for CelestialBodies.PredictSun: distance, declination, and subsolar point accuracy.
+/// Tests for Sun.Predict: distance, declination, and subsolar point accuracy.
 /// </summary>
 [TestClass]
 public sealed class SunPositionTests
@@ -21,7 +22,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 6, 21, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
         var distance = sun.Position.Length;
 
         // Assert -- 1 AU = 149,597,870.691 km, allow ±2% for orbital eccentricity (e=0.01671)
@@ -38,7 +39,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 6, 21, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
         var geo = sun.ToGeodetic();
 
         // Assert -- declination should be close to +23.44°
@@ -55,7 +56,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 12, 21, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
         var geo = sun.ToGeodetic();
 
         // Assert -- declination should be close to -23.44°
@@ -72,7 +73,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 3, 20, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
         var geo = sun.ToGeodetic();
 
         // Assert
@@ -89,7 +90,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 9, 23, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
         var geo = sun.ToGeodetic();
 
         // Assert
@@ -107,8 +108,8 @@ public sealed class SunPositionTests
         var t2 = t1.AddHours(12);
 
         // Act
-        var geo1 = CelestialBodies.PredictSun(t1).ToGeodetic();
-        var geo2 = CelestialBodies.PredictSun(t2).ToGeodetic();
+        var geo1 = Sun.Predict(t1).ToGeodetic();
+        var geo2 = Sun.Predict(t2).ToGeodetic();
 
         // Assert -- longitude should change by approximately 180° in 12 hours
         var deltaLon = Math.Abs(geo2.Longitude.Degrees - geo1.Longitude.Degrees);
@@ -128,7 +129,7 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 6, 21, 12, 0, 0, DateTimeKind.Utc);
 
         // Act
-        var sun = CelestialBodies.PredictSun(time);
+        var sun = Sun.Predict(time);
 
         // Assert -- at June solstice, Sun is near +Y in equatorial frame
         Assert.IsGreaterThan(0, sun.Position.Y);
@@ -137,7 +138,7 @@ public sealed class SunPositionTests
     }
 
     /// <summary>
-    /// Verifies PredictSun returns consistent results for the same input time.
+    /// Verifies Sun.Predict returns consistent results for the same input time.
     /// </summary>
     [TestMethod]
     public void PredictSun_IsDeterministic()
@@ -146,8 +147,8 @@ public sealed class SunPositionTests
         var time = new DateTime(2026, 5, 20, 22, 30, 0, DateTimeKind.Utc);
 
         // Act
-        var sun1 = CelestialBodies.PredictSun(time);
-        var sun2 = CelestialBodies.PredictSun(time);
+        var sun1 = Sun.Predict(time);
+        var sun2 = Sun.Predict(time);
 
         // Assert
         Assert.AreEqual(sun1.Position.X, sun2.Position.X, TestConstants.AngleTolerance);
@@ -168,12 +169,12 @@ public sealed class SunPositionTests
         var observer = new GeodeticCoordinate(Angle.Zero, Angle.Zero, 0);
 
         // At equinox noon, the sun should be near zenith for an observer at lon=0°
-        var noonSun = CelestialBodies.PredictSun(equinox);
+        var noonSun = Sun.Predict(equinox);
         var noonObs = observer.Observe(noonSun, equinox);
 
         // 12 hours later, sun should be on the opposite side of Earth
         var midnightTime = equinox.AddHours(12);
-        var midnightSun = CelestialBodies.PredictSun(midnightTime);
+        var midnightSun = Sun.Predict(midnightTime);
         var midnightObs = observer.Observe(midnightSun, midnightTime);
 
         // Assert noon elevation should be high, midnight elevation should be negative

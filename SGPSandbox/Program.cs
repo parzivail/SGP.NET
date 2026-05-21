@@ -1,6 +1,7 @@
 using System;
 using SGPdotNET.CoordinateSystem;
 using SGPdotNET.Propagation;
+using SGPdotNET.Propagation.Bodies;
 using SGPdotNET.Util;
 
 namespace SGPSandbox
@@ -37,12 +38,12 @@ namespace SGPSandbox
 			DateTime? solarNoon = null;
 			double maxElevation = double.MinValue;
 
-			var prevObs = observer.Observe(CelestialBodies.PredictSun(today), today);
+			var prevObs = observer.Observe(Sun.Predict(today), today);
 			var prevAbove = prevObs.Elevation.Degrees >= HorizonRefractionDeg;
 
 			for (var t = today + step; t <= endTime; t += step)
 			{
-				var sun = CelestialBodies.PredictSun(t);
+				var sun = Sun.Predict(t);
 				var obs = observer.Observe(sun, t);
 
 				var currAbove = obs.Elevation.Degrees >= HorizonRefractionDeg;
