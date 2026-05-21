@@ -1,151 +1,90 @@
 using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using SGPdotNET.CoordinateSystem;
-using SGPdotNET.Observation;
-using SGPdotNET.TLE;
+using SGPdotNET.Propagation;
 using SGPdotNET.Util;
 
 namespace SGPSandbox
 {
 	class Program
 	{
+		private const double ObserverLat = 28.3737081;
+		private const double ObserverLon = -81.5518777;
+		private const double HorizonRefractionDeg = -0.833;
+
+		private static readonly TimeZoneInfo LocalTz =
+			TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+
 		static void Main(string[] args)
 		{
-			var tleUrl = new Uri("https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle");
-			var provider = new RemoteTleProvider(true, tleUrl);
-			var tles = provider.GetTles();
-			var satellites = tles.Select(pair => new Satellite(pair.Value)).ToList();
+			var today = DateTime.UtcNow.Date;
+			var observer = new GeodeticCoordinate(
+				Angle.FromDegrees(ObserverLat),
+				Angle.FromDegrees(ObserverLon),
+				0);
 
-			var minAngle = (Angle)10;
-			var gs = new GroundStation(new GeodeticCoordinate(30.229777, -81.617525, 0));
+			var localToday = TimeZoneInfo.ConvertTimeFromUtc(today, LocalTz);
 
-			var state = TrackingState.ListingComPorts;
-			Satellite tracking = null;
-			SerialPort comPort = null;
+			Console.WriteLine($"Sunrise/Sunset for {localToday:yyyy-MM-dd}");
+			Console.WriteLine($"Observer: {ObserverLat:F4}°, {ObserverLon:F4}°");
+			Console.WriteLine($"Timezone: {LocalTz.DisplayName}");
+			Console.WriteLine();
 
-			while (true)
+			var step = TimeSpan.FromSeconds(30);
+			var endTime = today.AddHours(36);
+
+			DateTime? sunrise = null;
+			DateTime? sunset = null;
+			DateTime? solarNoon = null;
+			double maxElevation = double.MinValue;
+
+			var prevObs = observer.Observe(CelestialBodies.PredictSun(today), today);
+			var prevAbove = prevObs.Elevation.Degrees >= HorizonRefractionDeg;
+
+			for (var t = today + step; t <= endTime; t += step)
 			{
-				switch (state)
+				var sun = CelestialBodies.PredictSun(t);
+				var obs = observer.Observe(sun, t);
+
+				var currAbove = obs.Elevation.Degrees >= HorizonRefractionDeg;
+
+				if (!prevAbove && currAbove && !sunrise.HasValue)
 				{
-					case TrackingState.ListingComPorts:
-						comPort = SelectComPort();
-						if (comPort != null)
-						{
-							if (comPort.IsOpen)
-								comPort.Close();
-							comPort.Open();
-
-							comPort.WriteLine("$G");
-							comPort.WriteLine("G10P0L20X0Y0Z0");
-						}
-
-						state = TrackingState.ListingVisible;
-						break;
-					case TrackingState.ListingVisible:
-						tracking = SelectVisibleSatellite(satellites, gs, minAngle);
-						state = TrackingState.Tracking;
-						break;
-					case TrackingState.Tracking:
-						if (PressedKey(ConsoleKey.V))
-							state = TrackingState.ListingVisible;
-						if (PressedKey(ConsoleKey.Q))
-							state = TrackingState.Quitting;
-
-						Console.Clear();
-						var observation = gs.Observe(tracking, DateTime.UtcNow);
-						Console.WriteLine(tracking.Name);
-						Console.WriteLine($"{observation.Elevation.Degrees:F2};{observation.Azimuth.Degrees:F2}");
-
-						comPort?.WriteLine($"G1X{-observation.Elevation.Degrees:F2}Y{observation.Azimuth.Degrees:F2}F1000");
-
-						Thread.Sleep(250);
-						break;
+					sunrise = t;
 				}
 
-				if (state == TrackingState.Quitting)
+				if (sunrise.HasValue && obs.Elevation.Degrees > maxElevation)
+				{
+					maxElevation = obs.Elevation.Degrees;
+					solarNoon = t;
+				}
+
+				if (sunrise.HasValue && prevAbove && !currAbove && !sunset.HasValue)
+				{
+					sunset = t;
+				}
+
+				if (sunrise.HasValue && sunset.HasValue)
 					break;
+
+				prevAbove = currAbove;
 			}
 
-			comPort?.Close();
+			Console.WriteLine($"Sunrise: {FormatTime(sunrise)}");
+			Console.WriteLine($"Solar Noon: {FormatTime(solarNoon)} (elevation {maxElevation:F1}°)");
+			Console.WriteLine($"Sunset: {FormatTime(sunset)}");
+
+			if (sunrise.HasValue && sunset.HasValue)
+				Console.WriteLine($"Day Length: {(sunset.Value - sunrise.Value):hh\\:mm\\:ss}");
 		}
 
-		private static SerialPort SelectComPort()
+		private static string FormatTime(DateTime? utcTime)
 		{
-			Console.Clear();
+			if (!utcTime.HasValue)
+				return "N/A";
 
-			const string none = "None";
-			var ports = SerialPort.GetPortNames();
-			var portsL = ports.ToList();
-			portsL.Insert(0, "None");
-			ports = portsL.ToArray();
-
-			for (var i = 0; i < ports.Length; i++)
-			{
-				var sat = ports[i];
-				Console.WriteLine($"[{i}] {ports[i]}");
-			}
-
-			string input;
-			int selectedPort;
-			do
-			{
-				Console.Write("> ");
-				input = Console.ReadLine();
-			} while (!int.TryParse(input, out selectedPort));
-
-			return ports[selectedPort] == none ? null : new SerialPort(ports[selectedPort], 115200);
+			var local = TimeZoneInfo.ConvertTimeFromUtc(utcTime.Value, LocalTz);
+			var tzAbbr = LocalTz.IsDaylightSavingTime(local) ? LocalTz.DaylightName : LocalTz.StandardName;
+			return $"{local:hh:mm:ss tt} {tzAbbr}";
 		}
-
-		private static bool PressedKey(ConsoleKey needle)
-		{
-			if (!Console.KeyAvailable) return false;
-
-			var key = Console.ReadKey(true);
-			return key.Key == needle;
-		}
-
-		private static Satellite SelectVisibleSatellite(List<Satellite> satellites, GroundStation gs, Angle minAngle)
-		{
-			var visible = new List<Satellite>();
-			visible.Clear();
-			Console.Clear();
-
-			foreach (var satellite in satellites)
-			{
-				var satPos = satellite.Predict();
-				if (gs.IsVisible(satPos, minAngle, satPos.Time))
-					visible.Add(satellite);
-			}
-
-			for (var i = 0; i < visible.Count; i++)
-			{
-				var sat = visible[i];
-				Console.WriteLine($"[{i}] {sat.Name}");
-			}
-
-			string input;
-			int selectedSatellite;
-			do
-			{
-				Console.Write("> ");
-				input = Console.ReadLine();
-			} while (!int.TryParse(input, out selectedSatellite));
-
-			return visible[selectedSatellite];
-		}
-	}
-
-	enum TrackingState
-	{
-		ListingComPorts,
-		ListingVisible,
-		Tracking,
-		Quitting
 	}
 }
