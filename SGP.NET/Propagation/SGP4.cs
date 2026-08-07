@@ -346,7 +346,7 @@ public class Sgp4
             var delomg = _nearspaceConsts.Omgcof * tsince;
             var delm = _nearspaceConsts.Xmcof
                        * (Math.Pow(1.0 + _commonConsts.Eta * Math.Cos(xmdf), 3.0)
-                          * -_nearspaceConsts.Delmo);
+                          - _nearspaceConsts.Delmo);
             var temp = delomg + delm;
 
             xmp += temp;

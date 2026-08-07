@@ -57,9 +57,9 @@ public sealed class OmmPropagationTests
         var z = baseline.Position.Z;
 
         // Assert
-        Assert.AreEqual(-2435.710411, x, TestConstants.SmallDistanceToleranceKm);
-        Assert.AreEqual(-6278.309905, y, TestConstants.SmallDistanceToleranceKm);
-        Assert.AreEqual(918.205704, z, TestConstants.SmallDistanceToleranceKm);
+        Assert.AreEqual(-2435.708011, x, TestConstants.SmallDistanceToleranceKm);
+        Assert.AreEqual(-6278.303346, y, TestConstants.SmallDistanceToleranceKm);
+        Assert.AreEqual(918.204921, z, TestConstants.SmallDistanceToleranceKm);
     }
 
     /// <summary>
