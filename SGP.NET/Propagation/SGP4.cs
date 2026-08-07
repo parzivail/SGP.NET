@@ -610,7 +610,7 @@ public class Sgp4
         /*
          * initialize lunar / solar terms
          */
-        var jday = Orbit.Epoch.ToJulian() - SgpConstants.EpochJan112H2000;
+        var jday = Orbit.Epoch.ToJ1900();
 
         var xnodce = 4.5236020 - 9.2422029e-4 * jday;
         var xnodceTemp = xnodce % SgpConstants.TwoPi;
