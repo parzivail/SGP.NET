@@ -125,21 +125,6 @@ public class SgpConstants
     public const double EarthRotationPerSiderealDay = 1.00273790934;
 
     /// <summary>
-    ///     Jan 1.0 1900 = Jan 1 1900 00h UTC
-    /// </summary>
-    public const double EpochJan100H1900 = 2415019.5;
-
-    /// <summary>
-    ///     Jan 1.5 1900 = Jan 1 1900 12h UTC
-    /// </summary>
-    public const double EpochJan112H1900 = 2415020;
-
-    /// <summary>
-    ///     Jan 1.5 2000 = Jan 1 2000 12h UTC
-    /// </summary>
-    public const double EpochJan112H2000 = 2451545;
-
-    /// <summary>
     ///     The number of meters in a kilometer
     /// </summary>
     public const double MetersPerKilometer = 1000;

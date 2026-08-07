@@ -19,6 +19,17 @@ public static class TimeExtensions
     }
 
     /// <summary>
+    ///     Return the Julian date since the j1900 epoch
+    ///     January 1, 1900, at 12:00 TT
+    /// </summary>
+    /// <param name="dt">The time to convert</param>
+    /// <returns>The Julian representation the DateTime</returns>
+    public static double ToJ1900(this DateTime dt)
+    {
+        return dt.ToJulian() - 2415020.0;
+    }
+
+    /// <summary>
     ///     Converts a DateTime to Greenwich Sidereal Time
     /// </summary>
     /// <param name="dt">The time to convert</param>
