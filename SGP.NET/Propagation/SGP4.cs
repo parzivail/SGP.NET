@@ -78,10 +78,12 @@ public class Sgp4
         if (Orbit.Inclination.Radians < 0.0 || Orbit.Inclination.Radians > Math.PI)
             throw new SatellitePropagationException("GetInclination out of range");
 
-        _commonConsts.Cosio = Math.Cos(Orbit.Inclination.Radians);
-        _commonConsts.Sinio = Math.Sin(Orbit.Inclination.Radians);
+        RecomputeConstants(Orbit.Inclination.Radians,
+            out _commonConsts.Sinio, out _commonConsts.Cosio,
+            out _commonConsts.X3Thm1, out _commonConsts.X1Mth2, out _commonConsts.X7Thm1,
+            out _commonConsts.Xlcof, out _commonConsts.Aycof);
+
         var theta2 = _commonConsts.Cosio * _commonConsts.Cosio;
-        _commonConsts.X3Thm1 = 3.0 * theta2 - 1.0;
         var eosq = Orbit.Eccentricity * Orbit.Eccentricity;
         var betao2 = 1.0 - eosq;
         var betao = Math.Sqrt(betao2);
@@ -140,7 +142,6 @@ public class Sgp4
                           + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
                                                                   * (8.0 + 3.0 * etasq * (8.0 + etasq)));
         _commonConsts.C1 = Orbit.BStar * c2;
-        _commonConsts.X1Mth2 = 1.0 - theta2;
         _commonConsts.C4 = 2.0 * Orbit.RecoveredMeanMotion
                                * coef1 * Orbit.RecoveredSemiMajorAxis * betao2
                                * (_commonConsts.Eta * (2.0 + 0.5 * etasq) + Orbit.Eccentricity
@@ -167,16 +168,6 @@ public class Sgp4
             (3.0 - 7.0 * theta2)) * _commonConsts.Cosio;
         _commonConsts.Xnodcf = 3.5 * betao2 * xhdot1 * _commonConsts.C1;
         _commonConsts.T2Cof = 1.5 * _commonConsts.C1;
-
-        if (Math.Abs(_commonConsts.Cosio + 1.0) > 1.5e-12)
-            _commonConsts.Xlcof = 0.125 * SgpConstants.A3Ovk2 * _commonConsts.Sinio *
-                (3.0 + 5.0 * _commonConsts.Cosio) / (1.0 + _commonConsts.Cosio);
-        else
-            _commonConsts.Xlcof = 0.125 * SgpConstants.A3Ovk2 * _commonConsts.Sinio *
-                (3.0 + 5.0 * _commonConsts.Cosio) / 1.5e-12;
-
-        _commonConsts.Aycof = 0.25 * SgpConstants.A3Ovk2 * _commonConsts.Sinio;
-        _commonConsts.X7Thm1 = 7.0 * theta2 - 1.0;
 
         if (_useDeepSpace)
         {
@@ -223,6 +214,32 @@ public class Sgp4
                                             15.0 *
                                             c1Sq * (2.0 * _nearspaceConsts.D2 + c1Sq));
         }
+    }
+
+    /// <summary>
+    ///     Computes the constants that depend solely on the inclination. The deep space propagator
+    ///     perturbs the inclination, so these have to be recomputed for every position it finds.
+    /// </summary>
+    private static void RecomputeConstants(double xinc,
+        out double sinio, out double cosio,
+        out double x3Thm1, out double x1Mth2, out double x7Thm1,
+        out double xlcof, out double aycof)
+    {
+        sinio = Math.Sin(xinc);
+        cosio = Math.Cos(xinc);
+
+        var theta2 = cosio * cosio;
+
+        x3Thm1 = 3.0 * theta2 - 1.0;
+        x1Mth2 = 1.0 - theta2;
+        x7Thm1 = 7.0 * theta2 - 1.0;
+
+        if (Math.Abs(cosio + 1.0) > 1.5e-12)
+            xlcof = 0.125 * SgpConstants.A3Ovk2 * sinio * (3.0 + 5.0 * cosio) / (1.0 + cosio);
+        else
+            xlcof = 0.125 * SgpConstants.A3Ovk2 * sinio * (3.0 + 5.0 * cosio) / 1.5e-12;
+
+        aycof = 0.25 * SgpConstants.A3Ovk2 * sinio;
     }
 
     private EciCoordinate FindPositionSdp4(double tsince)
@@ -286,25 +303,10 @@ public class Sgp4
         /*
          * re-compute the perturbed values
          */
-        var perturbedSinio = Math.Sin(xincl.Radians);
-        var perturbedCosio = Math.Cos(xincl.Radians);
-
-        var perturbedTheta2 = perturbedCosio * perturbedCosio;
-
-        var perturbedX3Thm1 = 3.0 * perturbedTheta2 - 1.0;
-        var perturbedX1Mth2 = 1.0 - perturbedTheta2;
-        var perturbedX7Thm1 = 7.0 * perturbedTheta2 - 1.0;
-
-        double perturbedXlcof;
-        if (Math.Abs(perturbedCosio + 1.0) > 1.5e-12)
-            perturbedXlcof = 0.125 * SgpConstants.A3Ovk2 * perturbedSinio
-                * (3.0 + 5.0 * perturbedCosio) / (1.0 + perturbedCosio);
-        else
-            perturbedXlcof = 0.125 * SgpConstants.A3Ovk2 * perturbedSinio
-                * (3.0 + 5.0 * perturbedCosio) / 1.5e-12;
-
-        var perturbedAycof = 0.25 * SgpConstants.A3Ovk2
-                                  * perturbedSinio;
+        RecomputeConstants(xincl.Radians,
+            out var perturbedSinio, out var perturbedCosio,
+            out var perturbedX3Thm1, out var perturbedX1Mth2, out var perturbedX7Thm1,
+            out var perturbedXlcof, out var perturbedAycof);
 
         /*
          * using calculated values, find position and velocity
