@@ -1171,12 +1171,13 @@ public class Sgp4
             var xl = _integratorParams.Xli
                      + _integratorParams.ValuesT.Xldot * ft
                      + _integratorParams.ValuesT.Xndot * ft * ft * 0.5;
-            var temp = -xnodes + _deepspaceConsts.Gsto + tsince * SgpConstants.EarthRotationPerMinRad;
+            var theta = MathUtil.WrapTwoPi(_deepspaceConsts.Gsto
+                                           + tsince * SgpConstants.EarthRotationPerMinRad);
 
             if (_deepspaceConsts.SynchronousFlag)
-                xll = xl + temp - omgasm;
+                xll = xl + theta - xnodes - omgasm;
             else
-                xll = xl + temp + temp;
+                xll = xl + 2.0 * (theta - xnodes);
         }
     }
 
