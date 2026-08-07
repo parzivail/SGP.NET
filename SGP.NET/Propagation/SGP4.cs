@@ -140,9 +140,6 @@ public class Sgp4
                           + 0.75 * SgpConstants.Ck2 * tsi / psisq * _commonConsts.X3Thm1
                                                                   * (8.0 + 3.0 * etasq * (8.0 + etasq)));
         _commonConsts.C1 = Orbit.BStar * c2;
-        _commonConsts.A3Ovk2 = -SgpConstants.ZonalHarmonicJ3 / SgpConstants.Ck2 *
-                               SgpConstants.DistanceUnitsPerEarthRadii * SgpConstants.DistanceUnitsPerEarthRadii *
-                               SgpConstants.DistanceUnitsPerEarthRadii;
         _commonConsts.X1Mth2 = 1.0 - theta2;
         _commonConsts.C4 = 2.0 * Orbit.RecoveredMeanMotion
                                * coef1 * Orbit.RecoveredSemiMajorAxis * betao2
@@ -172,13 +169,13 @@ public class Sgp4
         _commonConsts.T2Cof = 1.5 * _commonConsts.C1;
 
         if (Math.Abs(_commonConsts.Cosio + 1.0) > 1.5e-12)
-            _commonConsts.Xlcof = 0.125 * _commonConsts.A3Ovk2 * _commonConsts.Sinio *
+            _commonConsts.Xlcof = 0.125 * SgpConstants.A3Ovk2 * _commonConsts.Sinio *
                 (3.0 + 5.0 * _commonConsts.Cosio) / (1.0 + _commonConsts.Cosio);
         else
-            _commonConsts.Xlcof = 0.125 * _commonConsts.A3Ovk2 * _commonConsts.Sinio *
+            _commonConsts.Xlcof = 0.125 * SgpConstants.A3Ovk2 * _commonConsts.Sinio *
                 (3.0 + 5.0 * _commonConsts.Cosio) / 1.5e-12;
 
-        _commonConsts.Aycof = 0.25 * _commonConsts.A3Ovk2 * _commonConsts.Sinio;
+        _commonConsts.Aycof = 0.25 * SgpConstants.A3Ovk2 * _commonConsts.Sinio;
         _commonConsts.X7Thm1 = 7.0 * theta2 - 1.0;
 
         if (_useDeepSpace)
@@ -193,7 +190,7 @@ public class Sgp4
         {
             var c3 = 0.0;
             if (Orbit.Eccentricity > 1.0e-4)
-                c3 = coef * tsi * _commonConsts.A3Ovk2 * Orbit.RecoveredMeanMotion *
+                c3 = coef * tsi * SgpConstants.A3Ovk2 * Orbit.RecoveredMeanMotion *
                     SgpConstants.DistanceUnitsPerEarthRadii *
                     _commonConsts.Sinio / Orbit.Eccentricity;
 
@@ -300,13 +297,13 @@ public class Sgp4
 
         double perturbedXlcof;
         if (Math.Abs(perturbedCosio + 1.0) > 1.5e-12)
-            perturbedXlcof = 0.125 * _commonConsts.A3Ovk2 * perturbedSinio
+            perturbedXlcof = 0.125 * SgpConstants.A3Ovk2 * perturbedSinio
                 * (3.0 + 5.0 * perturbedCosio) / (1.0 + perturbedCosio);
         else
-            perturbedXlcof = 0.125 * _commonConsts.A3Ovk2 * perturbedSinio
+            perturbedXlcof = 0.125 * SgpConstants.A3Ovk2 * perturbedSinio
                 * (3.0 + 5.0 * perturbedCosio) / 1.5e-12;
 
-        var perturbedAycof = 0.25 * _commonConsts.A3Ovk2
+        var perturbedAycof = 0.25 * SgpConstants.A3Ovk2
                                   * perturbedSinio;
 
         /*
@@ -1313,7 +1310,6 @@ public class Sgp4
         public double Sinio;
         public double Eta;
         public double T2Cof;
-        public double A3Ovk2;
         public double X1Mth2;
         public double X3Thm1;
         public double X7Thm1;
