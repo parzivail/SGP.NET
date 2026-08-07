@@ -260,10 +260,10 @@ public class Sgp4
 
         var xn = Orbit.RecoveredMeanMotion;
         var e = Orbit.Eccentricity;
-        var xincl = Orbit.Inclination;
+        var xinc = Orbit.Inclination;
 
         DeepSpaceSecular(tsince, Orbit, _commonConsts, _deepspaceConsts, ref _integratorParams,
-            ref xmdf, ref omgadf, ref xnode, ref e, ref xincl, ref xn);
+            ref xmdf, ref omgadf, ref xnode, ref e, ref xinc, ref xn);
 
         if (xn <= 0.0)
             throw new SatellitePropagationException("Error: (xn <= 0.0)");
@@ -272,15 +272,15 @@ public class Sgp4
         e -= tempe;
         var xmam = xmdf + Orbit.RecoveredMeanMotion * templ;
 
-        DeepSpacePeriodics(tsince, _deepspaceConsts, ref e, ref xincl, ref omgadf, ref xnode, ref xmam);
+        DeepSpacePeriodics(tsince, _deepspaceConsts, ref e, ref xinc, ref omgadf, ref xnode, ref xmam);
 
         /*
-         * keeping xincl positive important unless you need to display xincl
+         * keeping xinc positive important unless you need to display xinc
          * and dislike negative inclinations
          */
-        if (xincl.Radians < 0.0)
+        if (xinc.Radians < 0.0)
         {
-            xincl = Angle.FromRadians(-xincl.Radians);
+            xinc = Angle.FromRadians(-xinc.Radians);
             xnode += Math.PI;
             omgadf -= Math.PI;
         }
@@ -302,7 +302,7 @@ public class Sgp4
         /*
          * re-compute the perturbed values
          */
-        RecomputeConstants(xincl.Radians,
+        RecomputeConstants(xinc.Radians,
             out var perturbedSinio, out var perturbedCosio,
             out var perturbedX3Thm1, out var perturbedX1Mth2, out var perturbedX7Thm1,
             out var perturbedXlcof, out var perturbedAycof);
@@ -312,7 +312,7 @@ public class Sgp4
          */
         return CalculateFinalPositionVelocity(tsince, e,
             a, omega, xl, xnode,
-            xincl.Radians, perturbedXlcof, perturbedAycof,
+            xinc.Radians, perturbedXlcof, perturbedAycof,
             perturbedX3Thm1, perturbedX1Mth2, perturbedX7Thm1,
             perturbedCosio, perturbedSinio);
     }
@@ -335,7 +335,7 @@ public class Sgp4
         var tempe = Orbit.BStar * _commonConsts.C4 * tsince;
         var templ = _commonConsts.T2Cof * tsq;
 
-        var xincl = Orbit.Inclination;
+        var xinc = Orbit.Inclination;
         var omega = omgadf;
         var xmp = xmdf;
 
@@ -381,7 +381,7 @@ public class Sgp4
          */
         return CalculateFinalPositionVelocity(tsince, e,
             a, omega, xl, xnode,
-            xincl.Radians, _commonConsts.Xlcof, _commonConsts.Aycof,
+            xinc.Radians, _commonConsts.Xlcof, _commonConsts.Aycof,
             _commonConsts.X3Thm1, _commonConsts.X1Mth2, _commonConsts.X7Thm1,
             _commonConsts.Cosio, _commonConsts.Sinio);
     }
@@ -393,7 +393,7 @@ public class Sgp4
         double omega,
         double xl,
         double xnode,
-        double xincl,
+        double xinc,
         double xlcof,
         double aycof,
         double x3Thm1,
@@ -518,7 +518,7 @@ public class Sgp4
                  + 0.5 * temp42 * x1Mth2 * cos2U;
         var uk = u - 0.25 * temp43 * x7Thm1 * sin2U;
         var xnodek = xnode + 1.5 * temp43 * cosio * sin2U;
-        var xinck = xincl + 1.5 * temp43 * cosio * sinio * cos2U;
+        var xinck = xinc + 1.5 * temp43 * cosio * sinio * cos2U;
         var rdotk = rdot - xn * temp42 * x1Mth2 * sin2U;
         var rfdotk = rfdot + xn * temp42 * (x1Mth2 * cos2U + 1.5 * x3Thm1);
 
