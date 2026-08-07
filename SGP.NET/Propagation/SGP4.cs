@@ -14,7 +14,6 @@ public class Sgp4
     private static readonly CommonConstants EmptyCommonConstants = new CommonConstants();
     private static readonly NearSpaceConstants EmptyNearSpaceConstants = new NearSpaceConstants();
     private static readonly DeepSpaceConstants EmptyDeepSpaceConstants = new DeepSpaceConstants();
-    private static readonly IntegratorConstants EmptyIntegratorConstants = new IntegratorConstants();
     private static readonly IntegratorParams EmptyIntegratorParams = new IntegratorParams();
 
     /// <summary>
@@ -24,7 +23,6 @@ public class Sgp4
 
     private CommonConstants _commonConsts;
     private DeepSpaceConstants _deepspaceConsts;
-    private IntegratorConstants _integratorConsts;
     private IntegratorParams _integratorParams;
     private NearSpaceConstants _nearspaceConsts;
     private bool _useDeepSpace;
@@ -264,7 +262,8 @@ public class Sgp4
         var e = Orbit.Eccentricity;
         var xincl = Orbit.Inclination;
 
-        DeepSpaceSecular(tsince, ref xmdf, ref omgadf, ref xnode, ref e, ref xincl, ref xn);
+        DeepSpaceSecular(tsince, Orbit, _commonConsts, _deepspaceConsts, ref _integratorParams,
+            ref xmdf, ref omgadf, ref xnode, ref e, ref xincl, ref xn);
 
         if (xn <= 0.0)
             throw new SatellitePropagationException("Error: (xn <= 0.0)");
@@ -768,9 +767,7 @@ public class Sgp4
         _deepspaceConsts.Ssg += sgh - cosio * shdq;
         _deepspaceConsts.Ssh += shdq;
 
-        _deepspaceConsts.ResonanceFlag = false;
-        _deepspaceConsts.SynchronousFlag = false;
-        var initialiseIntegrator = true;
+        _deepspaceConsts.Shape = DeepSpaceOrbitShape.None;
 
         if (Orbit.RecoveredMeanMotion < 0.0052359877
             && Orbit.RecoveredMeanMotion > 0.0034906585)
@@ -778,8 +775,7 @@ public class Sgp4
             /*
              * 24h synchronous resonance terms initialisation
              */
-            _deepspaceConsts.ResonanceFlag = true;
-            _deepspaceConsts.SynchronousFlag = true;
+            _deepspaceConsts.Shape = DeepSpaceOrbitShape.Synchronous;
 
             var g200 = 1.0 + eosq * (-2.5 + 0.8125 * eosq);
             var g310 = 1.0 + 2.0 * eosq;
@@ -799,10 +795,10 @@ public class Sgp4
             _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                                     * f311 * g310 * q31 * aqnv;
 
-            _integratorConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
-                                                         + Orbit.AscendingNode.Radians
-                                                         + Orbit.ArgumentPerigee.Radians
-                                                         - _deepspaceConsts.Gsto);
+            _deepspaceConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
+                                                        + Orbit.AscendingNode.Radians
+                                                        + Orbit.ArgumentPerigee.Radians
+                                                        - _deepspaceConsts.Gsto);
             bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad
                     + _deepspaceConsts.Ssl
                     + _deepspaceConsts.Ssg
@@ -812,14 +808,14 @@ public class Sgp4
                  || Orbit.RecoveredMeanMotion > 9.24e-3
                  || Orbit.Eccentricity < 0.5)
         {
-            initialiseIntegrator = false;
+            // do nothing
         }
         else
         {
             /*
              * geopotential resonance initialisation for 12 hour orbits
              */
-            _deepspaceConsts.ResonanceFlag = true;
+            _deepspaceConsts.Shape = DeepSpaceOrbitShape.Resonance;
 
             double g211;
             double g310;
@@ -931,11 +927,11 @@ public class Sgp4
             _deepspaceConsts.D5421 = temp * f542 * g521;
             _deepspaceConsts.D5433 = temp * f543 * g533;
 
-            _integratorConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
-                                                         + Orbit.AscendingNode.Radians
-                                                         + Orbit.AscendingNode.Radians
-                                                         - _deepspaceConsts.Gsto
-                                                         - _deepspaceConsts.Gsto);
+            _deepspaceConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
+                                                        + Orbit.AscendingNode.Radians
+                                                        + Orbit.AscendingNode.Radians
+                                                        - _deepspaceConsts.Gsto
+                                                        - _deepspaceConsts.Gsto);
             bfact = xmdot
                     + xnodot + xnodot
                     - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad
@@ -944,19 +940,15 @@ public class Sgp4
                     + _deepspaceConsts.Ssh;
         }
 
-        if (initialiseIntegrator)
+        if (_deepspaceConsts.Shape != DeepSpaceOrbitShape.None)
         {
             /*
              * initialise integrator
              */
-            _integratorConsts.Xfact = bfact - Orbit.RecoveredMeanMotion;
+            _deepspaceConsts.Xfact = bfact - Orbit.RecoveredMeanMotion;
             _integratorParams.Atime = 0.0;
             _integratorParams.Xni = Orbit.RecoveredMeanMotion;
-            _integratorParams.Xli = _integratorConsts.Xlamo;
-            /*
-             * precompute dot terms for epoch
-             */
-            DeepSpaceCalcDotTerms(ref _integratorConsts.Values0);
+            _integratorParams.Xli = _deepspaceConsts.Xlamo;
         }
     }
 
@@ -1091,97 +1083,9 @@ public class Sgp4
         }
     }
 
-    private void DeepSpaceSecular(double tsince, ref double xll, ref double omgasm, ref double xnodes, ref double em,
-        ref Angle xinc, ref double xn)
-    {
-        const double step = 720.0;
-        const double step2 = 259200.0;
-
-        xll += _deepspaceConsts.Ssl * tsince;
-        omgasm += _deepspaceConsts.Ssg * tsince;
-        xnodes += _deepspaceConsts.Ssh * tsince;
-        em += _deepspaceConsts.Sse * tsince;
-        xinc = Angle.FromRadians(xinc.Radians + _deepspaceConsts.Ssi * tsince);
-
-        if (_deepspaceConsts.ResonanceFlag)
-        {
-            /*
-             * 1st condition (if tsince is less than one time step from epoch)
-             * 2nd condition (if integrator_params_.atime and
-             *     tsince are of opposite signs, so zero crossing required)
-             * 3rd condition (if tsince is closer to zero than
-             *     integrator_params_.atime, only integrate away from zero)
-             */
-            if (Math.Abs(tsince) < step ||
-                tsince * _integratorParams.Atime <= 0.0 ||
-                Math.Abs(tsince) < Math.Abs(_integratorParams.Atime))
-            {
-                /*
-                 * restart from epoch
-                 */
-                _integratorParams.Atime = 0.0;
-                _integratorParams.Xni = Orbit.RecoveredMeanMotion;
-                _integratorParams.Xli = _integratorConsts.Xlamo;
-
-                /*
-                 * restore precomputed values for epoch
-                 */
-                _integratorParams.ValuesT = _integratorConsts.Values0;
-            }
-
-            var ft = tsince - _integratorParams.Atime;
-
-            /*
-             * if time difference (ft) is greater than the time step (720.0)
-             * loop around until integrator_params_.atime is within one time step of
-             * tsince
-             */
-            if (Math.Abs(ft) >= step)
-            {
-                /*
-                 * calculate step direction to allow integrator_params_.atime
-                 * to catch up with tsince
-                 */
-                var delt = -step;
-                if (ft >= 0.0)
-                    delt = step;
-
-                do
-                {
-                    /*
-                     * integrate using current dot terms
-                     */
-                    DeepSpaceIntegrator(delt, step2, _integratorParams.ValuesT);
-
-                    /*
-                     * calculate dot terms for next integration
-                     */
-                    DeepSpaceCalcDotTerms(ref _integratorParams.ValuesT);
-
-                    ft = tsince - _integratorParams.Atime;
-                } while (Math.Abs(ft) >= step);
-            }
-
-            /*
-             * integrator
-             */
-            xn = _integratorParams.Xni
-                 + _integratorParams.ValuesT.Xndot * ft
-                 + _integratorParams.ValuesT.Xnddt * ft * ft * 0.5;
-            var xl = _integratorParams.Xli
-                     + _integratorParams.ValuesT.Xldot * ft
-                     + _integratorParams.ValuesT.Xndot * ft * ft * 0.5;
-            var theta = MathUtil.WrapTwoPi(_deepspaceConsts.Gsto
-                                           + tsince * SgpConstants.EarthRotationPerMinRad);
-
-            if (_deepspaceConsts.SynchronousFlag)
-                xll = xl + theta - xnodes - omgasm;
-            else
-                xll = xl + 2.0 * (theta - xnodes);
-        }
-    }
-
-    private void DeepSpaceCalcDotTerms(ref IntegratorValues values)
+    private static void DeepSpaceSecular(double tsince, Orbit orbit, in CommonConstants commonConsts,
+        in DeepSpaceConstants deepspaceConsts, ref IntegratorParams integratorParams,
+        ref double xll, ref double omgasm, ref double xnodes, ref double em, ref Angle xinc, ref double xn)
     {
         const double g22 = 5.7686396;
         const double g32 = 0.95240898;
@@ -1192,85 +1096,144 @@ public class Sgp4
         const double fasx4 = 2.8843198;
         const double fasx6 = 0.37448087;
 
-        if (_deepspaceConsts.SynchronousFlag)
-        {
-            values.Xndot = _deepspaceConsts.Del1
-                           * Math.Sin(_integratorParams.Xli - fasx2)
-                           + _deepspaceConsts.Del2
-                           * Math.Sin(2.0 * (_integratorParams.Xli - fasx4))
-                           + _deepspaceConsts.Del3
-                           * Math.Sin(3.0 * (_integratorParams.Xli - fasx6));
-            values.Xnddt = _deepspaceConsts.Del1
-                           * Math.Cos(_integratorParams.Xli - fasx2)
-                           + 2.0 * _deepspaceConsts.Del2
-                                 * Math.Cos(2.0 * (_integratorParams.Xli - fasx4))
-                           + 3.0 * _deepspaceConsts.Del3
-                                 * Math.Cos(3.0 * (_integratorParams.Xli - fasx6));
-        }
-        else
-        {
-            var xomi = Orbit.ArgumentPerigee.Radians
-                       + _commonConsts.Omgdot * _integratorParams.Atime;
-            var x2Omi = xomi + xomi;
-            var x2Li = _integratorParams.Xli + _integratorParams.Xli;
+        const double step = 720.0;
+        const double step2 = 259200.0;
 
-            values.Xndot = _deepspaceConsts.D2201
-                           * Math.Sin(x2Omi + _integratorParams.Xli - g22)
-                           + _deepspaceConsts.D2211
-                           * Math.Sin(_integratorParams.Xli - g22)
-                           + _deepspaceConsts.D3210
-                           * Math.Sin(xomi + _integratorParams.Xli - g32)
-                           + _deepspaceConsts.D3222
-                           * Math.Sin(-xomi + _integratorParams.Xli - g32)
-                           + _deepspaceConsts.D4410
-                           * Math.Sin(x2Omi + x2Li - g44)
-                           + _deepspaceConsts.D4422
-                           * Math.Sin(x2Li - g44)
-                           + _deepspaceConsts.D5220
-                           * Math.Sin(xomi + _integratorParams.Xli - g52)
-                           + _deepspaceConsts.D5232
-                           * Math.Sin(-xomi + _integratorParams.Xli - g52)
-                           + _deepspaceConsts.D5421
-                           * Math.Sin(xomi + x2Li - g54)
-                           + _deepspaceConsts.D5433
-                           * Math.Sin(-xomi + x2Li - g54);
-            values.Xnddt = _deepspaceConsts.D2201
-                           * Math.Cos(x2Omi + _integratorParams.Xli - g22)
-                           + _deepspaceConsts.D2211
-                           * Math.Cos(_integratorParams.Xli - g22)
-                           + _deepspaceConsts.D3210
-                           * Math.Cos(xomi + _integratorParams.Xli - g32)
-                           + _deepspaceConsts.D3222
-                           * Math.Cos(-xomi + _integratorParams.Xli - g32)
-                           + _deepspaceConsts.D5220
-                           * Math.Cos(xomi + _integratorParams.Xli - g52)
-                           + _deepspaceConsts.D5232
-                           * Math.Cos(-xomi + _integratorParams.Xli - g52)
-                           + 2.0 * (_deepspaceConsts.D4410 * Math.Cos(x2Omi + x2Li - g44)
-                                    + _deepspaceConsts.D4422
-                                    * Math.Cos(x2Li - g44)
-                                    + _deepspaceConsts.D5421
-                                    * Math.Cos(xomi + x2Li - g54)
-                                    + _deepspaceConsts.D5433
-                                    * Math.Cos(-xomi + x2Li - g54));
-        }
+        xll += deepspaceConsts.Ssl * tsince;
+        omgasm += deepspaceConsts.Ssg * tsince;
+        xnodes += deepspaceConsts.Ssh * tsince;
+        em += deepspaceConsts.Sse * tsince;
+        xinc = Angle.FromRadians(xinc.Radians + deepspaceConsts.Ssi * tsince);
 
-        values.Xldot = _integratorParams.Xni + _integratorConsts.Xfact;
-        values.Xnddt *= values.Xldot;
-    }
-
-    private void DeepSpaceIntegrator(double delt, double step2, IntegratorValues values)
-    {
-        /*
-         * integrator
-         */
-        _integratorParams.Xli += values.Xldot * delt + values.Xndot * step2;
-        _integratorParams.Xni += values.Xndot * delt + values.Xnddt * step2;
+        if (deepspaceConsts.Shape == DeepSpaceOrbitShape.None)
+            return;
 
         /*
-         * increment integrator time
+         * 1st condition (if tsince is less than one time step from epoch)
+         * 2nd condition (if integratorParams.Atime and
+         *     tsince are of opposite signs, so zero crossing required)
+         * 3rd condition (if tsince is closer to zero than
+         *     integratorParams.Atime, only integrate away from zero)
          */
-        _integratorParams.Atime += delt;
+        if (Math.Abs(tsince) < step ||
+            tsince * integratorParams.Atime <= 0.0 ||
+            Math.Abs(tsince) < Math.Abs(integratorParams.Atime))
+        {
+            /*
+             * restart back at the epoch
+             */
+            integratorParams.Atime = 0.0;
+            integratorParams.Xni = orbit.RecoveredMeanMotion;
+            integratorParams.Xli = deepspaceConsts.Xlamo;
+        }
+
+        var running = true;
+        while (running)
+        {
+            /*
+             * always calculate the dot terms ready for the integration
+             * beginning at the start of the range, which is Atime
+             */
+            double xndot;
+            double xnddt;
+
+            if (deepspaceConsts.Shape == DeepSpaceOrbitShape.Synchronous)
+            {
+                xndot = deepspaceConsts.Del1
+                        * Math.Sin(integratorParams.Xli - fasx2)
+                        + deepspaceConsts.Del2
+                        * Math.Sin(2.0 * (integratorParams.Xli - fasx4))
+                        + deepspaceConsts.Del3
+                        * Math.Sin(3.0 * (integratorParams.Xli - fasx6));
+                xnddt = deepspaceConsts.Del1
+                        * Math.Cos(integratorParams.Xli - fasx2)
+                        + 2.0 * deepspaceConsts.Del2
+                              * Math.Cos(2.0 * (integratorParams.Xli - fasx4))
+                        + 3.0 * deepspaceConsts.Del3
+                              * Math.Cos(3.0 * (integratorParams.Xli - fasx6));
+            }
+            else
+            {
+                var xomi = orbit.ArgumentPerigee.Radians
+                           + commonConsts.Omgdot * integratorParams.Atime;
+                var x2Omi = xomi + xomi;
+                var x2Li = integratorParams.Xli + integratorParams.Xli;
+
+                xndot = deepspaceConsts.D2201
+                        * Math.Sin(x2Omi + integratorParams.Xli - g22)
+                        + deepspaceConsts.D2211
+                        * Math.Sin(integratorParams.Xli - g22)
+                        + deepspaceConsts.D3210
+                        * Math.Sin(xomi + integratorParams.Xli - g32)
+                        + deepspaceConsts.D3222
+                        * Math.Sin(-xomi + integratorParams.Xli - g32)
+                        + deepspaceConsts.D4410
+                        * Math.Sin(x2Omi + x2Li - g44)
+                        + deepspaceConsts.D4422
+                        * Math.Sin(x2Li - g44)
+                        + deepspaceConsts.D5220
+                        * Math.Sin(xomi + integratorParams.Xli - g52)
+                        + deepspaceConsts.D5232
+                        * Math.Sin(-xomi + integratorParams.Xli - g52)
+                        + deepspaceConsts.D5421
+                        * Math.Sin(xomi + x2Li - g54)
+                        + deepspaceConsts.D5433
+                        * Math.Sin(-xomi + x2Li - g54);
+                xnddt = deepspaceConsts.D2201
+                        * Math.Cos(x2Omi + integratorParams.Xli - g22)
+                        + deepspaceConsts.D2211
+                        * Math.Cos(integratorParams.Xli - g22)
+                        + deepspaceConsts.D3210
+                        * Math.Cos(xomi + integratorParams.Xli - g32)
+                        + deepspaceConsts.D3222
+                        * Math.Cos(-xomi + integratorParams.Xli - g32)
+                        + deepspaceConsts.D5220
+                        * Math.Cos(xomi + integratorParams.Xli - g52)
+                        + deepspaceConsts.D5232
+                        * Math.Cos(-xomi + integratorParams.Xli - g52)
+                        + 2.0 * (deepspaceConsts.D4410 * Math.Cos(x2Omi + x2Li - g44)
+                                 + deepspaceConsts.D4422
+                                 * Math.Cos(x2Li - g44)
+                                 + deepspaceConsts.D5421
+                                 * Math.Cos(xomi + x2Li - g54)
+                                 + deepspaceConsts.D5433
+                                 * Math.Cos(-xomi + x2Li - g54));
+            }
+
+            var xldot = integratorParams.Xni + deepspaceConsts.Xfact;
+            xnddt *= xldot;
+
+            var ft = tsince - integratorParams.Atime;
+
+            if (Math.Abs(ft) >= step)
+            {
+                /*
+                 * integrate by a full step, moving Atime toward tsince
+                 */
+                var delt = ft >= 0.0 ? step : -step;
+
+                integratorParams.Xli += xldot * delt + xndot * step2;
+                integratorParams.Xni += xndot * delt + xnddt * step2;
+                integratorParams.Atime += delt;
+            }
+            else
+            {
+                /*
+                 * integrate by the difference ft remaining
+                 */
+                xn = integratorParams.Xni + xndot * ft + xnddt * ft * ft * 0.5;
+                var xl = integratorParams.Xli + xldot * ft + xndot * ft * ft * 0.5;
+                var theta = MathUtil.WrapTwoPi(deepspaceConsts.Gsto
+                                               + tsince * SgpConstants.EarthRotationPerMinRad);
+
+                if (deepspaceConsts.Shape == DeepSpaceOrbitShape.Synchronous)
+                    xll = xl + theta - xnodes - omgasm;
+                else
+                    xll = xl + 2.0 * (theta - xnodes);
+
+                running = false;
+            }
+        }
     }
 
     private void Reset()
@@ -1281,7 +1244,6 @@ public class Sgp4
         _commonConsts = EmptyCommonConstants;
         _nearspaceConsts = EmptyNearSpaceConstants;
         _deepspaceConsts = EmptyDeepSpaceConstants;
-        _integratorConsts = EmptyIntegratorConstants;
         _integratorParams = EmptyIntegratorParams;
     }
 
@@ -1331,11 +1293,12 @@ public class Sgp4
         public double Zmol;
         public double Zmos;
 
-        // Whether the deep space orbit is geopotential resonance for 12 hour orbits
-        public bool ResonanceFlag;
+        // Which resonance, if any, the deep space orbit is in
+        public DeepSpaceOrbitShape Shape;
 
-        // Whether the deep space orbit is 24h synchronous resonance
-        public bool SynchronousFlag;
+        // integrator constants
+        public double Xfact;
+        public double Xlamo;
 
         // lunar / solar constants for epoch applied during DeepSpaceSecular()
 
@@ -1345,7 +1308,7 @@ public class Sgp4
         public double Ssg;
         public double Ssh;
 
-        // lunar / solar constants used during DeepSpaceCalculateLunarSolarTerms()
+        // lunar / solar constants used during DeepSpacePeriodics()
 
         public double Se2;
         public double Si2;
@@ -1372,7 +1335,7 @@ public class Sgp4
         public double Xh2;
         public double Xh3;
 
-        // used during DeepSpaceCalcDotTerms()
+        // resonance constants used during DeepSpaceSecular()
 
         public double D2201;
         public double D2211;
@@ -1389,31 +1352,21 @@ public class Sgp4
         public double Del3;
     }
 
-    private struct IntegratorValues
-    {
-        public double Xndot;
-        public double Xnddt;
-        public double Xldot;
-    }
-
-    private struct IntegratorConstants
-    {
-        // integrator constants
-        public double Xfact;
-        public double Xlamo;
-
-        // integrator values for epoch
-        public IntegratorValues Values0;
-    }
-
     private struct IntegratorParams
     {
         // integrator values
         public double Xli;
         public double Xni;
         public double Atime;
+    }
 
-        // integrator values for current d_atime_
-        public IntegratorValues ValuesT;
+    /// <summary>
+    ///     Which resonance, if any, a deep space orbit is in
+    /// </summary>
+    private enum DeepSpaceOrbitShape
+    {
+        None,
+        Resonance,
+        Synchronous
     }
 }
