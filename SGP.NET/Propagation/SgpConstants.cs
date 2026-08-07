@@ -60,6 +60,12 @@ public class SgpConstants
         DistanceUnitsPerEarthRadii * DistanceUnitsPerEarthRadii;
 
     /// <summary>
+    ///     A3OVK2 propogation constant
+    /// </summary>
+    public const double A3Ovk2 = -ZonalHarmonicJ3 / Ck2 * DistanceUnitsPerEarthRadii *
+                                 DistanceUnitsPerEarthRadii * DistanceUnitsPerEarthRadii;
+
+    /// <summary>
     ///     Q-zero propogation constant
     /// </summary>
     public const double Q0 = 120;
