@@ -1238,7 +1238,7 @@ public class Sgp4
 
             values.Xndot = _deepspaceConsts.D2201
                            * Math.Sin(x2Omi + _integratorParams.Xli - g22)
-                           * +_deepspaceConsts.D2211
+                           + _deepspaceConsts.D2211
                            * Math.Sin(_integratorParams.Xli - g22)
                            + _deepspaceConsts.D3210
                            * Math.Sin(xomi + _integratorParams.Xli - g32)
