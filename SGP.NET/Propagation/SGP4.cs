@@ -611,10 +611,9 @@ public class Sgp4
          */
         var jday = Orbit.Epoch.ToJ1900();
 
-        var xnodce = 4.5236020 - 9.2422029e-4 * jday;
-        var xnodceTemp = xnodce % SgpConstants.TwoPi;
-        var stem = Math.Sin(xnodceTemp);
-        var ctem = Math.Cos(xnodceTemp);
+        var xnodce = MathUtil.WrapTwoPi(4.5236020 - 9.2422029e-4 * jday);
+        var stem = Math.Sin(xnodce);
+        var ctem = Math.Cos(xnodce);
         var zcosil = 0.91375164 - 0.03568096 * ctem;
         var zsinil = Math.Sqrt(1.0 - zcosil * zcosil);
         var zsinhl = 0.089683511 * stem / zsinil;
@@ -625,7 +624,7 @@ public class Sgp4
         var zx = 0.39785416 * stem / zsinil;
         var zy = zcoshl * ctem + 0.91744867 * zsinhl * stem;
         zx = Math.Atan2(zx, zy);
-        zx = (gam + zx - xnodce) % SgpConstants.TwoPi;
+        zx = gam + zx - xnodce;
 
         var zcosgl = Math.Cos(zx);
         var zsingl = Math.Sin(zx);
@@ -800,14 +799,14 @@ public class Sgp4
             _deepspaceConsts.Del1 = _deepspaceConsts.Del1
                                     * f311 * g310 * q31 * aqnv;
 
-            _integratorConsts.Xlamo = Orbit.MeanAnomoly.Radians
-                                      + Orbit.AscendingNode.Radians
-                                      + Orbit.ArgumentPerigee.Radians
-                                      - _deepspaceConsts.Gsto;
-            bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad;
-            bfact += _deepspaceConsts.Ssl
-                     + _deepspaceConsts.Ssg
-                     + _deepspaceConsts.Ssh;
+            _integratorConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
+                                                         + Orbit.AscendingNode.Radians
+                                                         + Orbit.ArgumentPerigee.Radians
+                                                         - _deepspaceConsts.Gsto);
+            bfact = xmdot + xpidot - SgpConstants.EarthRotationPerMinRad
+                    + _deepspaceConsts.Ssl
+                    + _deepspaceConsts.Ssg
+                    + _deepspaceConsts.Ssh;
         }
         else if (Orbit.RecoveredMeanMotion < 8.26e-3
                  || Orbit.RecoveredMeanMotion > 9.24e-3
@@ -932,17 +931,17 @@ public class Sgp4
             _deepspaceConsts.D5421 = temp * f542 * g521;
             _deepspaceConsts.D5433 = temp * f543 * g533;
 
-            _integratorConsts.Xlamo = Orbit.MeanAnomoly.Radians
-                                      + Orbit.AscendingNode.Radians
-                                      + Orbit.AscendingNode.Radians
-                                      - _deepspaceConsts.Gsto
-                                      - _deepspaceConsts.Gsto;
+            _integratorConsts.Xlamo = MathUtil.WrapTwoPi(Orbit.MeanAnomoly.Radians
+                                                         + Orbit.AscendingNode.Radians
+                                                         + Orbit.AscendingNode.Radians
+                                                         - _deepspaceConsts.Gsto
+                                                         - _deepspaceConsts.Gsto);
             bfact = xmdot
                     + xnodot + xnodot
-                    - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad;
-            bfact = bfact + _deepspaceConsts.Ssl
-                          + _deepspaceConsts.Ssh
-                          + _deepspaceConsts.Ssh;
+                    - SgpConstants.EarthRotationPerMinRad - SgpConstants.EarthRotationPerMinRad
+                    + _deepspaceConsts.Ssl
+                    + _deepspaceConsts.Ssh
+                    + _deepspaceConsts.Ssh;
         }
 
         if (initialiseIntegrator)
