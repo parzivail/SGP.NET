@@ -250,7 +250,7 @@ public class Sgp4
         var e = Orbit.Eccentricity;
         var xincl = Orbit.Inclination;
 
-        DeepSpaceSecular(tsince, ref xmdf, omgadf, xnode, ref e, ref xincl, ref xn);
+        DeepSpaceSecular(tsince, ref xmdf, ref omgadf, ref xnode, ref e, ref xincl, ref xn);
 
         if (xn <= 0.0)
             throw new SatellitePropagationException("Error: (xn <= 0.0)");
@@ -1114,7 +1114,7 @@ public class Sgp4
         }
     }
 
-    private void DeepSpaceSecular(double tsince, ref double xll, double omgasm, double xnodes, ref double em,
+    private void DeepSpaceSecular(double tsince, ref double xll, ref double omgasm, ref double xnodes, ref double em,
         ref Angle xinc, ref double xn)
     {
         const double step = 720.0;
