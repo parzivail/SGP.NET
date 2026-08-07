@@ -105,9 +105,13 @@ public class SgpConstants
     public const double EarthRotationPerMinRad = 4.37526908801129966e-3;
 
     /// <summary>
-    ///     Also called Au
+    ///     1 AU, here given in km, per the IAU 2012 Resolution B2
+    ///     and the BIPM published "The International System of Units (SI), 9th ed.",
+    ///     Table 8 of "Non-SI units accepted for use with the SI units".
+    ///     <see href="https://www.iau.org/static/resolutions/IAU2012_English.pdf" />
+    ///     <see href="https://www.bipm.org/documents/20126/41483022/SI-Brochure-9.pdf" />
     /// </summary>
-    public const double KmPerAu = 1.49597870691e8;
+    public const double KmPerAu = 1.49597870700e8;
 
     /// <summary>
     ///     Also called KmPer (WGS84 datum)
