@@ -273,7 +273,7 @@ public class Sgp4
         e -= tempe;
         var xmam = xmdf + Orbit.RecoveredMeanMotion * templ;
 
-        DeepSpacePeriodics(tsince, ref e, ref xincl, ref omgadf, ref xnode, ref xmam);
+        DeepSpacePeriodics(tsince, _deepspaceConsts, ref e, ref xincl, ref omgadf, ref xnode, ref xmam);
 
         /*
          * keeping xincl positive important unless you need to display xincl
@@ -960,8 +960,8 @@ public class Sgp4
         }
     }
 
-    private void DeepSpaceCalculateLunarSolarTerms(double tsince, ref double pe, ref double pinc, ref double pl,
-        ref double pgh, ref double ph)
+    private static void DeepSpacePeriodics(double tsince, in DeepSpaceConstants deepspaceConsts, ref double em,
+        ref Angle xinc, ref double omgasm, ref double xnodes, ref double xll)
     {
         const double zes = 0.01675;
         const double zns = 1.19459E-5;
@@ -971,74 +971,55 @@ public class Sgp4
         /*
          * calculate solar terms for time tsince
          */
-        var zm = _deepspaceConsts.Zmos + zns * tsince;
+        var zm = deepspaceConsts.Zmos + zns * tsince;
         var zf = zm + 2.0 * zes * Math.Sin(zm);
         var sinzf = Math.Sin(zf);
         var f2 = 0.5 * sinzf * sinzf - 0.25;
         var f3 = -0.5 * sinzf * Math.Cos(zf);
 
-        var ses = _deepspaceConsts.Se2 * f2
-                  + _deepspaceConsts.Se3 * f3;
-        var sis = _deepspaceConsts.Si2 * f2
-                  + _deepspaceConsts.Si3 * f3;
-        var sls = _deepspaceConsts.Sl2 * f2
-                  + _deepspaceConsts.Sl3 * f3
-                  + _deepspaceConsts.Sl4 * sinzf;
-        var sghs = _deepspaceConsts.Sgh2 * f2
-                   + _deepspaceConsts.Sgh3 * f3
-                   + _deepspaceConsts.Sgh4 * sinzf;
-        var shs = _deepspaceConsts.Sh2 * f2
-                  + _deepspaceConsts.Sh3 * f3;
+        var ses = deepspaceConsts.Se2 * f2
+                  + deepspaceConsts.Se3 * f3;
+        var sis = deepspaceConsts.Si2 * f2
+                  + deepspaceConsts.Si3 * f3;
+        var sls = deepspaceConsts.Sl2 * f2
+                  + deepspaceConsts.Sl3 * f3
+                  + deepspaceConsts.Sl4 * sinzf;
+        var sghs = deepspaceConsts.Sgh2 * f2
+                   + deepspaceConsts.Sgh3 * f3
+                   + deepspaceConsts.Sgh4 * sinzf;
+        var shs = deepspaceConsts.Sh2 * f2
+                  + deepspaceConsts.Sh3 * f3;
 
         /*
          * calculate lunar terms for time tsince
          */
-        zm = _deepspaceConsts.Zmol + znl * tsince;
+        zm = deepspaceConsts.Zmol + znl * tsince;
         zf = zm + 2.0 * zel * Math.Sin(zm);
         sinzf = Math.Sin(zf);
         f2 = 0.5 * sinzf * sinzf - 0.25;
         f3 = -0.5 * sinzf * Math.Cos(zf);
 
-        var sel = _deepspaceConsts.Ee2 * f2
-                  + _deepspaceConsts.E3 * f3;
-        var sil = _deepspaceConsts.Xi2 * f2
-                  + _deepspaceConsts.Xi3 * f3;
-        var sll = _deepspaceConsts.Xl2 * f2
-                  + _deepspaceConsts.Xl3 * f3
-                  + _deepspaceConsts.Xl4 * sinzf;
-        var sghl = _deepspaceConsts.Xgh2 * f2
-                   + _deepspaceConsts.Xgh3 * f3
-                   + _deepspaceConsts.Xgh4 * sinzf;
-        var shl = _deepspaceConsts.Xh2 * f2
-                  + _deepspaceConsts.Xh3 * f3;
+        var sel = deepspaceConsts.Ee2 * f2
+                  + deepspaceConsts.E3 * f3;
+        var sil = deepspaceConsts.Xi2 * f2
+                  + deepspaceConsts.Xi3 * f3;
+        var sll = deepspaceConsts.Xl2 * f2
+                  + deepspaceConsts.Xl3 * f3
+                  + deepspaceConsts.Xl4 * sinzf;
+        var sghl = deepspaceConsts.Xgh2 * f2
+                   + deepspaceConsts.Xgh3 * f3
+                   + deepspaceConsts.Xgh4 * sinzf;
+        var shl = deepspaceConsts.Xh2 * f2
+                  + deepspaceConsts.Xh3 * f3;
 
         /*
          * merge calculated values
          */
-        pe = ses + sel;
-        pinc = sis + sil;
-        pl = sls + sll;
-        pgh = sghs + sghl;
-        ph = shs + shl;
-    }
-
-    private void DeepSpacePeriodics(double tsince, ref double em, ref Angle xinc, ref double omgasm,
-        ref double xnodes, ref double xll)
-    {
-        /*
-         * storage for lunar / solar terms
-         * set by DeepSpaceCalculateLunarSolarTerms()
-         */
-        var pe = 0.0;
-        var pinc = 0.0;
-        var pl = 0.0;
-        var pgh = 0.0;
-        var ph = 0.0;
-
-        /*
-         * calculate lunar / solar terms for current time
-         */
-        DeepSpaceCalculateLunarSolarTerms(tsince, ref pe, ref pinc, ref pl, ref pgh, ref ph);
+        var pe = ses + sel;
+        var pinc = sis + sil;
+        var pl = sls + sll;
+        var pgh = sghs + sghl;
+        var ph = shs + shl;
 
         xinc = Angle.FromRadians(xinc.Radians + pinc);
         em += pe;
@@ -1093,8 +1074,6 @@ public class Sgp4
             var oldxnodes = xnodes;
 
             xnodes = Math.Atan2(alfdp, betdp);
-            if (xnodes < 0.0)
-                xnodes += SgpConstants.TwoPi;
 
             /*
              * Get perturbed xnodes in to same quadrant as original.
