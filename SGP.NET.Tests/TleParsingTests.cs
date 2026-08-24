@@ -57,16 +57,34 @@ public sealed class TleParsingTests
     /// Verifies negative BStar drag term parsed correctly.
     /// </summary>
     [TestMethod]
-    public void BStar_Negative_ParsedCorrectly()
+    [DataRow(" 00000-0", 0.0)]
+    [DataRow(" 00000+0", 0.0)]
+    [DataRow(" 12345-3", 0.12345e-3)]
+    [DataRow(" 12345+2", 12.345)]
+    [DataRow("-12345-4", -1.2345e-5)]
+    public void BStar_Negative_ParsedCorrectly(string bStarDragTerm, double expectedBStar)
     {
-        // Arrange — BStar field "-12345-4" means -0.12345e-4 = -1.2345e-5
-        var line1 = "1 25544U 98067A   26140.52007259  .00005164  00000-0 -12345-4 0  9995";
+        // Arrange
+        var line1 = $"1 25544U 98067A   26140.52007259  .00005164  00000-0 {bStarDragTerm} 0  9995";
 
         // Act
         var tle = new Tle(line1, TestConstants.IssLine2);
 
         // Assert
-        Assert.AreEqual(-1.2345e-5, tle.BStarDragTerm, TestConstants.AngleTolerance);
+        Assert.AreEqual(expectedBStar, tle.BStarDragTerm, TestConstants.AngleTolerance);
+    }
+
+    [TestMethod]
+    [DataRow("12345-34")]
+    [DataRow("000000")]
+    [DataRow("         ")]
+    public void ExponentialField_Malformed_ThrowsTleException(string bStarDragTerm)
+    {
+        // Assert
+        var line1 = $"1 25544U 98067A   26140.52007259  .00005164  00000-0 {bStarDragTerm} 0  9995";
+
+        // Act & Assert
+        Assert.ThrowsExactly<TleException>(() => new Tle(line1, TestConstants.IssLine2));
     }
 
     /// <summary>
@@ -185,7 +203,7 @@ public sealed class TleParsingTests
     public void SatelliteNumberMismatch_ThrowsTleException()
     {
         // Arrange
-        
+
         // Invalid NORAD number
         const string line2 = "2 99999  51.6328  77.0641 0007497  79.3410 280.8422 15.49283153567468";
 
