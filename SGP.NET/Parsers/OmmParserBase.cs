@@ -143,12 +143,6 @@ public abstract class OmmParserBase
         if (string.IsNullOrWhiteSpace(value))
             return 0.0;
 
-        value = value.Trim();
-
-        if (value.StartsWith("."))
-            value = "0" + value;
-        else if (value.StartsWith("-."))
-            value = "-0" + value.Substring(1);
 
         if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
             return result;
@@ -164,7 +158,7 @@ public abstract class OmmParserBase
         if (string.IsNullOrWhiteSpace(value))
             return 0;
 
-        if (uint.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        if (uint.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             return result;
 
         throw new FormatException($"Cannot parse unsigned integer value: '{value}'");
@@ -178,7 +172,7 @@ public abstract class OmmParserBase
         if (string.IsNullOrWhiteSpace(value))
             return 0;
 
-        if (int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             return result;
 
         throw new FormatException($"Cannot parse integer value: '{value}'");
@@ -192,7 +186,7 @@ public abstract class OmmParserBase
         if (string.IsNullOrWhiteSpace(value))
             return DateTime.MinValue;
 
-        if (DateTime.TryParse(value.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var result))
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var result))
             return result;
 
         throw new FormatException($"Cannot parse date-time value: '{value}'");
