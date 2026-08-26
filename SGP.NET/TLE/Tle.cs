@@ -417,31 +417,6 @@ public class Tle
         //2.4909e-3
         //  .00000-E0
         // "0.0000E-0" string
-        var correctedString = "";
-
-        if (str[0] == '-')
-        {
-            correctedString += "-";
-
-            // requires LastIndexOf to skip the first '-' in the string
-            if (str.LastIndexOf("+") > 1)
-                correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("+"));
-            else
-                correctedString += "0." + str.Substring(1, str.LastIndexOf("-") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("-"));
-        }
-        else
-        {
-            if (str.LastIndexOf("+") > 1)
-                correctedString += "0." + str.Substring(1, str.LastIndexOf("+") - 1) + "E" +
-                                   str.Substring(str.LastIndexOf("+"));
-            else
-                correctedString += "0." + str.Substring(1, str.IndexOf("-") - 1) + "E" +
-                                   str.Substring(str.IndexOf("-"));
-        }
-
-        val = (double) decimal.Parse(correctedString, NumberStyles.Float, CultureInfo.InvariantCulture);
 
         var temp = "";
 
@@ -460,7 +435,7 @@ public class Tle
                     throw new TleException("Invalid sign");
                 }
             }
-            else if (i == 0 + str.Length - 2)
+            else if (i == str.Length - 2)
             {
                 if (str[i] == '-' || str[i] == '+')
                 {
