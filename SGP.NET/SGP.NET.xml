@@ -1268,6 +1268,17 @@
             <param name="date">the date and time to predict</param>
             <returns>The predicted position of the satellite at a specific date and time</returns>
         </member>
+        <member name="M:SGPdotNET.Propagation.Sgp4.RecomputeConstants(System.Double,System.Double@,System.Double@,System.Double@,System.Double@,System.Double@,System.Double@,System.Double@)">
+            <summary>
+                Computes the constants that depend solely on the inclination. The deep space propagator
+                perturbs the inclination, so these have to be recomputed for every position it finds.
+            </summary>
+        </member>
+        <member name="T:SGPdotNET.Propagation.Sgp4.DeepSpaceOrbitShape">
+            <summary>
+                Which resonance, if any, a deep space orbit is in
+            </summary>
+        </member>
         <member name="T:SGPdotNET.Propagation.SgpConstants">
             <summary>
                 Stores various numerical constants used in propogation
@@ -1323,6 +1334,11 @@
                 CK4 propogation constant
             </summary>
         </member>
+        <member name="F:SGPdotNET.Propagation.SgpConstants.A3Ovk2">
+            <summary>
+                A3OVK2 propogation constant
+            </summary>
+        </member>
         <member name="F:SGPdotNET.Propagation.SgpConstants.Q0">
             <summary>
                 Q-zero propogation constant
@@ -1370,7 +1386,11 @@
         </member>
         <member name="F:SGPdotNET.Propagation.SgpConstants.KmPerAu">
             <summary>
-                Also called Au
+                1 AU, here given in km, per the IAU 2012 Resolution B2
+                and the BIPM published "The International System of Units (SI), 9th ed.",
+                Table 8 of "Non-SI units accepted for use with the SI units".
+                <see href="https://www.iau.org/static/resolutions/IAU2012_English.pdf" />
+                <see href="https://www.bipm.org/documents/20126/41483022/SI-Brochure-9.pdf" />
             </summary>
         </member>
         <member name="F:SGPdotNET.Propagation.SgpConstants.EarthRadiusKm">
@@ -1386,21 +1406,6 @@
         <member name="F:SGPdotNET.Propagation.SgpConstants.EarthRotationPerSiderealDay">
             <summary>
                 Also called OmegaE
-            </summary>
-        </member>
-        <member name="F:SGPdotNET.Propagation.SgpConstants.EpochJan100H1900">
-            <summary>
-                Jan 1.0 1900 = Jan 1 1900 00h UTC
-            </summary>
-        </member>
-        <member name="F:SGPdotNET.Propagation.SgpConstants.EpochJan112H1900">
-            <summary>
-                Jan 1.5 1900 = Jan 1 1900 12h UTC
-            </summary>
-        </member>
-        <member name="F:SGPdotNET.Propagation.SgpConstants.EpochJan112H2000">
-            <summary>
-                Jan 1.5 2000 = Jan 1 2000 12h UTC
             </summary>
         </member>
         <member name="F:SGPdotNET.Propagation.SgpConstants.MetersPerKilometer">
@@ -1927,6 +1932,14 @@
         <member name="M:SGPdotNET.Util.TimeExtensions.ToJulian(System.DateTime)">
             <summary>
                 Converts a DateTime to a Julian date
+            </summary>
+            <param name="dt">The time to convert</param>
+            <returns>The Julian representation the DateTime</returns>
+        </member>
+        <member name="M:SGPdotNET.Util.TimeExtensions.ToJ1900(System.DateTime)">
+            <summary>
+                Return the Julian date since the j1900 epoch
+                January 1, 1900, at 12:00 TT
             </summary>
             <param name="dt">The time to convert</param>
             <returns>The Julian representation the DateTime</returns>

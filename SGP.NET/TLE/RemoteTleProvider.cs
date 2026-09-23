@@ -119,7 +119,7 @@ public class RemoteTleProvider : ITleProvider
 	/// <summary>
 	///     Asynchronously queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
 	/// </summary>
-	/// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+	/// <returns>The remote TLEs for the all remote satellites, as a pair of satellite ID and TLE</returns>
 	public async Task<Dictionary<int, Tle>> GetTlesAsync()
 	{
 		await CacheRemoteTlesAsync().ConfigureAwait(false);
@@ -140,7 +140,7 @@ public class RemoteTleProvider : ITleProvider
 	/// <summary>
 	///     Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
 	/// </summary>
-	/// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+	/// <returns>The remote TLEs for the all remote satellites, as a pair of satellite ID and TLE</returns>
 	public Dictionary<int, Tle> GetTles()
 	{
 		CacheRemoteTles();

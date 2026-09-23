@@ -216,8 +216,8 @@ public abstract class Coordinate
 	/// <summary>
 	///     Calculates the look angles between this coordinate and target
 	/// </summary>
-	/// <param name="time">The time of observation</param>
 	/// <param name="to">The coordinate to observe</param>
+	/// <param name="time">The time of observation</param>
 	/// <returns>The topocentric angles between this coordinate and another</returns>
 	public TopocentricObservation Observe(Coordinate to, DateTime? time = null)
 	{
