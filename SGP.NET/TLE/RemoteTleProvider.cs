@@ -11,7 +11,6 @@ namespace SGPdotNET.TLE;
 /// </summary>
 public class RemoteTleProvider : ITleProvider
 {
-	private readonly object _lock = new object();
 	private readonly IEnumerable<Uri> _sources;
 
 	internal readonly TimeSpan MaxAge;
