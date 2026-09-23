@@ -88,7 +88,7 @@ public class TopocentricObservation
 	protected bool Equals(TopocentricObservation other)
 	{
 		return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) && RangeRate.Equals(other.RangeRate) &&
-		       Equals(ReferencePosition, other.ReferencePosition);
+			   Equals(ReferencePosition, other.ReferencePosition);
 	}
 
 	/// <inheritdoc />

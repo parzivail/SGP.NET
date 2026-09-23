@@ -45,7 +45,7 @@ public static class TopocentricCalculator
 		var c = 1.0 / Math.Sqrt(1.0 + SgpConstants.EarthFlatteningConstant *
 			(SgpConstants.EarthFlatteningConstant - 2.0) * sinLat * sinLat);
 		var s = (1.0 - SgpConstants.EarthFlatteningConstant) *
-		        (1.0 - SgpConstants.EarthFlatteningConstant) * c;
+				(1.0 - SgpConstants.EarthFlatteningConstant) * c;
 		var achcp = (SgpConstants.EarthRadiusKm * c + observerAltKm) * cosLat;
 
 		var obsX = achcp * cosTheta;
@@ -59,9 +59,9 @@ public static class TopocentricCalculator
 		var topS = sinLat * cosTheta * rangeX
 			+ sinLat * sinTheta * rangeY - cosLat * rangeZ;
 		var topE = -sinTheta * rangeX
-		           + cosTheta * rangeY;
+				   + cosTheta * rangeY;
 		var topZ = cosLat * cosTheta * rangeX
-		           + cosLat * sinTheta * rangeY + sinLat * rangeZ;
+				   + cosLat * sinTheta * rangeY + sinLat * rangeZ;
 
 		rangeKm = Math.Sqrt(topS * topS + topE * topE + topZ * topZ);
 
@@ -80,9 +80,9 @@ public static class TopocentricCalculator
 		var topSdot = sinLat * cosTheta * velX
 			+ sinLat * sinTheta * velY - cosLat * velZ;
 		var topEdot = -sinTheta * velX
-		              + cosTheta * velY;
+					  + cosTheta * velY;
 		var topZdot = cosLat * cosTheta * velX
-		              + cosLat * sinTheta * velY + sinLat * velZ;
+					  + cosLat * sinTheta * velY + sinLat * velZ;
 
 		rangeRateKmPerSec = (topS * topSdot + topE * topEdot + topZ * topZdot) / rangeKm;
 	}

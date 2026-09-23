@@ -20,7 +20,7 @@ public class GroundStation
 		public DateTime MaxElevationTime { get; } = maxElevationTime;
 		public Angle MaxElevation { get; } = maxElevation;
 	}
-	
+
 	/// <summary>
 	///     The location of the ground station
 	/// </summary>
@@ -114,7 +114,7 @@ public class GroundStation
 
 			var aosTime = aosCrossingPoint.Value;
 			t = aosTime + deltaTime;
-				
+
 			// find the LOS time and max elevation for the next pass
 			DateTime losTime;
 			DateTime maxElTime;
@@ -154,7 +154,7 @@ public class GroundStation
 			// add the visibility period for the pass
 			var (maxEl, maxElTime2) = FindMaxElevation(satellite, before, maxElTime, after, resolution);
 			maxElTime = maxElTime2;
-			
+
 			obs.Add(new SatelliteVisibilityPeriod(satellite, aosTime, losTime, maxEl, maxElTime, Location));
 
 			t = losTime + deltaTime;

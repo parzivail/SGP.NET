@@ -38,7 +38,7 @@ public class SatelliteVisibilityPeriod
 	protected bool Equals(SatelliteVisibilityPeriod other)
 	{
 		return Equals(Satellite, other.Satellite) && Start.Equals(other.Start) && End.Equals(other.End) && MaxElevation.Equals(other.MaxElevation) &&
-		       MaxElevationTime.Equals(other.MaxElevationTime) && Equals(ReferencePosition, other.ReferencePosition);
+			   MaxElevationTime.Equals(other.MaxElevationTime) && Equals(ReferencePosition, other.ReferencePosition);
 	}
 
 	/// <inheritdoc />

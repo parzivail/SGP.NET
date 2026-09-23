@@ -230,15 +230,15 @@ public static class Moon
 		var e2 = e * e;
 
 		var sigmaL = 3958.0 * Math.Sin(a1)
-		             + 1962.0 * Math.Sin(lPrime - f)
-		             + 318.0 * Math.Sin(a2);
+					 + 1962.0 * Math.Sin(lPrime - f)
+					 + 318.0 * Math.Sin(a2);
 		var sigmaR = 0.0;
 		var sigmaB = -2235.0 * Math.Sin(lPrime)
-		             + 382.0 * Math.Sin(a3)
-		             + 175.0 * Math.Sin(a1 - f)
-		             + 175.0 * Math.Sin(a1 + f)
-		             + 127.0 * Math.Sin(lPrime - mPrime)
-		             - 115.0 * Math.Sin(lPrime + mPrime);
+					 + 382.0 * Math.Sin(a3)
+					 + 175.0 * Math.Sin(a1 - f)
+					 + 175.0 * Math.Sin(a1 + f)
+					 + 127.0 * Math.Sin(lPrime - mPrime)
+					 - 115.0 * Math.Sin(lPrime + mPrime);
 
 		for (var i = 0; i < LongitudeTerms.Length; i++)
 		{
