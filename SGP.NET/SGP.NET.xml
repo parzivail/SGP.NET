@@ -100,8 +100,8 @@
             <summary>
                 Calculates the look angles between this coordinate and target
             </summary>
-            <param name="time">The time of observation</param>
             <param name="to">The coordinate to observe</param>
+            <param name="time">The time of observation</param>
             <returns>The topocentric angles between this coordinate and another</returns>
         </member>
         <member name="M:SGPdotNET.CoordinateSystem.Coordinate.Equals(SGPdotNET.CoordinateSystem.Coordinate)">
@@ -1523,7 +1523,7 @@
             <summary>
                 Asynchronously queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
             </summary>
-            <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+            <returns>The remote TLEs for the all remote satellites, as a pair of satellite ID and TLE</returns>
         </member>
         <member name="M:SGPdotNET.TLE.RemoteTleProvider.GetTle(System.Int32)">
             <summary>
@@ -1536,7 +1536,7 @@
             <summary>
                 Queries the cache (updating if needed) and retrieves a two-line sets for all remote satellites
             </summary>
-            <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
+            <returns>The remote TLEs for the all remote satellites, as a pair of satellite ID and TLE</returns>
         </member>
         <member name="T:SGPdotNET.TLE.Tle">
             <summary>
