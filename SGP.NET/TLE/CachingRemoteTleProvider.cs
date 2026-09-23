@@ -80,7 +80,7 @@ public class CachingRemoteTleProvider : RemoteTleProvider
 			{
 				using (var sr = new StreamReader(file))
 				{
-					var dateLine = sr.ReadLine();
+					var dateLine = await sr.ReadLineAsync();
 
 					if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
 							out var date) && DateTime.UtcNow - date < MaxAge)
