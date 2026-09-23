@@ -82,8 +82,8 @@ public sealed class OrbitTests
 		var orbit = new Orbit(tle);
 
 		// Act & Assert
-		Assert.IsTrue(orbit.RecoveredSemiMajorAxis > 0);
-		Assert.IsTrue(orbit.RecoveredMeanMotion > 0);
+		Assert.IsGreaterThan(0, orbit.RecoveredSemiMajorAxis);
+		Assert.IsGreaterThan(0, orbit.RecoveredSemiMajorAxis);
 	}
 
 	/// <summary>
@@ -151,7 +151,7 @@ public sealed class OrbitTests
 		var orbit = new Orbit(tle);
 
 		// Assert
-		Assert.IsTrue(orbit.Perigee < orbit.Apogee);
+		Assert.IsLessThan(orbit.Apogee, orbit.Perigee);
 	}
 
 	/// <summary>
@@ -193,7 +193,7 @@ public sealed class TopocentricObservationTests
 		var shift = obs.GetDopplerShift(1e9); // 1 GHz
 
 		// Assert
-		Assert.IsTrue(shift > 0);
+		Assert.IsGreaterThan(0, shift);
 	}
 
 	/// <summary>
@@ -209,7 +209,7 @@ public sealed class TopocentricObservationTests
 		var shift = obs.GetDopplerShift(1e9);
 
 		// Assert
-		Assert.IsTrue(shift < 0);
+		Assert.IsLessThan(0, shift);
 	}
 
 	/// <summary>
@@ -227,7 +227,7 @@ public sealed class TopocentricObservationTests
 		var delayFar = far.SignalDelay;
 
 		// Assert -- formula is c / (Range * 1000), so larger range → smaller delay
-		Assert.IsTrue(delayFar < delayNear);
+		Assert.IsLessThan(delayNear, delayFar);
 	}
 
 	/// <summary>
@@ -345,7 +345,7 @@ public sealed class GroundStationTests
 		// Assert
 		Assert.IsTrue(obs.Azimuth.Degrees >= 0 && obs.Azimuth.Degrees < 360);
 		Assert.IsTrue(obs.Elevation.Degrees >= -90 && obs.Elevation.Degrees <= 90);
-		Assert.IsTrue(obs.Range > 0);
+		Assert.IsGreaterThan(0, obs.Range);
 	}
 
 	/// <summary>
@@ -366,7 +366,7 @@ public sealed class GroundStationTests
 		var passes = station.Observe(sat, start, end, TimeSpan.FromSeconds(10));
 
 		// Assert
-		Assert.IsTrue(passes.Count > 0);
+		Assert.IsNotEmpty(passes);
 	}
 
 	/// <summary>
@@ -389,7 +389,7 @@ public sealed class GroundStationTests
 		// Assert
 		foreach (var pass in passes)
 		{
-			Assert.IsTrue(pass.Start < pass.End, $"AOS {pass.Start} should be before LOS {pass.End}");
+			Assert.IsLessThan(pass.End, pass.Start, $"AOS {pass.Start} should be before LOS {pass.End}");
 		}
 	}
 
@@ -413,8 +413,8 @@ public sealed class GroundStationTests
 		// Assert
 		foreach (var pass in passes)
 		{
-			Assert.IsTrue(pass.MaxElevationTime >= pass.Start, "Max elevation time should be >= AOS");
-			Assert.IsTrue(pass.MaxElevationTime <= pass.End, "Max elevation time should be <= LOS");
+			Assert.IsGreaterThanOrEqualTo(pass.Start, pass.MaxElevationTime, "Max elevation time should be >= AOS");
+			Assert.IsLessThanOrEqualTo(pass.End, pass.MaxElevationTime, "Max elevation time should be <= LOS");
 		}
 	}
 
@@ -438,7 +438,7 @@ public sealed class GroundStationTests
 		// Assert
 		foreach (var pass in passes)
 		{
-			Assert.IsTrue(pass.MaxElevation.Degrees > 0, "Max elevation should be positive");
+			Assert.IsGreaterThan(0, pass.MaxElevation.Degrees, "Max elevation should be positive");
 		}
 	}
 

@@ -48,7 +48,7 @@ public sealed class CoordinateConversionTests
 		// Assert
 		var dx = Math.Abs(eci2.Position.X - eci1.Position.X);
 		var dy = Math.Abs(eci2.Position.Y - eci1.Position.Y);
-		Assert.IsTrue(dx + dy > 100, "ECI position should change significantly over 6 hours");
+		Assert.IsGreaterThan(100, dx + dy, "ECI position should change significantly over 6 hours");
 	}
 
 	/// <summary>
