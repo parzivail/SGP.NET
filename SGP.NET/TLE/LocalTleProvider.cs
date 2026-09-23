@@ -11,50 +11,50 @@ namespace SGPdotNET.TLE;
 /// </summary>
 public class LocalTleProvider : ITleProvider
 {
-    private Dictionary<int, Tle> _tles;
+	private Dictionary<int, Tle> _tles;
 
-    /// <inheritdoc />
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    /// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
-    /// <param name="sourceFilenames">The source that should be loaded</param>
-    public LocalTleProvider(bool threeLine, params string[] sourceFilenames)
-    {
-        LoadTles(threeLine, sourceFilenames);
-    }
+	/// <inheritdoc />
+	/// <summary>
+	///     Constructor
+	/// </summary>
+	/// <param name="threeLine">True if the TLEs contain a third, preceding name line (3le format)</param>
+	/// <param name="sourceFilenames">The source that should be loaded</param>
+	public LocalTleProvider(bool threeLine, params string[] sourceFilenames)
+	{
+		LoadTles(threeLine, sourceFilenames);
+	}
 
-    private void LoadTles(bool threeLine, IEnumerable<string> sourceFilenames)
-    {
-        _tles = new Dictionary<int, Tle>();
-        foreach (var sourceFilename in sourceFilenames)
-            using (var file = File.OpenRead(sourceFilename))
-            {
-                using (var sr = new StreamReader(file))
-                {
-                    var restOfFile = sr.ReadToEnd()
-                        .Replace("\r\n", "\n") // normalize line endings
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries); // split into lines
+	private void LoadTles(bool threeLine, IEnumerable<string> sourceFilenames)
+	{
+		_tles = new Dictionary<int, Tle>();
+		foreach (var sourceFilename in sourceFilenames)
+			using (var file = File.OpenRead(sourceFilename))
+			{
+				using (var sr = new StreamReader(file))
+				{
+					var restOfFile = sr.ReadToEnd()
+						.Replace("\r\n", "\n") // normalize line endings
+						.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); // split into lines
 
-                    var elementSets = Tle.ParseElements(restOfFile, threeLine);
+					var elementSets = Tle.ParseElements(restOfFile, threeLine);
 
-                    var tempSet = elementSets.ToDictionary(elementSet => (int) elementSet.NoradNumber);
+					var tempSet = elementSets.ToDictionary(elementSet => (int)elementSet.NoradNumber);
 
-                    _tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
-                        .ToDictionary(x => x.Key, x => x.Value);
-                }
-            }
-    }
+					_tles = _tles.Concat(tempSet.Where(kvp => !_tles.ContainsKey(kvp.Key)))
+						.ToDictionary(x => x.Key, x => x.Value);
+				}
+			}
+	}
 
-    /// <inheritdoc />
-    public Tle GetTle(int satelliteId)
-    {
-        return !_tles.ContainsKey(satelliteId) ? null : _tles[satelliteId];
-    }
+	/// <inheritdoc />
+	public Tle GetTle(int satelliteId)
+	{
+		return !_tles.ContainsKey(satelliteId) ? null : _tles[satelliteId];
+	}
 
-    /// <inheritdoc />
-    public Dictionary<int, Tle> GetTles()
-    {
-        return _tles;
-    }
+	/// <inheritdoc />
+	public Dictionary<int, Tle> GetTles()
+	{
+		return _tles;
+	}
 }

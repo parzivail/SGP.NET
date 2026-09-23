@@ -38,13 +38,13 @@ public class SatelliteVisibilityPeriod
 	protected bool Equals(SatelliteVisibilityPeriod other)
 	{
 		return Equals(Satellite, other.Satellite) && Start.Equals(other.Start) && End.Equals(other.End) && MaxElevation.Equals(other.MaxElevation) &&
-		       MaxElevationTime.Equals(other.MaxElevationTime) && Equals(ReferencePosition, other.ReferencePosition);
+			   MaxElevationTime.Equals(other.MaxElevationTime) && Equals(ReferencePosition, other.ReferencePosition);
 	}
 
 	/// <inheritdoc />
 	public override bool Equals(object obj)
 	{
-		if (ReferenceEquals(null, obj)) return false;
+		if (obj is null) return false;
 		if (ReferenceEquals(this, obj)) return true;
 		if (obj.GetType() != this.GetType()) return false;
 		return Equals((SatelliteVisibilityPeriod)obj);
@@ -55,12 +55,12 @@ public class SatelliteVisibilityPeriod
 	{
 		unchecked
 		{
-			var hashCode = (Satellite != null ? Satellite.GetHashCode() : 0);
+			var hashCode = (Satellite is not null ? Satellite.GetHashCode() : 0);
 			hashCode = (hashCode * 397) ^ Start.GetHashCode();
 			hashCode = (hashCode * 397) ^ End.GetHashCode();
 			hashCode = (hashCode * 397) ^ MaxElevation.GetHashCode();
 			hashCode = (hashCode * 397) ^ MaxElevationTime.GetHashCode();
-			hashCode = (hashCode * 397) ^ (ReferencePosition != null ? ReferencePosition.GetHashCode() : 0);
+			hashCode = (hashCode * 397) ^ (ReferencePosition is not null ? ReferencePosition.GetHashCode() : 0);
 			return hashCode;
 		}
 	}

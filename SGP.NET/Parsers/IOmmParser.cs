@@ -8,18 +8,18 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public interface IOmmParser
 {
-    /// <summary>
-    /// Parses OMM data from a string.
-    /// </summary>
-    List<OmmData> Parse(string content);
+	/// <summary>
+	/// Parses OMM data from a string.
+	/// </summary>
+	List<OmmData> Parse(string content);
 
-    /// <summary>
-    /// Parses OMM data from a text reader.
-    /// </summary>
-    List<OmmData> Parse(TextReader reader);
+	/// <summary>
+	/// Parses OMM data from a text reader.
+	/// </summary>
+	List<OmmData> Parse(TextReader reader);
 
-    /// <summary>
-    /// Parses OMM data from a file path.
-    /// </summary>
-    List<OmmData> ParseFile(string path);
+	/// <summary>
+	/// Parses OMM data from a file path.
+	/// </summary>
+	List<OmmData> ParseFile(string path);
 }

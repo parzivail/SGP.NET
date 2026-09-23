@@ -6,12 +6,12 @@ namespace SGPdotNET.Exception;
 /// </summary>
 public class SatellitePropagationException : System.Exception
 {
-    /// <inheritdoc />
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    /// <param name="e">Message for the exception</param>
-    public SatellitePropagationException(string e) : base(e)
-    {
-    }
+	/// <inheritdoc />
+	/// <summary>
+	///     Constructor
+	/// </summary>
+	/// <param name="e">Message for the exception</param>
+	public SatellitePropagationException(string e) : base(e)
+	{
+	}
 }

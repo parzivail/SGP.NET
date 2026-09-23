@@ -5,13 +5,13 @@ namespace SGPdotNET.CoordinateSystem;
 /// </summary>
 public enum MaidenheadStandard
 {
-    /// <summary>
-    ///     The standard where the 5th pair ranges from AA to XX
-    /// </summary>
-    AaToXx,
+	/// <summary>
+	///     The standard where the 5th pair ranges from AA to XX
+	/// </summary>
+	AaToXx,
 
-    /// <summary>
-    ///     The standard where the 5th pair ranges from AA to YY
-    /// </summary>
-    AaToYy
+	/// <summary>
+	///     The standard where the 5th pair ranges from AA to YY
+	/// </summary>
+	AaToYy
 }

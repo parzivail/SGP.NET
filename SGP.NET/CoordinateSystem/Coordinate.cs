@@ -50,19 +50,12 @@ public abstract class Coordinate
 		var pairCount = (int)precision + 1;
 
 		var locator = new char[pairCount * 2];
-		int[] charRange;
-
-		switch (standard)
+		int[] charRange = standard switch
 		{
-			case MaidenheadStandard.AaToXx:
-				charRange = LocCharRangeAaXx;
-				break;
-			case MaidenheadStandard.AaToYy:
-				charRange = LocCharRangeAaYy;
-				break;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(standard), standard, null);
-		}
+			MaidenheadStandard.AaToXx => LocCharRangeAaXx,
+			MaidenheadStandard.AaToYy => LocCharRangeAaYy,
+			_ => throw new ArgumentOutOfRangeException(nameof(standard), standard, null),
+		};
 
 		for (var xOrY = 0; xOrY < 2; ++xOrY)
 		{
@@ -151,7 +144,7 @@ public abstract class Coordinate
 	public List<GeodeticCoordinate> GetFootprintBoundary(int numPoints = 60)
 	{
 		var center = ToGeodetic();
-		var coords = new List<GeodeticCoordinate>();
+		var coords = new List<GeodeticCoordinate>(numPoints);
 
 		var lat = center.Latitude;
 		var lon = center.Longitude;
@@ -162,10 +155,10 @@ public abstract class Coordinate
 			var perc = i / (float)numPoints * 2 * Math.PI;
 
 			var latRadians = Math.Asin(Math.Sin(lat.Radians) * Math.Cos(d) +
-			                           Math.Cos(lat.Radians) * Math.Sin(d) * Math.Cos(perc));
+									   Math.Cos(lat.Radians) * Math.Sin(d) * Math.Cos(perc));
 			var lngRadians = lon.Radians +
-			                 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
-				                 Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
+							 Math.Atan2(Math.Sin(perc) * Math.Sin(d) * Math.Cos(lat.Radians),
+								 Math.Cos(d) - Math.Sin(lat.Radians) * Math.Sin(latRadians));
 
 			lngRadians = MathUtil.WrapNegPosPi(lngRadians);
 
@@ -195,8 +188,8 @@ public abstract class Coordinate
 		var geo = ToGeodetic();
 		var toGeo = to.ToGeodetic();
 		var dist = Math.Sin(geo.Latitude.Radians) * Math.Sin(toGeo.Latitude.Radians) +
-		           Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) *
-		           Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
+				   Math.Cos(geo.Latitude.Radians) * Math.Cos(toGeo.Latitude.Radians) *
+				   Math.Cos(geo.Longitude.Radians - toGeo.Longitude.Radians);
 		dist = Math.Acos(dist);
 
 		return Angle.FromRadians(dist);
@@ -216,8 +209,8 @@ public abstract class Coordinate
 	/// <summary>
 	///     Calculates the look angles between this coordinate and target
 	/// </summary>
-	/// <param name="time">The time of observation</param>
 	/// <param name="to">The coordinate to observe</param>
+	/// <param name="time">The time of observation</param>
 	/// <returns>The topocentric angles between this coordinate and another</returns>
 	public TopocentricObservation Observe(Coordinate to, DateTime? time = null)
 	{
