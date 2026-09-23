@@ -50,19 +50,12 @@ public abstract class Coordinate
 		var pairCount = (int)precision + 1;
 
 		var locator = new char[pairCount * 2];
-		int[] charRange;
-
-		switch (standard)
+		int[] charRange = standard switch
 		{
-			case MaidenheadStandard.AaToXx:
-				charRange = LocCharRangeAaXx;
-				break;
-			case MaidenheadStandard.AaToYy:
-				charRange = LocCharRangeAaYy;
-				break;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(standard), standard, null);
-		}
+			MaidenheadStandard.AaToXx => LocCharRangeAaXx,
+			MaidenheadStandard.AaToYy => LocCharRangeAaYy,
+			_ => throw new ArgumentOutOfRangeException(nameof(standard), standard, null),
+		};
 
 		for (var xOrY = 0; xOrY < 2; ++xOrY)
 		{
