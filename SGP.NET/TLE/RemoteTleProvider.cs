@@ -59,7 +59,7 @@ public class RemoteTleProvider : ITleProvider
 		if (DateTime.UtcNow < LastRefresh + MaxAge)
 			return;
 
-		_cachedTles = await FetchNewTlesAsync();
+		_cachedTles = await FetchNewTlesAsync().ConfigureAwait(false);
 
 		LastRefresh = DateTime.UtcNow;
 	}
@@ -86,7 +86,7 @@ public class RemoteTleProvider : ITleProvider
 		{
 			foreach (var source in _sources)
 			{
-				var str = await wc.GetStringAsync(source);
+				var str = await wc.GetStringAsync(source).ConfigureAwait(false);
 				PopulateTleTable(str, tles);
 			}
 		}
@@ -113,7 +113,7 @@ public class RemoteTleProvider : ITleProvider
 	/// <returns>The remote TLE for the specified satellite</returns>
 	public async Task<Tle> GetTleAsync(int satelliteId)
 	{
-		await CacheRemoteTlesAsync();
+		await CacheRemoteTlesAsync().ConfigureAwait(false);
 		return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
 	}
 
@@ -123,7 +123,7 @@ public class RemoteTleProvider : ITleProvider
 	/// <returns>The remote TLEs for the all remote satellites, as a pair of of satellite ID and TLE</returns>
 	public async Task<Dictionary<int, Tle>> GetTlesAsync()
 	{
-		await CacheRemoteTlesAsync();
+		await CacheRemoteTlesAsync().ConfigureAwait(false);
 		return _cachedTles;
 	}
 

@@ -80,7 +80,7 @@ public class CachingRemoteTleProvider : RemoteTleProvider
 			{
 				using (var sr = new StreamReader(file))
 				{
-					var dateLine = await sr.ReadLineAsync();
+					var dateLine = await sr.ReadLineAsync().ConfigureAwait(false);
 
 					if (DateTime.TryParse(dateLine, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
 							out var date) && DateTime.UtcNow - date < MaxAge)
@@ -88,13 +88,13 @@ public class CachingRemoteTleProvider : RemoteTleProvider
 						LastRefresh = date;
 
 						var dict = new Dictionary<int, Tle>();
-						PopulateTleTable(await sr.ReadToEndAsync(), dict);
+						PopulateTleTable(await sr.ReadToEndAsync().ConfigureAwait(false), dict);
 						return dict;
 					}
 				}
 			}
 
-		var tles = await base.FetchNewTlesAsync();
+		var tles = await base.FetchNewTlesAsync().ConfigureAwait(false);
 		WriteOutNewTles(tles);
 
 		return tles;
