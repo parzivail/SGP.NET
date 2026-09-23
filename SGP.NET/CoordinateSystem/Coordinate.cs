@@ -151,7 +151,7 @@ public abstract class Coordinate
 	public List<GeodeticCoordinate> GetFootprintBoundary(int numPoints = 60)
 	{
 		var center = ToGeodetic();
-		var coords = new List<GeodeticCoordinate>();
+		var coords = new List<GeodeticCoordinate>(numPoints);
 
 		var lat = center.Latitude;
 		var lon = center.Longitude;
