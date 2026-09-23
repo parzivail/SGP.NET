@@ -114,7 +114,7 @@ public class RemoteTleProvider : ITleProvider
 	public async Task<Tle> GetTleAsync(int satelliteId)
 	{
 		await CacheRemoteTlesAsync().ConfigureAwait(false);
-		return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+		return _cachedTles.TryGetValue(satelliteId, out var tle) ? tle : null;
 	}
 
 	/// <summary>
@@ -135,7 +135,7 @@ public class RemoteTleProvider : ITleProvider
 	public Tle GetTle(int satelliteId)
 	{
 		CacheRemoteTles();
-		return _cachedTles.ContainsKey(satelliteId) ? _cachedTles[satelliteId] : null;
+		return _cachedTles.TryGetValue(satelliteId, out var tle) ? tle : null;
 	}
 
 	/// <summary>
