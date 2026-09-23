@@ -57,7 +57,7 @@ public struct Angle
 		var d = Math.Floor(dd);
 		var m = Math.Floor(dd % 1 * SgpConstants.MinutesPerDegree);
 		var s = (dd - d - m / SgpConstants.MinutesPerDegree) * SgpConstants.MinutesPerDegree * SgpConstants.SecondsPerMinute;
-		return $"{d}°{m:00}'{s:F2}\"";
+		return FormattableString.Invariant($"{d}°{m:00}'{s:F2}\"");
 	}
 
 	/// <summary>
