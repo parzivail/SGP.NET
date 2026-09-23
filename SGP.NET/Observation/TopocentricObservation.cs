@@ -94,7 +94,7 @@ public class TopocentricObservation
 	/// <inheritdoc />
 	public override bool Equals(object obj)
 	{
-		if (ReferenceEquals(null, obj)) return false;
+		if (obj is null) return false;
 		if (ReferenceEquals(this, obj)) return true;
 		if (obj.GetType() != this.GetType()) return false;
 		return Equals((TopocentricObservation)obj);
@@ -109,7 +109,7 @@ public class TopocentricObservation
 			hashCode = (hashCode * 397) ^ Elevation.GetHashCode();
 			hashCode = (hashCode * 397) ^ Range.GetHashCode();
 			hashCode = (hashCode * 397) ^ RangeRate.GetHashCode();
-			hashCode = (hashCode * 397) ^ (ReferencePosition != null ? ReferencePosition.GetHashCode() : 0);
+			hashCode = (hashCode * 397) ^ (ReferencePosition is not null ? ReferencePosition.GetHashCode() : 0);
 			return hashCode;
 		}
 	}

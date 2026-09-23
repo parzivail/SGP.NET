@@ -21,7 +21,7 @@ public class OmmCsvParser : OmmParserBase, IOmmParser
 		var results = new List<OmmData>();
 
 		var headerLine = reader.ReadLine();
-		if (headerLine == null)
+		if (headerLine is null)
 			return results;
 
 		var headers = ParseCsvLine(headerLine);
@@ -33,8 +33,7 @@ public class OmmCsvParser : OmmParserBase, IOmmParser
 			fieldIndices[i] = KnownFields.Contains(header) ? i : -1;
 		}
 
-		string line;
-		while ((line = reader.ReadLine()) != null)
+		while (reader.ReadLine() is { } line)
 		{
 			line = line.Trim();
 			if (string.IsNullOrEmpty(line))
