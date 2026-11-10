@@ -398,4 +398,69 @@ public sealed class TleParsingTests
 		Assert.IsTrue(tle1 == tle2);
 		Assert.AreEqual(tle1.GetHashCode(), tle2.GetHashCode());
 	}
+
+	/// <summary>
+	/// Verifies Alpha-5 catalog numbers decode (A-Z without I and O stand for 10-33), and plain numbers are unchanged.
+	/// </summary>
+	[TestMethod]
+	[DataRow("00005", 5u)]
+	[DataRow("99999", 99999u)]
+	[DataRow("A0000", 100000u)]
+	[DataRow("A0123", 100123u)]
+	[DataRow("H9999", 179999u)]
+	[DataRow("J0000", 180000u)]
+	[DataRow("N9999", 229999u)]
+	[DataRow("P0000", 230000u)]
+	[DataRow("Z9999", 339999u)]
+	public void NoradNumber_Alpha5_ParsedCorrectly(string catalogNumber, uint expectedNoradNumber)
+	{
+		// Arrange
+		var line1 = "1 " + catalogNumber + TestConstants.IssLine1.Substring(7);
+		var line2 = "2 " + catalogNumber + TestConstants.IssLine2.Substring(7);
+
+		// Act
+		var tle = new Tle(line1, line2);
+
+		// Assert
+		Assert.AreEqual(expectedNoradNumber, tle.NoradNumber);
+	}
+
+	/// <summary>
+	/// Verifies catalog numbers that are not Alpha-5 throw TleException (I and O are not used, lowercase is not allowed).
+	/// </summary>
+	[TestMethod]
+	[DataRow("I0000")]
+	[DataRow("O0000")]
+	[DataRow("a0000")]
+	[DataRow("AB123")]
+	[DataRow("A 123")]
+	[DataRow("A000-")]
+	public void NoradNumber_InvalidAlpha5_ThrowsTleException(string catalogNumber)
+	{
+		// Arrange
+		var line1 = "1 " + catalogNumber + TestConstants.IssLine1.Substring(7);
+		var line2 = "2 " + catalogNumber + TestConstants.IssLine2.Substring(7);
+
+		// Act & Assert
+		Assert.ThrowsExactly<TleException>(() => new Tle(line1, line2));
+	}
+
+	/// <summary>
+	/// Verifies an Alpha-5 element set from issue #35 parses.
+	/// </summary>
+	[TestMethod]
+	public void Alpha5_Saramago_ParsesCorrectly()
+	{
+		// Arrange
+		const string line1 = "1 A0000U 26067CY  26195.90649229  .00004770  00000+0  22159-3 0  9994";
+		const string line2 = "2 A0000  97.4593 154.0970 0005590 270.5113  89.5482 15.20467281 15911";
+
+		// Act
+		var tle = new Tle("SARAMAGO", line1, line2);
+
+		// Assert
+		Assert.AreEqual(100000u, tle.NoradNumber);
+		Assert.AreEqual("26067CY ", tle.IntDesignator);
+		Assert.AreEqual(15.20467281, tle.MeanMotionRevPerDay, TestConstants.AngleTolerance);
+	}
 }

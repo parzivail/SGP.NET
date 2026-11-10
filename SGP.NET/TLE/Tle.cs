@@ -327,9 +327,9 @@ public class Tle
 		if (Line2[0] != '2')
 			throw new TleException("Invalid line beginning for line two");
 
-		ExtractInteger(Line1.Substring(Tle1ColNoradnum,
+		ExtractNoradNumber(Line1.Substring(Tle1ColNoradnum,
 			Tle1LenNoradnum), out var satNumber1);
-		ExtractInteger(Line2.Substring(Tle2ColNoradnum,
+		ExtractNoradNumber(Line2.Substring(Tle2ColNoradnum,
 			Tle2LenNoradnum), out var satNumber2);
 
 		if (satNumber1 != satNumber2)
@@ -402,6 +402,33 @@ public class Tle
 			}
 
 		val = !foundDigit ? 0 : temp;
+	}
+
+	private static void ExtractNoradNumber(string str, out uint val)
+	{
+		var first = str[0];
+		if (first < 'A' || first > 'Z' || first == 'I' || first == 'O')
+		{
+			ExtractInteger(str, out val);
+			return;
+		}
+
+		// Alpha-5: the letters A-Z, skipping I and O, stand for 10-33, so A0000 is 100000 and Z9999 is 339999
+		var lead = (uint)(first - 'A' + 10);
+		if (first > 'I')
+			lead--;
+		if (first > 'O')
+			lead--;
+
+		uint temp = 0;
+		for (var i = 1; i != str.Length; ++i)
+		{
+			if (str[i] < '0' || str[i] > '9')
+				throw new TleException("Invalid character");
+			temp = temp * 10 + (uint)(str[i] - '0');
+		}
+
+		val = lead * 10000 + temp;
 	}
 
 	private static void ExtractDouble(string str, int pointPos, out double val)
