@@ -489,6 +489,18 @@ public class Tle
 	/// <inheritdoc />
 	protected bool Equals(Tle other)
 	{
+		if (Line1 is null || Line2 is null || other.Line1 is null || other.Line2 is null)
+		{
+			return Line1 is null && Line2 is null && other.Line1 is null && other.Line2 is null &&
+				   NoradNumber == other.NoradNumber && string.Equals(IntDesignator, other.IntDesignator) &&
+				   Epoch.Equals(other.Epoch) && _meanMotionDt2.Equals(other._meanMotionDt2) &&
+				   _meanMotionDdt6.Equals(other._meanMotionDdt6) && _bstar.Equals(other._bstar) &&
+				   _inclination.Equals(other._inclination) && _rightAscendingNode.Equals(other._rightAscendingNode) &&
+				   _eccentricity.Equals(other._eccentricity) && _argumentPerigee.Equals(other._argumentPerigee) &&
+				   _meanAnomaly.Equals(other._meanAnomaly) && _meanMotion.Equals(other._meanMotion) &&
+				   _orbitNumber == other._orbitNumber;
+		}
+
 		return string.Equals(Line1, other.Line1) && string.Equals(Line2, other.Line2);
 	}
 
@@ -505,6 +517,23 @@ public class Tle
 	{
 		unchecked
 		{
+			if (Line1 is null || Line2 is null)
+			{
+				var hashCode = NoradNumber.GetHashCode();
+				hashCode = (hashCode * 397) ^ (IntDesignator is not null ? IntDesignator.GetHashCode() : 0);
+				hashCode = (hashCode * 397) ^ Epoch.GetHashCode();
+				hashCode = (hashCode * 397) ^ _meanMotionDt2.GetHashCode();
+				hashCode = (hashCode * 397) ^ _meanMotionDdt6.GetHashCode();
+				hashCode = (hashCode * 397) ^ _bstar.GetHashCode();
+				hashCode = (hashCode * 397) ^ _inclination.GetHashCode();
+				hashCode = (hashCode * 397) ^ _rightAscendingNode.GetHashCode();
+				hashCode = (hashCode * 397) ^ _eccentricity.GetHashCode();
+				hashCode = (hashCode * 397) ^ _argumentPerigee.GetHashCode();
+				hashCode = (hashCode * 397) ^ _meanAnomaly.GetHashCode();
+				hashCode = (hashCode * 397) ^ _meanMotion.GetHashCode();
+				return (hashCode * 397) ^ _orbitNumber.GetHashCode();
+			}
+
 			return (Line1.GetHashCode() * 397) ^ Line2.GetHashCode();
 		}
 	}

@@ -1,6 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SGPdotNET.Exception;
+using SGPdotNET.Parsers;
 using SGPdotNET.TLE;
 
 namespace SGPdotNET.Tests;
@@ -396,6 +397,43 @@ public sealed class TleParsingTests
 
 		// Act & Assert
 		Assert.IsTrue(tle1 == tle2);
+		Assert.AreEqual(tle1.GetHashCode(), tle2.GetHashCode());
+	}
+
+	/// <summary>
+	/// Verifies OMM-backed TLE equality distinguishes different orbital data.
+	/// </summary>
+	[TestMethod]
+	public void OmmEquality_UsesOrbitalElements()
+	{
+		// Arrange
+		var epoch = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Utc);
+		var tle1 = new Tle(new OmmData { NoradCatID = 25544, Epoch = epoch, MeanMotion = 15.5 });
+		var sameTle = new Tle(new OmmData { NoradCatID = 25544, Epoch = epoch, MeanMotion = 15.5 });
+		var differentTle = new Tle(new OmmData { NoradCatID = 25544, Epoch = epoch, MeanMotion = 15.6 });
+
+		// Assert
+		Assert.IsTrue(tle1.Equals(sameTle));
+		Assert.IsFalse(tle1.Equals(differentTle));
+	}
+
+	/// <summary>
+	/// Verifies equal OMM-backed TLEs produce the same hash code without throwing.
+	/// </summary>
+	[TestMethod]
+	public void OmmGetHashCode_IsConsistentForEqualTles()
+	{
+		// Arrange
+		var omm = new OmmData
+		{
+			NoradCatID = 25544,
+			Epoch = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Utc),
+			MeanMotion = 15.5
+		};
+		var tle1 = new Tle(omm);
+		var tle2 = new Tle(omm);
+
+		// Assert
 		Assert.AreEqual(tle1.GetHashCode(), tle2.GetHashCode());
 	}
 
