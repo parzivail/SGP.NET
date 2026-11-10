@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -370,6 +371,136 @@ public sealed class OmmKvnParserTests
 		// Assert
 		Assert.HasCount(1, data);
 		Assert.IsNull(data[0].CreationDate);
+	}
+
+	/// <summary>
+	/// Verifies a day-of-year epoch (YYYY-DDDThh:mm:ss[.d][Z], CCSDS 502.0-B-3 7.5.10) parsed correctly.
+	/// </summary>
+	[TestMethod]
+	[DataRow("1998-324T06:49:59.999808Z", "1998-11-20T06:49:59.9998080Z")]
+	[DataRow("2026-140T08:56:33.249984", "2026-05-20T08:56:33.2499840Z")]
+	[DataRow("2026-001T00:00:00", "2026-01-01T00:00:00.0000000Z")]
+	[DataRow("2026-012T00:00:00Z", "2026-01-12T00:00:00.0000000Z")]
+	[DataRow("2024-366T23:59:59.5", "2024-12-31T23:59:59.5000000Z")]
+	public void DayOfYearEpoch_ParsedCorrectly(string epoch, string expectedEpoch)
+	{
+		// Arrange
+		var kvn = Kvn(epoch, "14.46");
+
+		// Act
+		var data = new OmmKvnParser().Parse(kvn);
+
+		// Assert
+		Assert.HasCount(1, data);
+		Assert.AreEqual(DateTime.Parse(expectedEpoch, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind), data[0].Epoch);
+		Assert.AreEqual(DateTimeKind.Utc, data[0].Epoch.Kind);
+	}
+
+	/// <summary>
+	/// Verifies a day-of-year epoch outside the year or day throws FormatException.
+	/// </summary>
+	[TestMethod]
+	[DataRow("2026-000T00:00:00")]
+	[DataRow("2026-366T00:00:00")]
+	[DataRow("2026-012T24:00:00")]
+	public void DayOfYearEpoch_Invalid_ThrowsFormatException(string epoch)
+	{
+		// Arrange
+		var kvn = Kvn(epoch, "14.46");
+
+		// Act & Assert
+		Assert.ThrowsExactly<FormatException>(() => new OmmKvnParser().Parse(kvn));
+	}
+
+	/// <summary>
+	/// Verifies units in square brackets after a value (CCSDS 502.0-B-3 7.7.1.1) are ignored.
+	/// </summary>
+	[TestMethod]
+	public void UnitsInBrackets_Ignored()
+	{
+		// Arrange
+		const string kvn = "CCSDS_OMM_VERS = 2.0\n"
+				  + "OBJECT_NAME    = TEST\n"
+				  + "EPOCH          = 2026-05-20T08:56:33.249984\n"
+				  + "MEAN_MOTION    = 16.05064833 [rev/day]\n"
+				  + "ECCENTRICITY   = .004\n"
+				  + "INCLINATION    = 25.0 [deg]\n"
+				  + "RA_OF_ASC_NODE = 19.3 [deg]\n"
+				  + "ARG_OF_PERICENTER = 203.4 [deg]\n"
+				  + "MEAN_ANOMALY   = 317.8   [deg]\n"
+				  + "EPHEMERIS_TYPE = 0\n"
+				  + "CLASSIFICATION_TYPE = U\n"
+				  + "NORAD_CAT_ID   = 22490\n"
+				  + "ELEMENT_SET_NO = 999\n"
+				  + "REV_AT_EPOCH   = 75708\n"
+				  + "BSTAR          = .36E-4 [1/ER]\n"
+				  + "MEAN_MOTION_DOT = -.32E-5 [rev/day**2]\n"
+				  + "MEAN_MOTION_DDOT = 0 [rev/day**3]\n";
+
+		// Act
+		var data = new OmmKvnParser().Parse(kvn);
+
+		// Assert
+		Assert.HasCount(1, data);
+		Assert.AreEqual(16.05064833, data[0].MeanMotion, TestConstants.AngleTolerance);
+		Assert.AreEqual(25.0, data[0].Inclination, TestConstants.AngleTolerance);
+		Assert.AreEqual(19.3, data[0].RAOfAscNode, TestConstants.AngleTolerance);
+		Assert.AreEqual(203.4, data[0].ArgOfPericenter, TestConstants.AngleTolerance);
+		Assert.AreEqual(317.8, data[0].MeanAnomaly, TestConstants.AngleTolerance);
+		Assert.AreEqual(.36E-4, data[0].BStar, TestConstants.AngleTolerance);
+		Assert.AreEqual(-.32E-5, data[0].MeanMotionDot, TestConstants.AngleTolerance);
+		Assert.AreEqual(0.0, data[0].MeanMotionDDot, TestConstants.AngleTolerance);
+	}
+
+	/// <summary>
+	/// Verifies a text value ending in brackets, such as an object name, is kept as it is.
+	/// </summary>
+	[TestMethod]
+	public void ObjectNameWithBrackets_Unchanged()
+	{
+		// Arrange
+		var kvn = Kvn("2026-05-20T08:56:33.249984", "14.46").Replace("OBJECT_NAME    = TEST", "OBJECT_NAME    = STARLINK-1234 [DTC]");
+
+		// Act
+		var data = new OmmKvnParser().Parse(kvn);
+
+		// Assert
+		Assert.HasCount(1, data);
+		Assert.AreEqual("STARLINK-1234 [DTC]", data[0].ObjectName);
+	}
+
+	/// <summary>
+	/// Verifies units not separated from the value by a blank throw FormatException.
+	/// </summary>
+	[TestMethod]
+	public void UnitsWithoutBlank_ThrowsFormatException()
+	{
+		// Arrange
+		var kvn = Kvn("2026-05-20T08:56:33.249984", "16.05064833[rev/day]");
+
+		// Act & Assert
+		Assert.ThrowsExactly<FormatException>(() => new OmmKvnParser().Parse(kvn));
+	}
+
+	private static string Kvn(string epoch, string meanMotion)
+	{
+		return "CCSDS_OMM_VERS = 2.0\n"
+			   + "OBJECT_NAME    = TEST\n"
+			   + $"EPOCH          = {epoch}\n"
+			   + $"MEAN_MOTION    = {meanMotion}\n"
+			   + "ECCENTRICITY   = .004\n"
+			   + "INCLINATION    = 25.0\n"
+			   + "RA_OF_ASC_NODE = 19.3\n"
+			   + "ARG_OF_PERICENTER = 203.4\n"
+			   + "MEAN_ANOMALY   = 317.8\n"
+			   + "EPHEMERIS_TYPE = 0\n"
+			   + "CLASSIFICATION_TYPE = U\n"
+			   + "NORAD_CAT_ID   = 22490\n"
+			   + "ELEMENT_SET_NO = 999\n"
+			   + "REV_AT_EPOCH   = 75708\n"
+			   + "BSTAR          = .36E-4\n"
+			   + "MEAN_MOTION_DOT = .32E-5\n"
+			   + "MEAN_MOTION_DDOT = 0\n";
 	}
 }
 

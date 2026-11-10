@@ -972,6 +972,12 @@
         <member name="M:SGPdotNET.Parsers.OmmKvnParser.ParseFile(System.String)">
             <inheritdoc />
         </member>
+        <member name="M:SGPdotNET.Parsers.OmmKvnParser.StripUnits(System.String)">
+            <summary>
+            Removes units in square brackets after a numeric value, e.g. "16.05 [rev/day]" (CCSDS 502.0-B-3, 7.7.1.1).
+            Text values such as an object name ending in brackets are left as they are.
+            </summary>
+        </member>
         <member name="T:SGPdotNET.Parsers.OmmParserBase">
             <summary>
             Base class providing shared parsing utilities for all OMM format parsers.
@@ -1005,6 +1011,11 @@
         <member name="M:SGPdotNET.Parsers.OmmParserBase.ParseDateTime(System.String)">
             <summary>
             Parses an ISO 8601 date-time string to UTC DateTime.
+            </summary>
+        </member>
+        <member name="M:SGPdotNET.Parsers.OmmParserBase.TryParseDayOfYear(System.String,System.DateTime@)">
+            <summary>
+            Parses the day-of-year form YYYY-DDDThh:mm:ss[.d→d][Z] (CCSDS 502.0-B-3, 7.5.10) to UTC DateTime.
             </summary>
         </member>
         <member name="M:SGPdotNET.Parsers.OmmParserBase.IsValidForPropagation(SGPdotNET.Parsers.OmmData)">

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace SGPdotNET.Parsers;
 
@@ -189,7 +190,39 @@ public abstract class OmmParserBase
 		if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var result))
 			return result;
 
+		if (TryParseDayOfYear(value, out result))
+			return result;
+
 		throw new FormatException($"Cannot parse date-time value: '{value}'");
+	}
+
+	private static readonly Regex DayOfYearDateTime = new Regex(@"^([0-9]{4})-([0-9]{3})T([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?Z?$", RegexOptions.CultureInvariant);
+
+	/// <summary>
+	/// Parses the day-of-year form YYYY-DDDThh:mm:ss[.d→d][Z] (CCSDS 502.0-B-3, 7.5.10) to UTC DateTime.
+	/// </summary>
+	private static bool TryParseDayOfYear(string value, out DateTime result)
+	{
+		result = DateTime.MinValue;
+
+		var match = DayOfYearDateTime.Match(value);
+		if (!match.Success)
+			return false;
+
+		var year = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+		var day = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+		var hour = int.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture);
+		var minute = int.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+		var second = int.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture);
+
+		if (year < 1 || day < 1 || day > (DateTime.IsLeapYear(year) ? 366 : 365) || hour > 23 || minute > 59 || second > 59)
+			return false;
+
+		var fraction = match.Groups[6].Value;
+		var ticks = fraction.Length == 0 ? 0 : long.Parse(fraction.PadRight(7, '0').Substring(0, 7), CultureInfo.InvariantCulture);
+
+		result = new DateTime(year, 1, 1, hour, minute, second, DateTimeKind.Utc).AddDays(day - 1).AddTicks(ticks);
+		return true;
 	}
 
 	/// <summary>

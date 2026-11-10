@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace SGPdotNET.Parsers;
@@ -36,7 +37,7 @@ public class OmmKvnParser : OmmParserBase, IOmmParser
 
 			var eqIndex = line.IndexOf('=');
 			var key = line.Substring(0, eqIndex).Trim();
-			var value = line.Substring(eqIndex + 1).Trim();
+			var value = StripUnits(line.Substring(eqIndex + 1).Trim());
 
 			if (string.Equals(key, "CCSDS_OMM_VERS", StringComparison.OrdinalIgnoreCase) && currentDict.Count > 0)
 			{
@@ -71,5 +72,22 @@ public class OmmKvnParser : OmmParserBase, IOmmParser
 	{
 		using var reader = File.OpenText(path);
 		return Parse(reader);
+	}
+
+	/// <summary>
+	/// Removes units in square brackets after a numeric value, e.g. "16.05 [rev/day]" (CCSDS 502.0-B-3, 7.7.1.1).
+	/// Text values such as an object name ending in brackets are left as they are.
+	/// </summary>
+	private static string StripUnits(string value)
+	{
+		if (!value.EndsWith("]", StringComparison.Ordinal))
+			return value;
+
+		var open = value.LastIndexOf('[');
+		if (open < 1 || !char.IsWhiteSpace(value[open - 1]))
+			return value;
+
+		var number = value.Substring(0, open).TrimEnd();
+		return double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out _) ? number : value;
 	}
 }
