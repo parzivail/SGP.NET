@@ -963,6 +963,11 @@
             Parses OMM data from KVN format. Blocks are separated by blank lines.
             </summary>
         </member>
+        <member name="F:SGPdotNET.Parsers.OmmKvnParser.NumericFields">
+            <summary>
+            OMM fields whose values are numeric and may include units.
+            </summary>
+        </member>
         <member name="M:SGPdotNET.Parsers.OmmKvnParser.Parse(System.String)">
             <inheritdoc />
         </member>
