@@ -453,20 +453,22 @@ public sealed class OmmKvnParserTests
 	}
 
 	/// <summary>
-	/// Verifies a text value ending in brackets, such as an object name, is kept as it is.
+	/// Verifies text values ending in brackets, including numeric-looking names, are kept as they are.
 	/// </summary>
 	[TestMethod]
-	public void ObjectNameWithBrackets_Unchanged()
+	[DataRow("STARLINK-1234 [DTC]")]
+	[DataRow("123 [DTC]")]
+	public void ObjectNameWithBrackets_Unchanged(string objectName)
 	{
 		// Arrange
-		var kvn = Kvn("2026-05-20T08:56:33.249984", "14.46").Replace("OBJECT_NAME    = TEST", "OBJECT_NAME    = STARLINK-1234 [DTC]");
+		var kvn = Kvn("2026-05-20T08:56:33.249984", "14.46").Replace("OBJECT_NAME    = TEST", $"OBJECT_NAME    = {objectName}");
 
 		// Act
 		var data = new OmmKvnParser().Parse(kvn);
 
 		// Assert
 		Assert.HasCount(1, data);
-		Assert.AreEqual("STARLINK-1234 [DTC]", data[0].ObjectName);
+		Assert.AreEqual(objectName, data[0].ObjectName);
 	}
 
 	/// <summary>

@@ -10,6 +10,26 @@ namespace SGPdotNET.Parsers;
 /// </summary>
 public class OmmKvnParser : OmmParserBase, IOmmParser
 {
+	/// <summary>
+	/// OMM fields whose values are numeric and may include units.
+	/// </summary>
+	private static readonly HashSet<string> NumericFields = new(StringComparer.OrdinalIgnoreCase)
+	{
+		"ARG_OF_PERICENTER",
+		"BSTAR",
+		"ECCENTRICITY",
+		"ELEMENT_SET_NO",
+		"EPHEMERIS_TYPE",
+		"INCLINATION",
+		"MEAN_ANOMALY",
+		"MEAN_MOTION",
+		"MEAN_MOTION_DDOT",
+		"MEAN_MOTION_DOT",
+		"NORAD_CAT_ID",
+		"RA_OF_ASC_NODE",
+		"REV_AT_EPOCH"
+	};
+
 	/// <inheritdoc />
 	public List<OmmData> Parse(string content)
 	{
@@ -37,7 +57,9 @@ public class OmmKvnParser : OmmParserBase, IOmmParser
 
 			var eqIndex = line.IndexOf('=');
 			var key = line.Substring(0, eqIndex).Trim();
-			var value = StripUnits(line.Substring(eqIndex + 1).Trim());
+			var value = line.Substring(eqIndex + 1).Trim();
+			if (NumericFields.Contains(key))
+				value = StripUnits(value);
 
 			if (string.Equals(key, "CCSDS_OMM_VERS", StringComparison.OrdinalIgnoreCase) && currentDict.Count > 0)
 			{
