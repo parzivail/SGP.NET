@@ -14,7 +14,28 @@ public sealed class ObservationTests
 {
 	private static readonly DateTime TestTime = new(2026, 5, 20, 22, 30, 0, DateTimeKind.Utc);
 
+	/// <summary>
+	/// QO-100 TLE line 1
+	/// </summary>
+	private const string QO100Line1 = "1 43700U 18090A   26301.98498903  .00000150  00000-0  00000-0 0  9990";
+
+	/// <summary>
+	/// QO-100 TLE line 2
+	/// </summary>
+	private const string QO100Line2 = "2 43700   0.0129 258.5524 0001591 350.2311 168.9273  1.00270275 29012";
+
 	private static string ExampleDir => Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "example_inputs");
+
+	/// <summary>
+	/// Estimates topocentric range rate by differentiating nearby range measurements.
+	/// </summary>
+	private static double EstimateRangeRate(GroundStation station, Satellite satellite, DateTime time)
+	{
+		const double intervalSeconds = 10.0;
+		var before = station.Observe(satellite, time.AddSeconds(-intervalSeconds)).Range;
+		var after = station.Observe(satellite, time.AddSeconds(intervalSeconds)).Range;
+		return (after - before) / (2.0 * intervalSeconds);
+	}
 
 	/// <summary>
 	/// Verifies GroundStation.Observe and Coordinate.Observe produce identical results
@@ -79,6 +100,61 @@ public sealed class ObservationTests
 
 		// Assert
 		Assert.AreEqual(directDistance, obs.Range, TestConstants.ObservationRangeToleranceKm, "Range should match ECI distance");
+	}
+
+	/// <summary>
+	/// Verifies QO-100 range rate against known reference and a finite difference of range at the TLE epoch.
+	/// </summary>
+	[TestMethod]
+	public void RangeRate_Qo100MatchesSkyfieldAndFiniteDifference()
+	{
+		var satellite = new Satellite(QO100Line1, QO100Line2);
+		var station = new GroundStation(new GeodeticCoordinate(Angle.FromDegrees(25.2854), Angle.FromDegrees(51.5310), 0));
+		var observation = station.Observe(satellite, satellite.Tle.Epoch);
+
+		// Reference: Skyfield 1.55 with python-sgp4 2.27 and a WGS-84 site at Doha.
+		Assert.AreEqual(0.000286871981, observation.RangeRate, 0.00001);
+		Assert.AreEqual(EstimateRangeRate(station, satellite, satellite.Tle.Epoch), observation.RangeRate, 0.000001);
+	}
+
+	/// <summary>
+	/// Verifies two Earth-fixed locations maintain constant range as Earth rotates.
+	/// </summary>
+	[TestMethod]
+	public void RangeRate_IsZeroBetweenEarthFixedLocations()
+	{
+		var time = new DateTime(2026, 10, 28, 23, 38, 23, DateTimeKind.Utc).AddMilliseconds(52.192);
+		var observer = new GeodeticCoordinate(Angle.FromDegrees(25.2854), Angle.FromDegrees(51.5310), 0);
+		var target = new GeodeticCoordinate(Angle.FromDegrees(0), Angle.FromDegrees(26), 35786);
+		var observation = observer.Observe(target.ToEci(time), time);
+
+		Assert.AreEqual(0, observation.RangeRate, 1e-12);
+	}
+
+	/// <summary>
+	/// Verifies range rate for a LEO satellite matches the finite-difference range derivative.
+	/// </summary>
+	[TestMethod]
+	public void RangeRate_IssMatchesFiniteDifference()
+	{
+		var satellite = new Satellite(TestConstants.IssLine1, TestConstants.IssLine2);
+		var station = new GroundStation(new GeodeticCoordinate(
+			Angle.FromDegrees(28.3922), Angle.FromDegrees(-80.6077), 0));
+
+		Assert.AreEqual(EstimateRangeRate(station, satellite, TestTime), station.Observe(satellite, TestTime).RangeRate, 0.0001);
+	}
+
+	/// <summary>
+	/// Verifies the range-rate calculation remains correct when observer rotational velocity is zero.
+	/// </summary>
+	[TestMethod]
+	public void RangeRate_AtPoleMatchesFiniteDifference()
+	{
+		var satellite = new Satellite(QO100Line1, QO100Line2);
+		var station = new GroundStation(new GeodeticCoordinate(Angle.FromDegrees(90), Angle.Zero, 0));
+
+		Assert.AreEqual(EstimateRangeRate(station, satellite, satellite.Tle.Epoch),
+			station.Observe(satellite, satellite.Tle.Epoch).RangeRate, 0.000001);
 	}
 
 	/// <summary>

@@ -6,7 +6,7 @@ namespace SGPdotNET.Observation;
 
 /// <summary>
 ///     Computes azimuth, elevation, range, and range-rate directly from
-///     geodetic observer parameters and an ECI target position
+///     geodetic observer parameters and an ECI target state
 /// </summary>
 public static class TopocentricCalculator
 {
@@ -22,7 +22,7 @@ public static class TopocentricCalculator
 	/// <param name="azimuth">Output: azimuth in radians [0, 2π).</param>
 	/// <param name="elevation">Output: elevation in radians [-π/2, π/2].</param>
 	/// <param name="rangeKm">Output: slant range in km.</param>
-	/// <param name="rangeRateKmPerSec">Output: range rate in km/s.</param>
+	/// <param name="rangeRateKmPerSec">Output: range rate relative to the rotating observer in km/s.</param>
 	public static void ComputeTopocentric(
 		double observerLatRad,
 		double observerLonRad,
@@ -73,8 +73,13 @@ public static class TopocentricCalculator
 
 		elevation = Math.Asin(topZ / rangeKm);
 
-		var velX = targetEciVel.X;
-		var velY = targetEciVel.Y;
+		// A fixed station still moves in ECI as Earth rotates, so range rate uses relative velocity.
+		const double earthRotationRate = SgpConstants.TwoPi * (SgpConstants.EarthRotationPerSiderealDay / SgpConstants.SecondsPerDay);
+		var observerVelX = -earthRotationRate * obsY;
+		var observerVelY = earthRotationRate * obsX;
+
+		var velX = targetEciVel.X - observerVelX;
+		var velY = targetEciVel.Y - observerVelY;
 		var velZ = targetEciVel.Z;
 
 		var topSdot = sinLat * cosTheta * velX

@@ -710,7 +710,7 @@
         <member name="T:SGPdotNET.Observation.TopocentricCalculator">
             <summary>
                 Computes azimuth, elevation, range, and range-rate directly from
-                geodetic observer parameters and an ECI target position
+                geodetic observer parameters and an ECI target state
             </summary>
         </member>
         <member name="M:SGPdotNET.Observation.TopocentricCalculator.ComputeTopocentric(System.Double,System.Double,System.Double,SGPdotNET.Util.Vector3,SGPdotNET.Util.Vector3,System.Double,System.Double@,System.Double@,System.Double@,System.Double@)">
@@ -726,7 +726,7 @@
             <param name="azimuth">Output: azimuth in radians [0, 2π).</param>
             <param name="elevation">Output: elevation in radians [-π/2, π/2].</param>
             <param name="rangeKm">Output: slant range in km.</param>
-            <param name="rangeRateKmPerSec">Output: range rate in km/s.</param>
+            <param name="rangeRateKmPerSec">Output: range rate relative to the rotating observer in km/s.</param>
         </member>
         <member name="M:SGPdotNET.Observation.TopocentricCalculator.ComputeTopocentricStatic(System.Double,System.Double,System.Double,SGPdotNET.Util.Vector3,System.Double,System.Double@,System.Double@,System.Double@)">
             <summary>
